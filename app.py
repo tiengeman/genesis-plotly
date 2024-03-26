@@ -8,7 +8,7 @@ lista_cc = lista_centro_custo()
 
 # Part 1: ui ----
 app_ui = ui.page_fluid(
-    ui.h2("Medido X Faturado"),
+    ui.h2("test"),
     #lista suspensa
     ui.input_selectize("x1", "Selecione o CC", lista_cc),
     #plot do gráfico
