@@ -2,33 +2,61 @@ import pandas as pd
 from google.cloud import bigquery
 from google.oauth2 import service_account
 
-credentials = service_account.Credentials.from_service_account_file(filename='keys.json',
-                                                                    scopes=["https://www.googleapis.com/auth/cloud-platform"])
+#cria o df para cada aba da planilha de dados
+def receitas():
+    df_receitas = pd.read_excel(r"C:\Users\eduardo.teles\Documents\genesis\tabelas sql (sistema custos).xlsx", sheet_name='cad-receitas')
+    return df_receitas
 
-def lista_centro_custo(credentials=credentials):
-    query_cc = """SELECT DISTINCT string_field_0 FROM `custos-404821.Geral.cad-receitas3` WHERE string_field_0 IS NOT NULL"""
-    lista = pd.read_gbq(query_cc, credentials=credentials)
-    lista_cc = list(lista['string_field_0'])
-    lista_cc.remove('PINTURA"')
-    lista_cc.remove("R$ 6.340")
-    lista_cc.remove("R$ 11.109")
-    lista_cc.remove("R$ 16.062")
-    lista_cc.remove("R$ 34.683")
-    lista_cc.remove("R$ 35.721")
-    lista_cc.remove("R$ 62.538")
-    lista_cc.remove('SUPERVISOR "')
-    lista_cc.remove('PINTOR OFFSHORE"')
-    lista_cc.remove('Caldeiraria e Solda"')
-    lista_cc.remove('SERVIÇO TEC. SEGURANÇA"')
+def despesasrel():
+    df_despesasrel = pd.read_excel(r"C:\Users\eduardo.teles\Documents\genesis\tabelas sql (sistema custos).xlsx", sheet_name='cad-despesasrel')
+    return df_despesasrel
 
-    return lista_cc
+def despesasfin():
+    df_despesasfin = pd.read_excel(r"C:\Users\eduardo.teles\Documents\genesis\tabelas sql (sistema custos).xlsx", sheet_name='cad-despesasfin')
+    return df_despesasfin
 
-def medidofaturado(cc, credentials=credentials):
-    columns = ['CONTRATO', 'COMPETENCIA', 'MEDIDO', 'FATURADO']
-    query = f"""SELECT string_field_1, string_field_4, string_field_7, string_field_20
-                FROM 
-                `custos-404821.Geral.cad-receitas3` WHERE string_field_0 = '{cc}'"""
+def despesasfol():
+    df_despesasfol = pd.read_excel(r"C:\Users\eduardo.teles\Documents\genesis\tabelas sql (sistema custos).xlsx", sheet_name='cad-despesasfol')
+    return df_despesasfol
 
-    df = pd.read_gbq(query, credentials=credentials)
-    df.columns = columns
+def filiais():
+    df_filiais = pd.read_excel(r"C:\Users\eduardo.teles\Documents\genesis\tabelas sql (sistema custos).xlsx", sheet_name='cad-filiais')
+    return df_filiais
+
+def projetos():
+    df_projetos = pd.read_excel(r"C:\Users\eduardo.teles\Documents\genesis\tabelas sql (sistema custos).xlsx", sheet_name='cad-projetos')
+    return df_projetos
+
+def premissas():
+    df_premissas = pd.read_excel(r"C:\Users\eduardo.teles\Documents\genesis\tabelas sql (sistema custos).xlsx", sheet_name='cad-premissas')
+    return df_premissas
+
+def orcamentos():
+    df_orcamentos = pd.read_excel(r"C:\Users\eduardo.teles\Documents\genesis\tabelas sql (sistema custos).xlsx", sheet_name='cad-orcamentos')
+    return df_orcamentos
+
+def impostos():
+    df_impostos = pd.read_excel(r"C:\Users\eduardo.teles\Documents\genesis\tabelas sql (sistema custos).xlsx", sheet_name='cad-impostos')
+    return df_impostos
+
+def tabela():
+    list_contratos = list(projetos()['descricao-projeto'])
+    list_cc = list(projetos()['codigo-projeto'])
+    list_local = [None]*len(list_contratos)
+    list_inativo = [None]*len(list_contratos)
+    list_filial = [None]*len(list_contratos)
+    list_medicao = [None]*len(list_contratos)
+    list_despesas = [None]*len(list_contratos)
+    list_lucro = [None]*len(list_contratos)
+    list_perc = [None]*len(list_contratos)
+    df = pd.DataFrame.from_dict(data={'LOCAL':list_local, 
+                                      'CONTRATO':list_contratos, 
+                                      'C.CUSTOS':list_cc, 
+                                      'INATIVO':list_inativo,
+                                      'FILIAL':list_filial, 
+                                      '(R) MEDIÇÃO':list_medicao, 
+                                      '(D) DESPESAS':list_despesas, 
+                                      '(R-D) LUCRO':list_lucro, 
+                                      '%':list_perc})
+    
     return df
