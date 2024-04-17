@@ -1,6 +1,4 @@
 import pandas as pd
-from google.cloud import bigquery
-from google.oauth2 import service_account
 
 #cria o df para cada aba da planilha de dados
 def receitas():
