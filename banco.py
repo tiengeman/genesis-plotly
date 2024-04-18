@@ -38,6 +38,8 @@ def impostos():
     return df_impostos
 
 def tabela():
+    lista_remove_contrato = ["INVESTIMENTOS (CONTRATOS)", "EXPANSÃO - FILIAL MACAÉ", "EXPANSÃO - MATRIZ RECIFE", "DEPÓSITO JUDICIAIS", "ENGEMAN TECNOLOGIAS"]
+    lista_remove_cc = ['888', '2180', '2250', '1111', '1930']
     list_contratos = list(projetos()['descricao-projeto'])
     list_cc = list(projetos()['codigo-projeto'])
     list_local = [None]*len(list_contratos)
@@ -47,6 +49,9 @@ def tabela():
     list_despesas = [None]*len(list_contratos)
     list_lucro = [None]*len(list_contratos)
     list_perc = [None]*len(list_contratos)
+    list_medicao_total = [None]*len(list_contratos)
+    list_desp_totais = [None]*len(list_contratos)
+    list_lucro_total = [None]*len(list_contratos)
     df = pd.DataFrame.from_dict(data={'LOCAL':list_local, 
                                       'CONTRATO':list_contratos, 
                                       'C.CUSTOS':list_cc, 
@@ -55,6 +60,37 @@ def tabela():
                                       '(R) MEDIÇÃO':list_medicao, 
                                       '(D) DESPESAS':list_despesas, 
                                       '(R-D) LUCRO':list_lucro, 
-                                      '%':list_perc})
+                                      '%':list_perc,
+                                      'MEDIÇÃO TOTAL': list_medicao_total,
+                                      'DESPESAS TOTAIS': list_desp_totais,
+                                      'LUCRO TOTAL': list_lucro_total})
+    
+    return df
+
+def tabela_2():
+    lista_remove_contrato = ["INVESTIMENTOS (CONTRATOS)", "EXPANSÃO - FILIAL MACAÉ", "EXPANSÃO - MATRIZ RECIFE", "DEPÓSITO JUDICIAIS", "ENGEMAN TECNOLOGIAS"]
+    lista_remove_cc = ['888', '2180', '2250', '1111', '1930']
+    list_local = [None]*len(lista_remove_contrato)
+    list_inativo = [None]*len(lista_remove_contrato)
+    list_filial = [None]*len(lista_remove_contrato)
+    list_medicao = [None]*len(lista_remove_contrato)
+    list_despesas = [None]*len(lista_remove_contrato)
+    list_lucro = [None]*len(lista_remove_contrato)
+    list_perc = [None]*len(lista_remove_contrato)
+    list_medicao_total = [None]*len(lista_remove_contrato)
+    list_desp_totais = [None]*len(lista_remove_contrato)
+    list_lucro_total = [None]*len(lista_remove_contrato)
+    df = pd.DataFrame.from_dict(data={'LOCAL':list_local, 
+                                      'CONTRATO':lista_remove_contrato, 
+                                      'C.CUSTOS':lista_remove_cc, 
+                                      'INATIVO':list_inativo,
+                                      'FILIAL':list_filial, 
+                                      '(R) MEDIÇÃO':list_medicao, 
+                                      '(D) DESPESAS':list_despesas, 
+                                      '(R-D) LUCRO':list_lucro, 
+                                      '%':list_perc,
+                                      'MEDIÇÃO TOTAL': list_medicao_total,
+                                      'DESPESAS TOTAIS': list_desp_totais,
+                                      'LUCRO TOTAL': list_lucro_total})
     
     return df
