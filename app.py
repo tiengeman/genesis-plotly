@@ -9,14 +9,12 @@ with ui.sidebar(open="closed", bg="#FF4500"):
 
 ui.input_selectize(
         "var", "Selecione a competencia:",
-        ["01/2024", "02/2024", "03/2024", "04/2024", "05/2024"]
+        ["dezembro/2023","janeiro/2024", "fevereiro/2024", "março/2024", "abril/2024"]
     )
 
-# with ui.card(full_screen=True):
 @render.data_frame  
 def data_df():
-    #passa o valor do input na função tabela input.var()
-    df = tabela()
+    df = tabela(input.var())
     return render.DataGrid(df, summary=False, row_selection_mode="single", width="2000px", height="3550px")
 
 @render.data_frame  

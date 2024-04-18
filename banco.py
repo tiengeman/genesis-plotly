@@ -1,4 +1,5 @@
 import pandas as pd
+import back.queries
 
 #cria o df para cada aba da planilha de dados
 def receitas():
@@ -37,27 +38,24 @@ def impostos():
     df_impostos = pd.read_excel(r"C:\Users\eduardo.teles\Documents\genesis\tabelas sql (sistema custos).xlsx", sheet_name='cad-impostos')
     return df_impostos
 
-def tabela():
-    lista_remove_contrato = ["INVESTIMENTOS (CONTRATOS)", "EXPANSÃO - FILIAL MACAÉ", "EXPANSÃO - MATRIZ RECIFE", "DEPÓSITO JUDICIAIS", "ENGEMAN TECNOLOGIAS"]
-    lista_remove_cc = ['888', '2180', '2250', '1111', '1930']
-    list_contratos = list(projetos()['descricao-projeto'])
-    list_cc = list(projetos()['codigo-projeto'])
-    list_local = [None]*len(list_contratos)
-    list_inativo = [None]*len(list_contratos)
-    list_filial = [None]*len(list_contratos)
-    list_medicao = [None]*len(list_contratos)
-    list_despesas = [None]*len(list_contratos)
-    list_lucro = [None]*len(list_contratos)
-    list_perc = [None]*len(list_contratos)
-    list_medicao_total = [None]*len(list_contratos)
-    list_desp_totais = [None]*len(list_contratos)
-    list_lucro_total = [None]*len(list_contratos)
+def tabela(mes):
+    lista_contrato, lista_soma_comp = back.queries.medicao(back.db, mes)
+    list_cc = [None]*len(lista_contrato)
+    list_local = [None]*len(lista_contrato)
+    list_inativo = [None]*len(lista_contrato)
+    list_filial = [None]*len(lista_contrato)
+    list_despesas = [None]*len(lista_contrato)
+    list_lucro = [None]*len(lista_contrato)
+    list_perc = [None]*len(lista_contrato)
+    list_medicao_total = [None]*len(lista_contrato)
+    list_desp_totais = [None]*len(lista_contrato)
+    list_lucro_total = [None]*len(lista_contrato)
     df = pd.DataFrame.from_dict(data={'LOCAL':list_local, 
-                                      'CONTRATO':list_contratos, 
+                                      'CONTRATO':lista_contrato, 
                                       'C.CUSTOS':list_cc, 
                                       'INATIVO':list_inativo,
                                       'FILIAL':list_filial, 
-                                      '(R) MEDIÇÃO':list_medicao, 
+                                      '(R) MEDIÇÃO':lista_soma_comp, 
                                       '(D) DESPESAS':list_despesas, 
                                       '(R-D) LUCRO':list_lucro, 
                                       '%':list_perc,
