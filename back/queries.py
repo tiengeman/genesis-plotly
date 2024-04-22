@@ -1,10 +1,11 @@
 import pandas as pd
-import banco_teste
+import back.banco_teste
+from datetime import datetime
 # from banco import client, DB_NAME,COLLECTION_NAME
 
 
 # Pega o nome dos contratos
-def pega_contratos(db):
+def pega_contratos(db=back.db):
     lista_desc = []
     lista_projs = []
 
@@ -30,7 +31,7 @@ def pega_contratos(db):
     return desc
 
 
-def total_despesa(db):
+def total_despesa(db=back.db):
 
     soma_total = 0
     colecao_despesa_financeiro = db.get_collection('Despesas Financeiro')
@@ -75,7 +76,7 @@ def total_despesa(db):
     return lista_final
 
 
-def medicao(db,competencia):
+def medicao(competencia, db=back.db):
 
     colecao_medicao = db.get_collection('Receitas')
 
@@ -99,7 +100,7 @@ def medicao(db,competencia):
 
     return lista_descricao_projeto,lista_total_medicao,lista_centro_de_custo
 
-def medicao_total(db):
+def medicao_total(db=back.db):
 
     colecao_med_total = db.get_collection('Receitas')
 
@@ -122,13 +123,51 @@ def medicao_total(db):
     return lista_descricao_projeto,lista_total_medicao,lista_centro_de_custo 
 
 # função para retornar uma lista com todas as medições(pelos menos todas as presentes na aba de cad-receitas)
-def competencias(db):
+def competencias(db=back.db):
     colecao_competencia = db.get_collection('Receitas')
 
     filtro = colecao_competencia.distinct('competencia-medicao')
+    comp = ordenar_datas(list(filtro))
 
-    return list(filtro)
+    return comp
 
-a= competencias(banco_teste.db)
+def ordenar_datas(lista):
+    # Define um dicionário para mapear os meses para seus números correspondentes
+    meses = {
+        'janeiro': 1,
+        'fevereiro': 2,
+        'março': 3,
+        'abril': 4,
+        'maio': 5,
+        'junho': 6,
+        'julho': 7,
+        'agosto': 8,
+        'setembro': 9,
+        'outubro': 10,
+        'novembro': 11,
+        'dezembro': 12
+    }
+    # Converte cada elemento da lista para um formato que possa ser ordenado facilmente
+    lista_formatada = [(int(ano), meses[mes], 1) for mes, ano in [data.split('/') for data in lista]]
+    # Ordena as datas formatadas
+    lista_ordenada = sorted(lista_formatada)
+    # Converte as datas ordenadas de volta para o formato original
+    lista_ordenada = [f"{datetime(ano, mes, dia).strftime('%B').lower()}/{ano}" for ano, mes, dia in lista_ordenada]
+    # Substitui os nomes dos meses de inglês para português
+    meses_pt = {
+        'january': 'janeiro',
+        'february': 'fevereiro',
+        'march': 'março',
+        'april': 'abril',
+        'may': 'maio',
+        'june': 'junho',
+        'july': 'julho',
+        'august': 'agosto',
+        'september': 'setembro',
+        'october': 'outubro',
+        'november': 'novembro',
+        'december': 'dezembro'
+    }
+    lista_ordenada = [data.replace(datetime.strptime(data.split('/')[0], '%B').strftime('%B').lower(), meses_pt[datetime.strptime(data.split('/')[0], '%B').strftime('%B').lower()]) for data in lista_ordenada]
 
-print(a)
+    return lista_ordenada
