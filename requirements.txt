@@ -49,7 +49,6 @@ oauthlib==3.2.2
 openpyxl==3.0.10
 oracledb==1.4.2
 outcome==1.3.0.post0
-pandas @ file:///C:/b/abs_81b3npjrl8/croot/pandas_1697477219064/work/dist/pandas-2.1.1-cp311-cp311-win_amd64.whl#sha256=1732f3b07ba52119320a2b01aa09f2627f6258176e492b728daf60efb4f4d78e
 pandas-gbq==0.20.0
 patsy==0.5.3
 pefile==2023.2.7
