@@ -1,8 +1,3 @@
-aiobotocore @ file:///C:/b/abs_3cwz1w13nn/croot/aiobotocore_1701291550158/work
-aiohttp @ file:///C:/b/abs_bc6tmjiy12/croot/aiohttp_1701112585940/work
-aioitertools @ file:///tmp/build/80754af9/aioitertools_1607109665762/work
-aiosignal @ file:///tmp/build/80754af9/aiosignal_1637843061372/work
-alabaster @ file:///home/ktietz/src/ci/alabaster_1611921544520/work
 altgraph==0.17.4
 anaconda-anon-usage @ file:///C:/b/abs_f4tsjyl9va/croot/anaconda-anon-usage_1695310457827/work
 anaconda-catalogs @ file:///C:/b/abs_8btyy0o8s8/croot/anaconda-catalogs_1685727315626/work
