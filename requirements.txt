@@ -41,7 +41,6 @@ pep8==1.7.1
 ply==3.11
 proto-plus==1.23.0
 protobuf==4.25.1
-pyarrow==11.0.0
 pyasn1-modules==0.2.8
 PyAutoGUI==0.9.54
 pycurl==7.45.2
