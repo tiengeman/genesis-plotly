@@ -8,7 +8,6 @@ backports.weakref==1.0.post1
 bottle==0.12.25
 bottle-websocket==0.2.9
 cachetools==5.3.2
-clyent==1.2.1
 conda-verify==3.4.2
 constantly==15.1.0
 cssselect==1.1.0
