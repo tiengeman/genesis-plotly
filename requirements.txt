@@ -8,11 +8,7 @@ backports.weakref==1.0.post1
 bottle==0.12.25
 bottle-websocket==0.2.9
 cachetools==5.3.2
-conda-verify==3.4.2
-constantly==15.1.0
-cssselect==1.1.0
 cx-Oracle==8.3.0
-daal4py==2023.1.1
 dash==2.14.2
 dash-core-components==2.0.0
 dash-html-components==2.0.0
@@ -25,15 +21,6 @@ et-xmlfile==1.1.0
 fonttools==4.25.0
 gevent==23.9.1
 gevent-websocket==0.10.1
-google-api-core==2.15.0
-google-auth==2.25.2
-google-auth-oauthlib==1.2.0
-google-cloud-bigquery==3.14.1
-google-cloud-bigquery-storage==2.24.0
-google-cloud-core==2.4.1
-google-crc32c==1.5.0
-google-resumable-media==2.7.0
-googleapis-common-protos==1.62.0
 greenlet==3.0.1
 grpcio==1.60.0
 grpcio-status==1.60.0
