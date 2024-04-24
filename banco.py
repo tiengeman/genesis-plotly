@@ -1,7 +1,6 @@
 import pandas as pd
 import back.queries
 import back.banco_teste
-import locale
 
 #cria o df para cada aba da planilha de dados
 # def receitas():

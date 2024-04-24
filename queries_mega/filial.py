@@ -1,6 +1,5 @@
 import oracledb
 import pandas as pd
-import openpyxl
 
 
 def pega_filiais():
