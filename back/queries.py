@@ -38,6 +38,7 @@ def total_despesa(db=back.db):
     colecao_despesa_folha = db.get_collection('Despesas Folha')
     colecao_despesa_relatorio = db.get_collection('Despesas Relatório')
 
+    # filtros que agrupam os campos descricao-projeto e somam os valores de valor-original-despesa de cada contrato
     pipeline_financeiro =  [ 
         {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa_financeiro':{'$sum':'$valor-original-despesa'}}}
     ]
@@ -48,6 +49,68 @@ def total_despesa(db=back.db):
         {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa_relatorio':{'$sum':'$valor-original-despesa'}}}
     ]
 
+    # Consultas que utilizam os filtros a cima. O retorno dessas consultas são dicionarios. Ex:. {'_id': {'descricao-projeto': 'ADM LOCAL (MACAÉ)'}, 'despesa_financeiro': 450681.34}
+    total_financeiro = colecao_despesa_financeiro.aggregate(pipeline_financeiro)
+    total_folha = colecao_despesa_folha.aggregate(pipeline_folha)
+    total_relatorio = colecao_despesa_relatorio.aggregate(pipeline_relatorio)
+
+    dicio_financeiro = {}
+    dicio_folha = {}
+    dicio_relatorio = {}
+
+    lista_final = []
+    
+    # Loops para adicionar nos respectivos dicionários os valores totais dos contratos(são as chaves dos dicios) e a despesa total(que são os valores dos dicios)
+    for i in total_financeiro:
+        dicio_financeiro[i['_id']['descricao-projeto']] = i['despesa_financeiro']
+
+    for j in total_folha:
+        dicio_folha[j['_id']['descricao-projeto']] = j['despesa_folha']
+    
+    for k in total_relatorio:
+        dicio_relatorio[k['_id']['descricao-projeto']] = k['despesa_relatorio']
+
+    for contrato in dicio_relatorio:
+        # aqui o código ira tentar somar o valor da despesa caso a chave contrato exista no dicionario
+        try:
+            soma_total += dicio_financeiro[contrato]
+        except:
+            pass
+        try:
+            soma_total += dicio_folha[contrato]
+        except:
+            pass
+        try:            
+            soma_total += dicio_relatorio[contrato]
+        except:
+            pass
+        lista_final.append((contrato,soma_total))
+        soma_total = 0
+    
+    return lista_final
+
+def total_despesa_competencia(db,competencia):
+
+    soma_total = 0
+    colecao_despesa_financeiro = db.get_collection('Despesas Financeiro')
+    colecao_despesa_folha = db.get_collection('Despesas Folha')
+    colecao_despesa_relatorio = db.get_collection('Despesas Relatório')
+
+    # filtros que agrupam os campos especificados e somam os valores de despesas de cada contrato
+    pipeline_financeiro =  [ 
+        {"$match": {"competencia-despesa": competencia}},
+        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa_financeiro':{'$sum':'$valor-original-despesa'}}}
+    ]
+    pipeline_folha  = [
+        {"$match": {"competencia-despesa": competencia}},
+        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa_folha':{'$sum':'$valor-original-despesa'}}}
+    ]
+    pipeline_relatorio = [
+        {"$match": {"competencia-despesa": competencia}},
+        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa_relatorio':{'$sum':'$valor-original-despesa'}}}
+    ]
+
+    # Consultas que utilizam os filtros a cima. O retorno dessas consultas são dicionarios. Ex:. {'_id': {'descricao-projeto': 'ADM LOCAL (MACAÉ)'}, 'despesa_financeiro': 450681.34}
     total_financeiro = colecao_despesa_financeiro.aggregate(pipeline_financeiro)
     total_folha = colecao_despesa_folha.aggregate(pipeline_folha)
     total_relatorio = colecao_despesa_relatorio.aggregate(pipeline_relatorio)
@@ -58,6 +121,7 @@ def total_despesa(db=back.db):
 
     lista_final = []
 
+    # Loops para adicionar nos respectivos dicionários os valores totais dos contratos(são as chaves dos dicios) e a despesa total(que são os valores dos dicios)
     for i in total_financeiro:
         dicio_financeiro[i['_id']['descricao-projeto']] = i['despesa_financeiro']
 
@@ -67,11 +131,22 @@ def total_despesa(db=back.db):
     for k in total_relatorio:
         dicio_relatorio[k['_id']['descricao-projeto']] = k['despesa_relatorio']
 
-    for total in dicio_relatorio:
-        soma_total += dicio_financeiro[total]
-        soma_total += dicio_folha[total]
-        soma_total += dicio_relatorio[total]
-        lista_final.append((total,soma_total))
+    for contrato in dicio_relatorio:
+        try:
+            soma_total += dicio_financeiro[contrato]
+        except:
+            pass
+        try:
+            soma_total += dicio_folha[contrato]
+        except:
+            pass
+        try:            
+            soma_total += dicio_relatorio[contrato]
+        except:
+            pass
+        
+        lista_final.append((contrato,soma_total))
+        soma_total = 0
     
     return lista_final
 
