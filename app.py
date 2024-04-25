@@ -6,7 +6,6 @@ import back
 from dash.dash_table.Format import Format, Scheme, Sign, Symbol
 import dash.dash_table.FormatTemplate as FormatTemplate
 
-
 app = dash.Dash(__name__)
 server = app.server
 

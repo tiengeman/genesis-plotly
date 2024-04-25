@@ -89,7 +89,7 @@ def total_despesa(db=back.db):
     
     return lista_final
 
-def total_despesa_competencia(db,competencia):
+def total_despesa_competencia(competencia, db=back.db):
 
     soma_total = 0
     colecao_despesa_financeiro = db.get_collection('Despesas Financeiro')

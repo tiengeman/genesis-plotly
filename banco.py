@@ -41,10 +41,12 @@ import back.banco_teste
 
 def tabela(mes):
     lista_contrato, lista_soma_comp, lista_cc = back.medicao(mes)
+    lista_total_contrato, lista_total_valor, lista_total_cc = back.medicao_total()
     list_local = [None]*len(lista_contrato)
     list_inativo = inativo(lista_soma_comp)
     list_filial = [None]*len(lista_contrato)
-    list_despesas = [None]*len(lista_contrato)
+    tupla_despesas = back.total_despesa_competencia(mes)
+    list_despesas = ordena_lista_despesa(lista_contrato, tupla_despesas)
     list_lucro = [None]*len(lista_contrato)
     list_perc = [None]*len(lista_contrato)
     list_medicao_total = [None]*len(lista_contrato)
@@ -75,39 +77,15 @@ def inativo(lista_valores): #função para criar a lista se o contrato está ina
         
     return lista_inativo
 
-# def formatar_para_moeda(lista_numeros):
-#     # Define a localização para o formato de moeda
-#     locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+def ordena_lista_despesa(lista_contrato, lista_desp): #função para ordenar a lista de despesas de acordo com a lista de contratos
+    lista_apoio = []
+    for i in lista_contrato:
+        flag = False
+        for a in lista_desp:
+            if a[0]==i:
+                lista_apoio.append(a[1])
+                flag = True
+        if flag == False:
+            lista_apoio.append(0)
 
-#     # Formata cada número como moeda e adiciona à lista formatada
-#     lista_formatada = [locale.currency(numero, grouping=True) for numero in lista_numeros]
-
-#     return lista_formatada
-
-def tabela_2():
-    lista_remove_contrato = ["INVESTIMENTOS (CONTRATOS)", "EXPANSÃO - FILIAL MACAÉ", "EXPANSÃO - MATRIZ RECIFE", "DEPÓSITO JUDICIAIS", "ENGEMAN TECNOLOGIAS"]
-    lista_remove_cc = ['888', '2180', '2250', '1111', '1930']
-    list_local = [None]*len(lista_remove_contrato)
-    list_inativo = [None]*len(lista_remove_contrato)
-    list_filial = [None]*len(lista_remove_contrato)
-    list_medicao = [None]*len(lista_remove_contrato)
-    list_despesas = [None]*len(lista_remove_contrato)
-    list_lucro = [None]*len(lista_remove_contrato)
-    list_perc = [None]*len(lista_remove_contrato)
-    list_medicao_total = [None]*len(lista_remove_contrato)
-    list_desp_totais = [None]*len(lista_remove_contrato)
-    list_lucro_total = [None]*len(lista_remove_contrato)
-    df = pd.DataFrame.from_dict(data={'LOCAL':list_local, 
-                                      'CONTRATO':lista_remove_contrato, 
-                                      'C.CUSTOS':lista_remove_cc, 
-                                      'INATIVO':list_inativo,
-                                      'FILIAL':list_filial, 
-                                      '(R) MEDIÇÃO':list_medicao, 
-                                      '(D) DESPESAS':list_despesas, 
-                                      '(R-D) LUCRO':list_lucro, 
-                                      '%':list_perc,
-                                      'MEDIÇÃO TOTAL': list_medicao_total,
-                                      'DESPESAS TOTAIS': list_desp_totais,
-                                      'LUCRO TOTAL': list_lucro_total})
-    
-    return df
+    return lista_apoio
