@@ -42,7 +42,7 @@ def atualizar_tabela(selecao):
         
         # Formatar colunas numéricas para o estilo brasileiro
         for coluna in ['(R) MEDIÇÃO', '(D) DESPESAS', '(R-D) LUCRO', 'MEDIÇÃO TOTAL', 'DESPESAS TOTAIS', 'LUCRO TOTAL']:
-            df_tabela[coluna] = df_tabela[coluna].apply(lambda x: locale.format('%1.2f', x, grouping=True))
+            df_tabela[coluna] = df_tabela[coluna].apply(lambda x: locale.format_string('%1.2f', x, grouping=True))
         
         # Cria DataTable a partir do DataFrame
         tabela_datatable = dash_table.DataTable(
