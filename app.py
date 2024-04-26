@@ -50,7 +50,7 @@ def atualizar_tabela(selecao):
             {'name': '(R) MEDIÇÃO', 'id': '(R) MEDIÇÃO', 'type': 'numeric', 'format': FormatTemplate.money(2)},
             {'name': '(D) DESPESAS', 'id': '(D) DESPESAS', 'type': 'numeric', 'format': FormatTemplate.money(2)},
             {'name': '(R-D) LUCRO', 'id': '(R-D) LUCRO', 'type': 'numeric', 'format': FormatTemplate.money(2)},
-            {'name': '%', 'id': '%', 'type': 'numeric'},
+            {'name': '%', 'id': '%', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
             {'name': 'MEDIÇÃO TOTAL', 'id': 'MEDIÇÃO TOTAL', 'type': 'numeric', 'format': FormatTemplate.money(2)},
             {'name': 'DESPESAS TOTAIS', 'id': 'DESPESAS TOTAIS', 'type': 'numeric', 'format': FormatTemplate.money(2)},
             {'name': 'LUCRO TOTAL', 'id': 'LUCRO TOTAL', 'type': 'numeric', 'format': FormatTemplate.money(2)},
