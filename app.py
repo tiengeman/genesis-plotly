@@ -3,14 +3,18 @@ from banco import *
 from dash import dcc, html, dash_table
 from dash.dependencies import Input, Output
 import back
+import locale
 from dash.dash_table.Format import Format, Scheme, Sign, Symbol
 import dash.dash_table.FormatTemplate as FormatTemplate
+
+# Definindo a localidade para o Brasil (pt_BR)
+locale.setlocale(locale.LC_NUMERIC, 'pt_BR.UTF-8')
 
 app = dash.Dash(__name__)
 server = app.server
 
 # Layout do aplicativo
-app.layout = html.Div(style={'fontFamily': 'Arial, sans-serif'}, children=[  # Definindo a fonte do aplicativo
+app.layout = html.Div(style={'fontFamily': 'Arial, sans-serif'}, children=[
     html.H2(children='Performance Mensal por Competencia'),
     html.Hr(),
     html.Div(style={'margin-top': '20px'}),
@@ -36,6 +40,10 @@ def atualizar_tabela(selecao):
         # Obtém a tabela com base na seleção da lista suspensa
         df_tabela = tabela(selecao)
         
+        # Formatar colunas numéricas para o estilo brasileiro
+        for coluna in ['(R) MEDIÇÃO', '(D) DESPESAS', '(R-D) LUCRO', 'MEDIÇÃO TOTAL', 'DESPESAS TOTAIS', 'LUCRO TOTAL']:
+            df_tabela[coluna] = df_tabela[coluna].apply(lambda x: locale.format('%1.2f', x, grouping=True))
+        
         # Cria DataTable a partir do DataFrame
         tabela_datatable = dash_table.DataTable(
             id='tabela',
@@ -47,13 +55,13 @@ def atualizar_tabela(selecao):
             {'name': 'C.CUSTOS', 'id': 'C.CUSTOS', 'type': 'text'},
             {'name': 'INATIVO', 'id': 'INATIVO', 'type': 'text'},
             {'name': 'FILIAL', 'id': 'FILIAL', 'type': 'text'},
-            {'name': '(R) MEDIÇÃO', 'id': '(R) MEDIÇÃO', 'type': 'numeric', 'format': FormatTemplate.money(2)},
-            {'name': '(D) DESPESAS', 'id': '(D) DESPESAS', 'type': 'numeric', 'format': FormatTemplate.money(2)},
-            {'name': '(R-D) LUCRO', 'id': '(R-D) LUCRO', 'type': 'numeric', 'format': FormatTemplate.money(2)},
+            {'name': '(R) MEDIÇÃO', 'id': '(R) MEDIÇÃO', 'type': 'numeric'},
+            {'name': '(D) DESPESAS', 'id': '(D) DESPESAS', 'type': 'numeric'},
+            {'name': '(R-D) LUCRO', 'id': '(R-D) LUCRO', 'type': 'numeric'},
             {'name': '%', 'id': '%', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
-            {'name': 'MEDIÇÃO TOTAL', 'id': 'MEDIÇÃO TOTAL', 'type': 'numeric', 'format': FormatTemplate.money(2)},
-            {'name': 'DESPESAS TOTAIS', 'id': 'DESPESAS TOTAIS', 'type': 'numeric', 'format': FormatTemplate.money(2)},
-            {'name': 'LUCRO TOTAL', 'id': 'LUCRO TOTAL', 'type': 'numeric', 'format': FormatTemplate.money(2)},
+            {'name': 'MEDIÇÃO TOTAL', 'id': 'MEDIÇÃO TOTAL', 'type': 'numeric'},
+            {'name': 'DESPESAS TOTAIS', 'id': 'DESPESAS TOTAIS', 'type': 'numeric'},
+            {'name': 'LUCRO TOTAL', 'id': 'LUCRO TOTAL', 'type': 'numeric'},
         ],
             style_cell={'textAlign': 'center', 'padding': '5px', 'fontFamily': 'Arial, sans-serif', 'fontSize': '0.8em'},  # Ajustando o tamanho da fonte
             style_cell_conditional=[
