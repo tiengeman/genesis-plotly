@@ -2,6 +2,10 @@ import dash
 from banco import *
 from dash import dcc, html, dash_table
 from dash.dependencies import Input, Output
+import back
+import locale
+from dash.dash_table.Format import Format, Scheme, Sign, Symbol
+import dash.dash_table.FormatTemplate as FormatTemplate
 import plotly.graph_objects as go
 
 app = dash.Dash(__name__)
@@ -14,9 +18,10 @@ app.layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'backgroundColor
     ]),
     html.Hr(style={'borderColor': '#ff4e00', 'marginBottom': '20px'}),  # Linha horizontal com cor laranja e margem inferior
     dcc.Tabs(id='tabs', value='tab-tabela', children=[  # Tabs para separar as telas
-        dcc.Tab(label='Tabela', value='tab-tabela', selected_style={'backgroundColor': '#ff4e00', 'color': '#fff'}),  # Tab para exibir a tabela
+        dcc.Tab(label='Tabela', value='tab-tabela', selected_style={'backgroundColor': '#ff4e00', 'color': '#fff','margin':"20px"}),  # Tab para exibir a tabela
         dcc.Tab(label='Gráfico e Informações', value='tab-grafico', selected_style={'backgroundColor': '#ff4e00', 'color': '#fff'}),  # Tab para exibir o gráfico e informações
     ]),
+    
     html.Div(id='tabs-content')  # Div para mostrar o conteúdo da tab selecionada
 ])
 
@@ -92,10 +97,11 @@ def atualizar_tabela(selecao):
                 {'name': '(R) MEDIÇÃO', 'id': '(R) MEDIÇÃO', 'type': 'numeric', 'format': {'specifier': '.2f'}},
                 {'name': '(D) DESPESAS', 'id': '(D) DESPESAS', 'type': 'numeric', 'format': {'specifier': '.2f'}},
                 {'name': '(R-D) LUCRO', 'id': '(R-D) LUCRO', 'type': 'numeric', 'format': {'specifier': '.2f'}},
-                {'name': '%', 'id': '%', 'type': 'numeric'},
+                {'name': '%', 'id': '%', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
                 {'name': 'MEDIÇÃO TOTAL', 'id': 'MEDIÇÃO TOTAL', 'type': 'numeric', 'format': {'specifier': '.2f'}},
                 {'name': 'DESPESAS TOTAIS', 'id': 'DESPESAS TOTAIS', 'type': 'numeric', 'format': {'specifier': '.2f'}},
                 {'name': 'LUCRO TOTAL', 'id': 'LUCRO TOTAL', 'type': 'numeric', 'format': {'specifier': '.2f'}},
+                {'name': '% TOTAL', 'id': '% TOTAL', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
             ],
             style_cell={'textAlign': 'center', 'padding': '5px', 'fontFamily': 'Arial, sans-serif', 'fontSize': '0.8em', 'backgroundColor': '#fff', 'color': '#333'},  # Ajustando o estilo das células da tabela
             style_cell_conditional=[
@@ -109,10 +115,65 @@ def atualizar_tabela(selecao):
                 'backgroundColor': '#ff4e00',
                 'color': '#fff',
             },
-            style_data_conditional=[
+             style_data_conditional=[
                 {
                     'if': {'row_index': 'odd'},
-                    'backgroundColor': '#f1f1f1',
+                    'backgroundColor': 'rgb(245,245,245)',
+                },
+                {
+                    'if': {
+                        'filter_query': "{CONTRATO} = 'TOTAL OPERAÇÃO'",
+                    },
+                    'backgroundColor': 'rgb(220,220,220)',
+                    'fontWeight': 'bold',
+                },
+                {
+                    'if': {
+                        'filter_query': "{%} < 0",
+                        'column_id': '%',
+                    },
+                    'backgroundColor': '#B22222',
+                    'color': 'white',
+                },
+                {
+                    'if': {
+                        'filter_query': "{%} > 0.07",
+                        'column_id': '%',
+                    },
+                    'backgroundColor': '#008000',
+                    'color': 'white',
+                },
+                {
+                    'if': {
+                        'filter_query': "{%} > 0 && {%} < 0.07",
+                        'column_id': '%',
+                    },
+                    'backgroundColor': '#DAA520',
+                    'color': 'white',
+                },
+                {
+                    'if': {
+                        'filter_query': "{% TOTAL} < 0",
+                        'column_id': '% TOTAL',
+                    },
+                    'backgroundColor': '#B22222',
+                    'color': 'white',
+                },
+                {
+                    'if': {
+                        'filter_query': "{% TOTAL} > 0.07",
+                        'column_id': '% TOTAL',
+                    },
+                    'backgroundColor': '#008000',
+                    'color': 'white',   
+                },
+                {
+                    'if': {
+                        'filter_query': "{% TOTAL} > 0 && {% TOTAL} < 0.07",
+                        'column_id': '% TOTAL',
+                    },
+                    'backgroundColor': '#DAA520',
+                    'color': 'white',
                 }
             ], 
         )
