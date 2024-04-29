@@ -4,6 +4,9 @@ import back.banco_teste
 
 def tabela(mes): #função que gera a tabela principal do resumo
     lista_contrato, lista_soma_comp, lista_cc = back.medicao(mes)
+    lista_contrato.append('TOTAL OPERAÇÃO')
+    lista_cc.append('')
+    lista_soma_comp.append(sum(lista_soma_comp))
     lista_cont_total, lista_valor_total, lista_cc_total = back.medicao_total()
     tupla_medicao_total = merge_lists_into_tuples(lista_cont_total, lista_valor_total)
     tupla_despesa_total = back.total_despesa()
@@ -11,13 +14,26 @@ def tabela(mes): #função que gera a tabela principal do resumo
 
     list_local = [None]*len(lista_contrato)
     list_inativo = inativo(lista_soma_comp) #gera a lista se é inativo ou não
+    del list_inativo[-1]
+    list_inativo.append('')
     list_filial = [None]*len(lista_contrato)
     list_despesas = ordena_lista(lista_contrato, tupla_despesas) #aqui ele ordena os valores de acordo com a lista de contrato
+    del list_despesas[-1]
+    list_despesas.append(sum(list_despesas))
     list_lucro = subtrair_listas(lista_soma_comp, list_despesas)
+    del list_lucro[-1]
+    list_lucro.append(sum(list_lucro))
     list_perc = perc(lista_soma_comp, list_lucro)
     list_medicao_total = ordena_lista(lista_contrato, tupla_medicao_total)
+    del list_medicao_total[-1]
+    list_medicao_total.append(sum(list_medicao_total))
     list_desp_totais = ordena_lista(lista_contrato, tupla_despesa_total)
+    del list_desp_totais[-1]
+    list_desp_totais.append(sum(list_desp_totais))
     list_lucro_total = subtrair_listas(list_medicao_total, list_desp_totais)
+    del list_lucro_total[-1]
+    list_lucro_total.append(sum(list_lucro_total))
+    list_perc_total = perc(list_medicao_total, list_lucro_total)
     df = pd.DataFrame.from_dict(data={'LOCAL':list_local, 
                                       'CONTRATO':lista_contrato, 
                                       'C.CUSTOS':lista_cc, 
@@ -29,7 +45,8 @@ def tabela(mes): #função que gera a tabela principal do resumo
                                       '%':list_perc,
                                       'MEDIÇÃO TOTAL': list_medicao_total,
                                       'DESPESAS TOTAIS': list_desp_totais,
-                                      'LUCRO TOTAL': list_lucro_total})
+                                      'LUCRO TOTAL': list_lucro_total,
+                                      '% TOTAL': list_perc_total})
     
     return df
 
@@ -64,7 +81,7 @@ def subtrair_listas(lista1, lista2): #calcula o lucro
     for i in range(len(lista1)):
         resultado.append(lista1[i] - lista2[i])
     
-    return resultado
+    return list(resultado)
 
 def perc(lista_soma_comp, list_lucro): #função que retorna a lista com o calculo do percentual
     lista_perc = []

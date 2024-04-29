@@ -26,12 +26,12 @@ app.layout = html.Div(style={'fontFamily': 'Arial, sans-serif'}, children=[
         style={'fontFamily': 'Arial, sans-serif'}  # Definindo a fonte da lista suspensa
     ),
     html.Div(style={'margin-top': '20px'}),  # Espaçamento entre dropdown e tabela
-    html.Div(id='tabela-selecionada')  # Div para mostrar a tabela selecionada
+    html.Div(id='tabela-container', style={'margin': '20px'})  # Div para mostrar a tabela selecionada com margem
 ])
 
 # Callback para atualizar a tabela com base na seleção da lista suspensa
 @app.callback(
-    Output('tabela-selecionada', 'children'),
+    Output('tabela-container', 'children'),
     [Input('minha-lista-suspensa', 'value')]
 )
 def atualizar_tabela(selecao):
@@ -62,6 +62,7 @@ def atualizar_tabela(selecao):
             {'name': 'MEDIÇÃO TOTAL', 'id': 'MEDIÇÃO TOTAL', 'type': 'numeric'},
             {'name': 'DESPESAS TOTAIS', 'id': 'DESPESAS TOTAIS', 'type': 'numeric'},
             {'name': 'LUCRO TOTAL', 'id': 'LUCRO TOTAL', 'type': 'numeric'},
+            {'name': '% TOTAL', 'id': '% TOTAL', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
         ],
             style_cell={'textAlign': 'center', 'padding': '5px', 'fontFamily': 'Arial, sans-serif', 'fontSize': '0.8em'},  # Ajustando o tamanho da fonte
             style_cell_conditional=[
@@ -85,6 +86,13 @@ def atualizar_tabela(selecao):
                 },
                 {
                     'if': {
+                        'filter_query': "{CONTRATO} = 'TOTAL OPERAÇÃO'",
+                    },
+                    'backgroundColor': 'rgb(220,220,220)',
+                    'fontWeight': 'bold',
+                },
+                {
+                    'if': {
                         'filter_query': "{%} < 0",
                         'column_id': '%',
                     },
@@ -93,17 +101,40 @@ def atualizar_tabela(selecao):
                 },
                 {
                     'if': {
-                        'filter_query': "{%} > 0.7",
+                        'filter_query': "{%} > 0.07",
                         'column_id': '%',
                     },
                     'backgroundColor': '#008000',
                     'color': 'white',
-                    
                 },
                 {
                     'if': {
-                        'filter_query': "{%} > 0 && {%} < 0.7",
+                        'filter_query': "{%} > 0 && {%} < 0.07",
                         'column_id': '%',
+                    },
+                    'backgroundColor': '#DAA520',
+                    'color': 'white',
+                },
+                {
+                    'if': {
+                        'filter_query': "{% TOTAL} < 0",
+                        'column_id': '% TOTAL',
+                    },
+                    'backgroundColor': '#B22222',
+                    'color': 'white',
+                },
+                {
+                    'if': {
+                        'filter_query': "{% TOTAL} > 0.07",
+                        'column_id': '% TOTAL',
+                    },
+                    'backgroundColor': '#008000',
+                    'color': 'white',   
+                },
+                {
+                    'if': {
+                        'filter_query': "{% TOTAL} > 0 && {% TOTAL} < 0.07",
+                        'column_id': '% TOTAL',
                     },
                     'backgroundColor': '#DAA520',
                     'color': 'white',
