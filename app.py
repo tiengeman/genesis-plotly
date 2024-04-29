@@ -1,17 +1,16 @@
 import dash
-from banco import *
-from dash import dcc, html, dash_table
-from dash.dependencies import Input, Output
-import back
-import locale
-from dash.dash_table.Format import Format, Scheme, Sign, Symbol
-import dash.dash_table.FormatTemplate as FormatTemplate
+import dash_core_components as dcc
+import dash_html_components as html
+import dash_table
+from dash.dependencies import Input, Output, State
 import plotly.graph_objects as go
+from banco import *
+import back
+import dash.dash_table.FormatTemplate as FormatTemplate
 
 app = dash.Dash(__name__)
 server = app.server
 
-# Layout do aplicativo
 app.layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'backgroundColor': '#f9f9f9', 'color': '#333'}, children=[
     html.Div([
         html.H2(children='Performance Mensal por Contrato', style={'color': '#ff4e00', 'fontFamily': 'Arial Black', 'fontSize': '36px', 'textAlign': 'center', 'marginBottom': '20px'}),  # Título com cor laranja e estilo de fonte Arial Black
@@ -52,12 +51,14 @@ def render_content(tab):
 
         return tab_tabela
     elif tab == 'tab-grafico':  # Se a tab selecionada for a de gráfico e informações
-        # Lista suspensa
-        lista_suspensa = dcc.Dropdown(
-            id='minha-lista-suspensa-grafico',
-            options=back.competencias(),
-            value=back.competencias()[-1],
-            style={'fontFamily': 'Arial, sans-serif', 'color': '#ff4e00', 'backgroundColor': '#f1f1f1'},  # Cores da lista suspensa
+       
+        # Modal de seleção de contrato
+        modal = html.Div(
+            [
+                dcc.Store(id='selected-contract'),  # Store para armazenar o contrato selecionado
+                html.Div(id='modal-content'),
+             
+            ]
         )
 
         # Gráfico e informações
@@ -65,12 +66,86 @@ def render_content(tab):
 
         # Layout da tab de gráfico e informações
         tab_grafico = html.Div([
-            lista_suspensa,
-            html.Div(style={'margin-top': '20px'}),  # Espaçamento entre dropdown e gráfico
+            modal,
+            html.Div(id='output-container-button'),
+            html.Div(style={'margin-top': '20px'}),  # Espaçamento entre botão e gráfico
             grafico_info
         ])
 
         return tab_grafico
+
+# Callback para abrir o modal ao clicar na aba do gráfico
+@app.callback(
+    Output('modal-content', 'children'),
+    [Input('tabs', 'value')]
+)
+def open_modal(tab):
+    if tab == 'tab-grafico':
+        return [
+            html.H2('Selecione um Contrato'),
+            dcc.Dropdown(
+                id='modal-dropdown',
+                options=[{'label': contrato, 'value': contrato} for contrato in tabela('selecao')['CONTRATO'].unique()],
+                value=tabela('selecao')['CONTRATO'].iloc[0],  # Seleciona o primeiro contrato como padrão
+                style={'width': '100%'}
+            ),
+            html.Button('Gerar Gráfico', id='modal-button', n_clicks=0, style={'margin-top': '10px'}),
+        ]
+    else:
+        return html.Div()
+
+# Callback para atualizar o Store com o contrato selecionado
+@app.callback(
+    Output('selected-contract', 'data'),
+    [Input('modal-button', 'n_clicks')],
+    [State('modal-dropdown', 'value')]
+)
+def update_selected_contract(n_clicks, selected_contract):
+    if n_clicks > 0:
+        return selected_contract
+    else:
+        raise dash.exceptions.PreventUpdate
+
+# Callback para gerar o gráfico quando clicar em "Gerar Gráfico"
+@app.callback(
+    Output('grafico-info', 'children'),
+    [Input('modal-button', 'n_clicks')],
+    [State('selected-contract', 'data')]
+)
+def gerar_grafico(n_clicks, selected_contract):
+    if n_clicks > 0:
+        # Filtra a tabela com base no contrato selecionado
+        df_contrato_selecionado = tabela('selecao')[tabela('selecao')['CONTRATO'] == selected_contract]
+
+        # Cria um gráfico de barras 3D com os dados do contrato selecionado
+        grafico_barras = go.Figure(
+            data=[go.Bar(x=df_contrato_selecionado['CONTRATO'], y=df_contrato_selecionado['(R) MEDIÇÃO'], marker_color='#ff4e00')],
+            layout=go.Layout(
+                title=f'Gráfico de Barras - (R) MEDIÇÃO para o Contrato {selected_contract}',
+                scene=dict(
+                    xaxis=dict(title='CONTRATO'),
+                    yaxis=dict(title='(R) MEDIÇÃO'),
+                    zaxis=dict(title='Valor'),
+                ),
+                font=dict(family='Arial, sans-serif', size=12, color='#333'),  # Ajustando a fonte e o tamanho do texto
+                paper_bgcolor='#f9f9f9',  # Cor de fundo do gráfico
+            )
+        )
+
+        # Renderiza o gráfico
+        grafico_barras_html = dcc.Graph(id='grafico-barras', figure=grafico_barras)
+
+        # Informações adicionais
+        informacoes_adicionais = html.Div([
+            html.H3("Informações Adicionais", style={'color': '#ff4e00'}),
+            html.P("."),
+            html.P("."),
+        ])
+
+        # Renderiza o gráfico e informações adicionais
+        return html.Div([grafico_barras_html, informacoes_adicionais])
+    else:
+        return html.Div()
 
 # Callback para atualizar o conteúdo da tabela
 @app.callback(
@@ -182,48 +257,6 @@ def atualizar_tabela(selecao):
     else:
         # Se não houver seleção, retorna uma mensagem indicando que nenhuma tabela está disponível
         return html.P("Nenhuma tabela disponível para esta seleção.")
-
-# Callback para atualizar o conteúdo do gráfico e informações
-@app.callback(
-    Output('grafico-info', 'children'),
-    [Input('minha-lista-suspensa-grafico', 'value')]
-)
-def atualizar_grafico_info(selecao):
-    # Verifica se há uma seleção
-    if selecao:
-        # Obtém a tabela com base na seleção da lista suspensa
-        df_tabela = tabela(selecao)
-        
-        # Cria um gráfico de barras 3D com os dados da coluna "(R) MEDIÇÃO"
-        grafico_barras = go.Figure(
-            data=[go.Bar(x=df_tabela['CONTRATO'], y=df_tabela['(R) MEDIÇÃO'], marker_color='#ff4e00')],
-            layout=go.Layout(
-                title='Gráfico de Barras - (R) MEDIÇÃO por CONTRATO',
-                scene=dict(
-                    xaxis=dict(title='CONTRATO'),
-                    yaxis=dict(title='(R) MEDIÇÃO'),
-                    zaxis=dict(title='Valor'),
-                ),
-                font=dict(family='Arial, sans-serif', size=12, color='#333'),  # Ajustando a fonte e o tamanho do texto
-                paper_bgcolor='#f9f9f9',  # Cor de fundo do gráfico
-            )
-        )
-
-        # Renderiza o gráfico
-        grafico_barras_html = dcc.Graph(id='grafico-barras', figure=grafico_barras)
-
-        # Informações adicionais
-        informacoes_adicionais = html.Div([
-            html.H3("Informações Adicionais", style={'color': '#ff4e00'}),
-            html.P("."),
-            html.P("."),
-        ])
-
-        # Renderiza o gráfico e informações adicionais
-        return html.Div([grafico_barras_html, informacoes_adicionais])
-    else:
-        # Se não houver seleção, retorna uma mensagem indicando que nenhuma tabela está disponível
-        return html.P("Nenhuma tabela disponível para esta seleção.") 
 
 if __name__ == '__main__':
     app.run_server(debug=True)
