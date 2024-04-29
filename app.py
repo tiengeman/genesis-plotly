@@ -82,6 +82,31 @@ def atualizar_tabela(selecao):
                 {
                     'if': {'row_index': 'odd'},
                     'backgroundColor': 'rgb(245,245,245)',
+                },
+                {
+                    'if': {
+                        'filter_query': "{%} < 0",
+                        'column_id': '%',
+                    },
+                    'backgroundColor': '#B22222',
+                    'color': 'white',
+                },
+                {
+                    'if': {
+                        'filter_query': "{%} > 0.7",
+                        'column_id': '%',
+                    },
+                    'backgroundColor': '#008000',
+                    'color': 'white',
+                    
+                },
+                {
+                    'if': {
+                        'filter_query': "{%} > 0 && {%} < 0.7",
+                        'column_id': '%',
+                    },
+                    'backgroundColor': '#DAA520',
+                    'color': 'white',
                 }
             ], 
         )
