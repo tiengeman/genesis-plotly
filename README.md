@@ -243,7 +243,6 @@ O resultado da consulta vai para a lista `filiais`:
 
 retorno = pega_filiais()
 ```
----
 
 #### `rel_notas.py`
 Esse códigose conecta com o banco de dados Mega, realiza uma consulta e retorna informações sobre despesas relacionadas a recebimentos de itens.
