@@ -100,3 +100,4 @@ def merge_lists_into_tuples(list1, list2): #função para juntar duas listas e f
 
     # Usar zip para combinar as listas em uma lista de tuplas
     merged_list = list(zip(list1, list2))
+    return merged_list
