@@ -1,4 +1,3 @@
-
 # Genesis
 
 Sistema de gerenciamento de faturamento em python e banco de dados MongoDB.
@@ -238,5 +237,3 @@ genesis/
 ├── app.py
 ├── keys.json
 └── banco.py
-
-```
