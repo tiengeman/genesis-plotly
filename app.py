@@ -8,7 +8,7 @@ from dash.dash_table.Format import Format, Scheme, Sign, Symbol
 import dash.dash_table.FormatTemplate as FormatTemplate
 
 # Definindo a localidade para o Brasil (pt_BR)
-locale.setlocale(locale.LC_NUMERIC, 'pt_BR.UTF-8')
+# locale.setlocale(locale.LC_NUMERIC, 'pt_BR.UTF-8')
 
 app = dash.Dash(__name__)
 server = app.server
