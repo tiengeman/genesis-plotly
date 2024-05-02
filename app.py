@@ -7,17 +7,23 @@ import locale
 from dash.dash_table.Format import Format, Scheme, Sign, Symbol
 import dash.dash_table.FormatTemplate as FormatTemplate
 
-# Definindo a localidade para o Brasil (pt_BR)
-# locale.setlocale(locale.LC_NUMERIC, 'pt_BR.UTF-8')
-
 app = dash.Dash(__name__)
 server = app.server
 
+# Paleta de cores
+colors = {
+    'background': '#F8F8F8',  # Cinza claro para o fundo da página
+    'text': '#333333',        # Cor de texto principal em preto
+    'orange': '#FF4E00',      # Laranja
+    'white': '#FFFFFF',       # Branco
+    'gray': '#CCCCCC'         # Cinza claro para elementos secundários
+}
+
 # Layout do aplicativo
-app.layout = html.Div(style={'fontFamily': 'Arial, sans-serif'}, children=[
-    html.H2(children='Performance Mensal por Competencia'),
-    html.Hr(),
-    html.Div(style={'margin-top': '20px'}),
+app.layout = html.Div(style={'backgroundColor': colors['background'], 'fontFamily': 'Arial, sans-serif'}, children=[
+    html.H2(children='Performance Mensal por Competência', style={'color': colors['orange'], 'textAlign': 'center', 'marginBottom': '20px', 'fontSize': '2em'}),
+    html.Hr(style={'backgroundColor': colors['orange']}),  # Linha horizontal laranja
+    html.Div(style={'marginTop': '20px'}),
     # Lista suspensa
     dcc.Dropdown(
         id='minha-lista-suspensa',
@@ -25,7 +31,7 @@ app.layout = html.Div(style={'fontFamily': 'Arial, sans-serif'}, children=[
         value=back.competencias()[-1],
         style={'fontFamily': 'Arial, sans-serif'}  # Definindo a fonte da lista suspensa
     ),
-    html.Div(style={'margin-top': '20px'}),  # Espaçamento entre dropdown e tabela
+    html.Div(style={'marginTop': '20px'}),  # Espaçamento entre dropdown e tabela
     html.Div(id='tabela-container', style={'margin': '20px'}),  # Div para mostrar a tabela selecionada com margem
     html.Div(id='tabela2-container', style={'margin': '20px'})  # Div para mostrar a tabela selecionada com margem
 ])
