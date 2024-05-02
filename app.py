@@ -71,7 +71,7 @@ def atualizar_tabela(selecao):
             {'name': 'LUCRO TOTAL', 'id': 'LUCRO TOTAL', 'type': 'numeric'},
             {'name': '% TOTAL', 'id': '% TOTAL', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
         ],
-            style_cell={'textAlign': 'center', 'padding': '5px', 'fontFamily': 'Arial, sans-serif', 'fontSize': '0.8em'},  # Ajustando o tamanho da fonte
+            style_cell={'textAlign': 'center', 'padding': '5px', 'fontFamily': 'Arial, sans-serif', 'fontSize': '0.8em', 'backgroundColor': colors['white'], 'color': colors['text']},  # Ajustando o tamanho da fonte
             style_cell_conditional=[
                 {
                     'if': {'column_id': c},
@@ -80,22 +80,22 @@ def atualizar_tabela(selecao):
             ],
             style_header={
                 'fontWeight': 'bold',
-                'backgroundColor': 'rgb(220,220,220)',
+                'backgroundColor': colors['orange'],
+                'color': colors['white'],
             },
             style_data={
-                'color': 'black',
-                'backgroundColor': 'white',
+                'backgroundColor': colors['gray'],
             },
             style_data_conditional=[
                 {
                     'if': {'row_index': 'odd'},
-                    'backgroundColor': 'rgb(245,245,245)',
+                    'backgroundColor': colors['background'],
                 },
                 {
                     'if': {
                         'filter_query': "{CONTRATO} = 'TOTAL OPERAÇÃO'",
                     },
-                    'backgroundColor': 'rgb(220,220,220)',
+                    'backgroundColor': colors['gray'],
                     'fontWeight': 'bold',
                 },
                 {
@@ -153,7 +153,7 @@ def atualizar_tabela(selecao):
     else:
         # Se não houver seleção, retorna uma mensagem indicando que nenhuma tabela está disponível
         return html.P("Nenhuma tabela disponível para esta seleção.")
-    
+
 # Callback para atualizar a tabela com base na seleção da lista suspensa
 @app.callback(
     Output('tabela2-container', 'children'),
@@ -189,7 +189,7 @@ def atualizar_tabela2(selecao):
             {'name': 'LUCRO TOTAL', 'id': 'LUCRO TOTAL', 'type': 'numeric'},
             {'name': '% TOTAL', 'id': '% TOTAL', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
         ],
-            style_cell={'textAlign': 'center', 'padding': '5px', 'fontFamily': 'Arial, sans-serif', 'fontSize': '0.8em'},  # Ajustando o tamanho da fonte
+            style_cell={'textAlign': 'center', 'padding': '5px', 'fontFamily': 'Arial, sans-serif', 'fontSize': '0.8em', 'backgroundColor': colors['white'], 'color': colors['text']},  # Ajustando o tamanho da fonte
             style_cell_conditional=[
                 {
                     'if': {'column_id': c},
@@ -198,22 +198,22 @@ def atualizar_tabela2(selecao):
             ],
             style_header={
                 'fontWeight': 'bold',
-                'backgroundColor': 'rgb(220,220,220)',
+                'backgroundColor': colors['orange'],
+                'color': colors['white'],
             },
             style_data={
-                'color': 'black',
-                'backgroundColor': 'white',
+                'backgroundColor': colors['gray'],
             },
             style_data_conditional=[
                 {
                     'if': {'row_index': 'odd'},
-                    'backgroundColor': 'rgb(245,245,245)',
+                    'backgroundColor': colors['background'],
                 },
                 {
                     'if': {
                         'filter_query': "{CONTRATO} = 'TOTAL OPERAÇÃO'",
                     },
-                    'backgroundColor': 'rgb(220,220,220)',
+                    'backgroundColor': colors['gray'],
                     'fontWeight': 'bold',
                 },
                 {
