@@ -5,6 +5,7 @@ import back.banco_teste
 def tabela(mes): #função que gera a tabela principal do resumo
     lista_contrato, lista_soma_comp, lista_cc = back.medicao(mes)
     lista_contrato.append('TOTAL OPERAÇÃO')
+    lista_contrato_final, lista_soma_comp, lista_cc = remove_capex(lista_contrato, lista_soma_comp, lista_cc)
     lista_cc.append('')
     lista_soma_comp.append(sum(lista_soma_comp))
     lista_cont_total, lista_valor_total, lista_cc_total = back.medicao_total()
@@ -12,22 +13,22 @@ def tabela(mes): #função que gera a tabela principal do resumo
     tupla_despesa_total = back.total_despesa()
     tupla_despesas = back.total_despesa_competencia(mes) #gera uma lista de tuplas com as info
 
-    list_local = [None]*len(lista_contrato)
+    list_local = [None]*len(lista_contrato_final)
     list_inativo = inativo(lista_soma_comp) #gera a lista se é inativo ou não
     del list_inativo[-1]
     list_inativo.append('')
-    list_filial = [None]*len(lista_contrato)
-    list_despesas = ordena_lista(lista_contrato, tupla_despesas) #aqui ele ordena os valores de acordo com a lista de contrato
+    list_filial = [None]*len(lista_contrato_final)
+    list_despesas = ordena_lista(lista_contrato_final, tupla_despesas) #aqui ele ordena os valores de acordo com a lista de contrato
     del list_despesas[-1]
     list_despesas.append(sum(list_despesas))
     list_lucro = subtrair_listas(lista_soma_comp, list_despesas)
     del list_lucro[-1]
     list_lucro.append(sum(list_lucro))
     list_perc = perc(lista_soma_comp, list_lucro)
-    list_medicao_total = ordena_lista(lista_contrato, tupla_medicao_total)
+    list_medicao_total = ordena_lista(lista_contrato_final, tupla_medicao_total)
     del list_medicao_total[-1]
     list_medicao_total.append(sum(list_medicao_total))
-    list_desp_totais = ordena_lista(lista_contrato, tupla_despesa_total)
+    list_desp_totais = ordena_lista(lista_contrato_final, tupla_despesa_total)
     del list_desp_totais[-1]
     list_desp_totais.append(sum(list_desp_totais))
     list_lucro_total = subtrair_listas(list_medicao_total, list_desp_totais)
@@ -35,7 +36,7 @@ def tabela(mes): #função que gera a tabela principal do resumo
     list_lucro_total.append(sum(list_lucro_total))
     list_perc_total = perc(list_medicao_total, list_lucro_total)
     df = pd.DataFrame.from_dict(data={'LOCAL':list_local, 
-                                      'CONTRATO':lista_contrato, 
+                                      'CONTRATO':lista_contrato_final, 
                                       'C.CUSTOS':lista_cc, 
                                       'INATIVO':list_inativo,
                                       'FILIAL':list_filial, 
@@ -163,3 +164,17 @@ def medicao_capex_total():
             medicao_total.append(0)
 
     return medicao_total
+
+def remove_capex(lista_contratos, lista_valor, lista_cc): #função para gerar uma lista sem o capex
+    lista_capex = ['INVESTIMENTOS (CONTRATO)', 'EXPANSÃO - FILIAL MACAÉ', 'EXPANSÃO - MATRIZ RECIFE', 'DEPÓSITOS JUDICIAIS', 'ENGEMAN TECNOLOGIAS']
+    list_index = []
+    for i in lista_capex:
+        for a in range(len(lista_contratos)):
+            if i == lista_contratos[a]:
+                list_index.append(a)
+    for i in list_index:
+        del lista_contratos[i]
+        del lista_valor[i]
+        del lista_cc[i]
+    
+    return lista_contratos, lista_valor, lista_cc

@@ -12,7 +12,7 @@ server = app.server
 
 # Paleta de cores
 colors = {
-    'background': '#F8F8F8',  # Cinza claro para o fundo da página
+    'background': '#EFEEEE',  # Cinza claro para o fundo da página
     'text': '#333333',        # Cor de texto principal em preto
     'orange': '#FF4E00',      # Laranja
     'white': '#FFFFFF',       # Branco
@@ -20,8 +20,8 @@ colors = {
 }
 
 # Layout do aplicativo
-app.layout = html.Div(style={'backgroundColor': colors['background'], 'fontFamily': 'Arial, sans-serif'}, children=[
-    html.H2(children='Performance Mensal por Competência', style={'color': colors['orange'], 'textAlign': 'center', 'marginBottom': '20px', 'fontSize': '2em'}),
+app.layout = html.Div(style={'fontFamily': 'Arial, sans-serif'}, children=[
+    html.H2(children='Performance Mensal por Competência', style={'color': colors['orange'], 'textAlign': 'center', 'marginTop': '20px', 'marginBottom': '20px', 'fontSize': '2em'}),
     html.Hr(style={'backgroundColor': colors['orange']}),  # Linha horizontal laranja
     html.Div(style={'marginTop': '20px'}),
     # Lista suspensa
@@ -82,9 +82,6 @@ def atualizar_tabela(selecao):
                 'fontWeight': 'bold',
                 'backgroundColor': colors['orange'],
                 'color': colors['white'],
-            },
-            style_data={
-                'backgroundColor': colors['gray'],
             },
             style_data_conditional=[
                 {
@@ -200,9 +197,6 @@ def atualizar_tabela2(selecao):
                 'fontWeight': 'bold',
                 'backgroundColor': colors['orange'],
                 'color': colors['white'],
-            },
-            style_data={
-                'backgroundColor': colors['gray'],
             },
             style_data_conditional=[
                 {
