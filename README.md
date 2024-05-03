@@ -7,7 +7,7 @@ Sistema de gerenciamento de faturamento em python e banco de dados MongoDB.
 
 <br>
 
-## Indice
+## Índice
 
 - [Instalação](#-instalação)
 - [Estrutura do codigo](#-estrutura-do-codigo)
@@ -16,7 +16,10 @@ Sistema de gerenciamento de faturamento em python e banco de dados MongoDB.
 
 ### Instalação
 ---
-#### Pré-requisitos
+
+**Pré-requisitos**
+
+
 Certifique-se de ter os seguintes pré-requisitos instalados:
 
  * [Python](https://www.python.org/downloads/)  
@@ -27,7 +30,12 @@ Certifique-se de ter os seguintes pré-requisitos instalados:
 
  * [Git](https://git-scm.com/download/win)
 
-**Instalando bibliotecas**
+<br/>
+
+<details>
+<summary>
+    Instalando bibliotecas
+</summary>
 
 **Dash**
 
@@ -65,15 +73,15 @@ Certifique-se de ter os seguintes pré-requisitos instalados:
 
 <a href="https://openpyxl.readthedocs.io/en/stable/tutorial.html"><img src="https://img.shields.io/badge/Openpyxl-3.1.2-ffdb58"></a>
 
-
-
 ```
  > pip install openyxl
 ```
-
+</details>
 
 **Clonando o repositório**
 >Também é possível iniciar o projeto com o GitHub Codepaces, ao navegar para `<>Code`, selecionar Codespace e clicar em `Create codespace on main`.
+<br/>
+
 
 ```
 $ git clone https://github.com/tiengeman/genesis-plotly
@@ -85,9 +93,7 @@ $ cd genesis-plotly
 > shiny run app.py
 ```
 
-<h1>
-  <img src="https://ik.imagekit.io/palitos/genesisrun.gif?updatedAt=1714138806739">
-</h1>
+![genesisrun](https://github.com/tiengeman/genesis-plotly/assets/167530396/2b3f5d25-e4b3-44e2-bcba-04b9aebde330)
 
 
 <br>
@@ -99,13 +105,24 @@ $ cd genesis-plotly
 
 #### `app.py`
 
-O código exibe dados de desempenho mensal por competência em uma tabela interativa.
+O código cria um aplicativo web interativo que exibe tabelas de desempenho mensal por competência, permitindo ao usuário selecionar diferentes competências através de uma lista suspensa e visualizar os dados formatados em tabelas.
 
-Os módulos importados são o framework Dash para inetrface, e as funções definidas nos arquivos `banco.py` e `back.py`.
+Os módulos importados são o framework Dash para interface, e as funções definidas nos arquivos `banco.py` e `back.py`.
+
+Define um dicionário de cores para ser utilizado no estilo do aplicativo.
+```
+colors = {
+    'background': '#F8F8F8',  # Cinza claro para o fundo da página
+    'text': '#333333',        # Cor de texto principal em preto
+    'orange': '#FF4E00',      # Laranja
+    'white': '#FFFFFF',       # Branco
+    'gray': '#CCCCCC'         # Cinza claro para elementos secundários
+}
+```
 
 O código define um layout que consiste em um título, uma lista suspensa(dropdown) e uma área para exibir a tabela selecionada. A função atualiza a tabela exibida com base na seleção feita na lista suspensa.
 
-A função tabela(selecao) retorna um DataFrame com os dados de desempenho mensal por competência.
+A função `tabela(selecao)` retorna um DataFrame com os dados de desempenho mensal por competência.
 
 ```
 def atualizar_tabela(selecao):
@@ -113,12 +130,27 @@ def atualizar_tabela(selecao):
         df_tabela = tabela(selecao)
         ...
 ```
+
+O código define duas callbacks que atualizam as tabelas quando um item é selecionado no dropdown. As callbakcs chamam as funções atualizar_tabela e atualizar_tabela2.
+
+```
+@app.callback(
+    Output('tabela-container', 'children'),
+    [Input('minha-lista-suspensa', 'value')]
+)
+```
+
+As funções `atualizar_tabela` e `atualizar_tabela2` são responsáveis por criar e atualizar tabelas com base na seleção feita no dropdown. Elas obtêm os dadso da tabela através de funções tabela e tabela2, aplicam formatação aos dados numéricos para o estilo brasileiro e retorna, tabelas formatadas em formato Dash DataTable.
+
 A tabela é formatada usando a classe `dash_table.DataTable`. Cada coluna tem um nome, ID e um tipo de dado associado. Algumas colunas possuem valor monetário.
+
+O código verifica se o script está sendo executado diretamnete e, nesse caso, inicia o servidor Dash com a opção de depuração ativada.
 
 #### `banco.py`
 Analisa e resume dados financeiros relacionados a contratos e despesas.
 
 A função tabela cria tabela resumo. Ela chama algumas funções para gerar listas de dados que são usadas para criar um Dataframe do pandas.
+
 
 ```
 def tabela(mes): #função que gera a tabela principal do resumo
@@ -133,7 +165,7 @@ def inativo(lista_valores):
     ...
 ```
 
-A função ordena_lista  recebe a lista de contratos e uma lista de tuplas(contrato,valor) e retorna uma lista de valores ordenada de acordo com a lista de contratos.
+A função `ordena_lista`  recebe a lista de contratos e uma lista de tuplas(contrato,valor) e retorna uma lista de valores ordenada de acordo com a lista de contratos.
 
 ```
 def ordena_lista(lista_contrato, lista_desp): 
@@ -143,7 +175,7 @@ def ordena_lista(lista_contrato, lista_desp):
         ...  
 ```
 
-Função subtrair_listas recebe duas listas e retorna uma nova lista contendo a subtração elemento por elemento.
+Função `subtrair_listas` recebe duas listas e retorna uma nova lista contendo a subtração elemento por elemento.
 
 ```
 def subtrair_listas(lista1, lista2): #calcula o lucro
@@ -152,7 +184,7 @@ def subtrair_listas(lista1, lista2): #calcula o lucro
         return "As listas precisam ter o mesmo comprimento!"
 ```
 
-Função perc recebe duas listas e retorna uma lista contendo o percentual de cada elemento da segunda lista em relação ao correspondente na primeira lista.
+Função `perc` recebe duas listas e retorna uma lista contendo o percentual de cada elemento da segunda lista em relação ao correspondente na primeira lista.
 
 ```
 def perc(lista_soma_comp, list_lucro): #função que retorna a lista com o calculo do percentual
@@ -161,9 +193,8 @@ def perc(lista_soma_comp, list_lucro): #função que retorna a lista com o calcu
     ...
 ```
 
-Função merge_list_into_tuples recebe duas listas e as combina em uma lista de tuplas.
+Função `merge_list_into_tuples` recebe duas listas e as combina em uma lista de tuplas.
 Um dataframe do pandas é criado usando os dados gerados pelas funções anteriores.
-
 
 
 <br>
@@ -172,13 +203,13 @@ Um dataframe do pandas é criado usando os dados gerados pelas funções anterio
 
 #### `__init__.py`
 
-Importa todos os arquivos da pasta back e suas funções 
+Importa todos os arquivos da pasta back e suas funções.
 
 #### `banco_teste.py`
 
 * Parte dos import :  MongoClient, ServerApi.
 
-* Conexão com o banco mongodb utilizando username, senha e endereço. Está conectando o banco Project e a coleção "Despesas relatório".
+* Conexão com o banco de dados Mongodb utilizando username, senha e endereço. Está conectando o banco Project e a coleção "Despesas relatório".
 
 
 #### `despesasrel.py`
@@ -190,25 +221,28 @@ host = 'dbconnect.megaerp.online'
 
 Essa função define os parâmetros de conexão com o banco de dados mega. 
 
-Também define uma consulta utilizando muitas tabelas e junções para buscar as informações da tabela despesas no banco. A consulta é executada e é criado um dicionário Python contendo as informações e adiciona esse dicionário à lista 'documents'. 
+Também define uma consulta utilizando muitas tabelas e junções para buscar as informações da tabela "Despesas" no banco. A consulta é executada e é criado um dicionário Python contendo as informações e adiciona esse dicionário à lista 'documents'. 
 
 #### `queries.py`
 
-Retorna a lista de nomes de contratos presentes na coleção 'Contratos' do banco de dados MongoDB.
+Sistema de análise de dados financeiros e de medição de projeto, onde as informações são extraídas no banco de dados MongoDb e manipuladas para cálculos específicos e apresentaçãoes de resultados.
+
+A função `pega_contratos` recupera a lista de descrições de contratos da coleção "Cotratos" do MongoDB.
 
 ```
 def pega_contratos(db):
     lista_desc = []
     lista_projs = []
 ```
-Essa função calcula o valor total das despesas para cada contrato. Ela recebe como entrada objeto do banco de dados e uma lista de contratos e retorna uma lista de tuplas, onde cada tupla contém o nome do contrato e o valor total das despesas associadas a esse contrato.
+
+Essa função calcula o valor total das despesas financeiras, folha e de relatóroi para cada contrato. Ela recebe como entrada objeto do banco de dados e uma lista de contratos e retorna uma lista de tuplas, onde cada tupla contém o nome do contrato e o valor total das despesas associadas a esse contrato.
 
 ```
 def total_despesa(db,contratos):
 
     soma_total = 0
 ```
-Calcula o valor total das despesas para cada contrato em uma competência específica.Ela recebe como entrada o objeto do banco de dados, uma competência, e uma lista de contratos, retornando uma lista de tuplas com oo nome do contrato e o valor total das despesas para essa competência.
+Calcula o valor total das despesas para cada contrato em uma competência específica. Ela recebe como entrada o objeto do banco de dados, uma competência, e uma lista de contratos, retornando uma lista de tuplas com oo nome do contrato e o valor total das despesas para essa competência.
 
 ```
 def total_despesa_competencia(db,competencia,contratos):
@@ -220,7 +254,41 @@ def total_despesa_competencia(db,competencia,contratos):
     colecao_despesa_relatorio = db.get_collection('Despesas Relatório')
 ```
 
-Consulta o valor total das medições para cada contrato em uma competência específica. Recebecomo entrada a copet~encia, uma lista de contratos e o objeto do banco de dados.
+A função `medicao` retorna uma lista de descrições de projetos centro de custp e totais de medição par uma competencia específicas.
+
+```
+def medicao(competencia, db=back.db):
+
+    colecao_medicao = db.get_collection('Receitas')
+    ...
+```
+
+A função `medicao_total` é similar a `medicao`, mas calcula para todas as competências.
+```
+def medicao_total(db=back.db):
+
+    colecao_med_total = db.get_collection('Receitas')
+    ...
+```
+
+
+A função `competencia` retorna uma lista de todas as competencias presente na coleção de "Receitas".
+
+```
+def competencias(db=back.db):
+    colecao_competencia = db.get_collection('Receitas')
+    filtro = colecao_competencia.distinct('competencia-medicao')
+```
+
+Ordena uma liistta de datas no formato "mês/ano" de forma cronológica.
+```
+def ordenar_datas(lista):
+    meses = {
+        'janeiro': 1,
+        'fevereiro': 2,
+        ...
+    }
+```
 
 
 <br>
@@ -231,7 +299,7 @@ Consulta o valor total das medições para cada contrato em uma competência esp
 
 As importações incluem as bibliotecas oraclesb para se conectar ao banco de dados Mega, pandas para manipulação de dados e openpyxl para trabalhar com arquivos excel.
 
-Na função `pega filiais`, primeiro define os parametros para a conexão com o banco. A consulta sql seleciona informações sobre as filiais. 
+Na função `pega filiais`, primeiro define os parâmetros para a conexão com o banco. A consulta sql seleciona informações sobre as filiais. 
 
 O resultado da consulta vai para a lista `filiais`:
 
@@ -243,9 +311,10 @@ O resultado da consulta vai para a lista `filiais`:
 
 retorno = pega_filiais()
 ```
+---
 
 #### `rel_notas.py`
-Esse códigose conecta com o banco de dados Mega, realiza uma consulta e retorna informações sobre despesas relacionadas a recebimentos de itens.
+Esse código se conecta com o banco de dados Mega, realiza uma consulta e retorna informações sobre despesas relacionadas a recebimentos de itens.
 
 A função `pega_infps_para_despesasrel` define variáveis de conexão com o banco de dados:
 
