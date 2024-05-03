@@ -87,10 +87,8 @@ Certifique-se de ter os seguintes pré-requisitos instalados:
 $ git clone https://github.com/tiengeman/genesis-plotly
 
 $ cd genesis-plotly
-```
-**Run**
-```
-> shiny run app.py
+
+$ shiny run app.py
 ```
 
 ![genesisrun](https://github.com/tiengeman/genesis-plotly/assets/167530396/2b3f5d25-e4b3-44e2-bcba-04b9aebde330)
