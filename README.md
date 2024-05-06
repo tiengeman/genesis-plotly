@@ -90,8 +90,7 @@ $ cd genesis-plotly
 
 $ python app.py
 ```
-
-[![Design sem nome](https://github.com/tiengeman/genesis-plotly/assets/167530396/03a7c5c1-005c-405c-9c66-3d684a14f695)](https://github.com/tiengeman/genesis-plotly/assets/167530396/45bd2532-1b48-44f9-8681-0779e925d44a)
+[genesis-plotly-run.gif]
 
 
 <br>
