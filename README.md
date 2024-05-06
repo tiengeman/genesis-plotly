@@ -14,8 +14,8 @@ Sistema de gerenciamento de faturamento em python e banco de dados MongoDB.
 
 <br>
 
-### Instalação
----
+## Instalação
+
 
 **Pré-requisitos**
 
@@ -88,16 +88,15 @@ $ git clone https://github.com/tiengeman/genesis-plotly
 
 $ cd genesis-plotly
 
-$ shiny run app.py
+$ python app.py
 ```
 
-![genesisrun](https://github.com/tiengeman/genesis-plotly/assets/167530396/2b3f5d25-e4b3-44e2-bcba-04b9aebde330)
+[![Design sem nome](https://github.com/tiengeman/genesis-plotly/assets/167530396/03a7c5c1-005c-405c-9c66-3d684a14f695)](https://github.com/tiengeman/genesis-plotly/assets/167530396/45bd2532-1b48-44f9-8681-0779e925d44a)
 
 
 <br>
  
-### Estrutura do codigo
----
+## Estrutura do codigo
 
 ### 🗀 FRONT END
 
@@ -145,17 +144,26 @@ A tabela é formatada usando a classe `dash_table.DataTable`. Cada coluna tem um
 O código verifica se o script está sendo executado diretamnete e, nesse caso, inicia o servidor Dash com a opção de depuração ativada.
 
 #### `banco.py`
+
 Analisa e resume dados financeiros relacionados a contratos e despesas.
 
-A função tabela cria tabela resumo. Ela chama algumas funções para gerar listas de dados que são usadas para criar um Dataframe do pandas.
+A função tabela cria tabela resumo com base no mês fornecido. Ela chama algumas funções para gerar listas de dados que são usadas para criar um Dataframe.
 
 
 ```
-def tabela(mes): #função que gera a tabela principal do resumo
+def tabela(mes): 
     lista_contrato, lista_soma_comp, lista_cc = back.medicao(mes)
     ...
 ```
-A função inativo recebe uma lista de valores e retorna uma lista indicando se cada valor é igual zero ou não.
+
+A função `tabela_2(mes)` gera uma tabela diferente com base em gastos para investimento da empresa.
+```
+def tabela_2(mes):
+    lista_contrato = ['INVESTIMENTOS (CONTRATO)', 'EXPANSÃO - FILIAL MACAÉ', 'EXPANSÃO - MATRIZ RECIFE', 'DEPÓSITOS JUDICIAIS', 'ENGEMAN TECNOLOGIAS']
+    list_local = ['CAPEX']*len(lista_contrato)
+```
+
+A função `inativo` determina se um contrato está inativo com base nos valores fornecidos.
 
 ```
 def inativo(lista_valores): 
@@ -173,10 +181,10 @@ def ordena_lista(lista_contrato, lista_desp):
         ...  
 ```
 
-Função `subtrair_listas` recebe duas listas e retorna uma nova lista contendo a subtração elemento por elemento.
+Função `subtrair_listas` recebe duas listas e retorna uma nova lista contendo a subtração dos elementos.
 
 ```
-def subtrair_listas(lista1, lista2): #calcula o lucro
+def subtrair_listas(lista1, lista2):
     # Verifica se as listas têm o mesmo comprimento
     if len(lista1) != len(lista2):
         return "As listas precisam ter o mesmo comprimento!"
@@ -185,7 +193,7 @@ def subtrair_listas(lista1, lista2): #calcula o lucro
 Função `perc` recebe duas listas e retorna uma lista contendo o percentual de cada elemento da segunda lista em relação ao correspondente na primeira lista.
 
 ```
-def perc(lista_soma_comp, list_lucro): #função que retorna a lista com o calculo do percentual
+def perc(lista_soma_comp, list_lucro): 
     lista_perc = []
     for i in range(len(lista_soma_comp)):
     ...
@@ -194,6 +202,32 @@ def perc(lista_soma_comp, list_lucro): #função que retorna a lista com o calcu
 Função `merge_list_into_tuples` recebe duas listas e as combina em uma lista de tuplas.
 Um dataframe do pandas é criado usando os dados gerados pelas funções anteriores.
 
+`medicao_capex(mes)` calcula as medições para os contratos de capital dos meses.
+```
+def medicao_capex(mes):
+    lista_capex = ['INVESTIMENTOS (CONTRATO)', 'EXPANSÃO - FILIAL MACAÉ', 'EXPANSÃO - MATRIZ RECIFE', 'DEPÓSITOS JUDICIAIS', 'ENGEMAN TECNOLOGIAS']
+    medicao = []
+```
+
+`medicao_capex_total` calcula as medições totais para os contratos de capital.
+```
+def medicao_capex_total():
+    lista_capex = ['INVESTIMENTOS (CONTRATO)', 'EXPANSÃO - FILIAL MACAÉ', 'EXPANSÃO - MATRIZ RECIFE', 'DEPÓSITOS JUDICIAIS', 'ENGEMAN TECNOLOGIAS']
+    medicao_total = []
+```
+
+
+Função `remove_capex` remove os contratos de capital da listade cotratos, valores e centros de custo.
+
+```
+def remove_capex(lista_contratos, lista_valor, lista_cc):
+    lista_capex = ['INVESTIMENTOS (CONTRATO)', 'EXPANSÃO - FILIAL MACAÉ', 'EXPANSÃO - MATRIZ RECIFE', ...]
+```
+
+O código lida com dados de contratos, medições, despesas e lucros, organizando-os em tabelas para a análise visualização.
+
+#### `requerimentos.txt`
+Mostra as bibliotecas python e as versões com recursos utilizados nos códigos.
 
 <br>
 
@@ -212,18 +246,18 @@ Importa todos os arquivos da pasta back e suas funções.
 
 #### `despesasrel.py`
 
+A função `insert_despesasrel` define os parâmetros de conexão com o banco de dados Mega.
+
 ```bash
 Def insert_despesasrel(collection):
 host = 'dbconnect.megaerp.online' 
 ```
 
-Essa função define os parâmetros de conexão com o banco de dados mega. 
-
 Também define uma consulta utilizando muitas tabelas e junções para buscar as informações da tabela "Despesas" no banco. A consulta é executada e é criado um dicionário Python contendo as informações e adiciona esse dicionário à lista 'documents'. 
 
 #### `queries.py`
 
-Sistema de análise de dados financeiros e de medição de projeto, onde as informações são extraídas no banco de dados MongoDb e manipuladas para cálculos específicos e apresentaçãoes de resultados.
+Sistema de análise de dados financeiros e de medição de projeto, onde as informações são extraídas no banco de dados MongoDb e manipuladas para cálculos e apresentação de resultados.
 
 A função `pega_contratos` recupera a lista de descrições de contratos da coleção "Cotratos" do MongoDB.
 
@@ -357,6 +391,9 @@ A consulta envolve as tabelas EST_RECEBIMENTO, EST_ITENSRECEB, EST_ITENSRECEB_CC
 
 A consulta retorna informações sobre ação, nome da ação, tipo de nota, número e nome do projeto,centro de custo, número da nota fiscal, código e nome do agente, item, descrição do item, valor do item por projeto, código e nome da classe financeira, e data de entrada da nota.
 
+
+### Pastas e arquivos
+___
 
 ```shell
 genesis/
