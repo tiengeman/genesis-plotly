@@ -30,6 +30,10 @@ Certifique-se de ter os seguintes pré-requisitos instalados:
 
  * [Git](https://git-scm.com/download/win)
 
+```
+pip install all -r requirements.txt
+```
+
 <br/>
 
 <details>
