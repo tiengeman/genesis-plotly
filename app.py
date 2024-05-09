@@ -2,32 +2,74 @@
 import dash
 import dash_bootstrap_components as dbc
 from dash import html, dcc
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import pages.pagina1 as pagina1
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+# Constants
+HOME_URL = '/home'
+PAGE1_URL = '/page1'
+logo = 'https://i0.wp.com/engeman.net/wp-content/uploads/2024/04/LOGO_ENGEMAN_HORIZONTAL-e1714498268589.png?w=851&ssl=1'
+
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP])
 server = app.server
 
-# Layout
 sidebar = dbc.Nav(
     [
-        dbc.NavItem(dbc.NavLink('Home', href='/home', className='nav-link')),
-        dbc.NavItem(dbc.NavLink('Page 1', href='/page1', className='nav-link')),
+        dbc.NavItem(dbc.NavLink('Home', href=HOME_URL, className='nav-link')),
+        dbc.NavItem(dbc.NavLink('Gerencial', href=PAGE1_URL, className='nav-link')),
         #...
     ],
     vertical=True,  # Make the nav items stack vertically
     pills=True,  # Make the nav items take up the full width of the sidebar
-    className='bg-light'  # Add a light background color to the sidebar
 )
 
+offcanvas = html.Div(
+    [
+        dbc.Button(
+            html.I(className="bi bi-list"),  # Use Bootstrap Icon
+            id="open-offcanvas",
+            n_clicks=0,
+            color='#FF4E00',
+            size="lg",  # Add a size to the button
+            style={"font-size": "1.75em"},  # Increase the font size
+        ),
+        dbc.Offcanvas(
+            sidebar,
+            id="offcanvas",
+            title="Menu",
+            is_open=False,
+        ),
+    ]
+)
+
+# Top navigation bar
+header = dbc.Navbar(
+    dbc.Row(
+        [
+            dbc.Col(offcanvas),
+            dbc.Col(
+                html.A(
+                    html.Img(src=logo, height="60px"),
+                    href="/home",
+                    style={"textDecoration": "none"}  # Add this style to remove the default underline
+                )
+            ),
+        ]
+    ),
+    color='#DCDCDC',
+    dark=True,
+    className='justify-content-between',  # Add this class to justify the content
+)
+
+# Content area
 content_area = html.Div(id='content')
 
 app.layout = html.Div([
+    header,
     dcc.Location(id='url', refresh=False),
     dbc.Row([
-        dbc.Col(sidebar, width=1, className='bg-light'),  # Make the sidebar take up 2 columns
-        dbc.Col(content_area, width=10)  # Make the content area take up 10 columns
-    ])
+        dbc.Col(content_area),  # Make the content area take up 10 columns
+    ]),
 ])
 
 # Callbacks
@@ -36,12 +78,12 @@ app.layout = html.Div([
     [Input('url', 'pathname')]
 )
 def update_content(pathname):
-    if pathname == '/page1':
+    if pathname == PAGE1_URL:
         return pagina1.layout
     else:
         return html.Div([
             html.H1('Home'),
-            html.P('This is a simple text message.')
+            html.P('This is a simple text message.'),
         ])
 
 def update_table(output_id, value):
@@ -50,20 +92,23 @@ def update_table(output_id, value):
     elif output_id == 'tabela2-container':
         return pagina1.atualizar_tabela2(value)
 
-
 @app.callback(
     Output('tabela-container', 'children'),
-    [Input('minha-lista-suspensa', 'value')]
-)
-def update_table1(value):
-    return update_table('tabela-container', value)
-
-@app.callback(
     Output('tabela2-container', 'children'),
     [Input('minha-lista-suspensa', 'value')]
 )
-def update_table2(value):
-    return update_table('tabela2-container', value)
+def update_tables(value):
+    return update_table('tabela-container', value), update_table('tabela2-container', value)
+    
+@app.callback(
+    Output("offcanvas", "is_open"),
+    Input("open-offcanvas", "n_clicks"),
+    [State("offcanvas", "is_open")],
+)
+def toggle_offcanvas(n1, is_open):
+    if n1:
+        return not is_open
+    return is_open
 
 if __name__ == '__main__':
     app.run_server(debug=True)

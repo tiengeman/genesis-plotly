@@ -16,8 +16,9 @@ colors = {
     'gray': '#CCCCCC'         # Cinza claro para elementos secundários
 }
 
-layout = html.Div(style={'fontFamily': 'Arial, sans-serif'}, children=[
-    html.H2(children='Performance Mensal por Competência', style={'color': colors['orange'], 'textAlign': 'center', 'arginTop': '20px', 'arginBottom': '20px', 'fontSize': '2em'}),
+# Define a layout with a centered container
+layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center'}, children=[
+    html.H1(children='Performance Mensal por Competência', style={'color': colors['orange'], 'fontSize': '2em', 'marginTop': '10px'}),
     html.Hr(style={'backgroundColor': colors['orange']}),  # Linha horizontal laranja
     html.Div(style={'marginTop': '20px'}),
     # Lista suspensa
@@ -28,8 +29,8 @@ layout = html.Div(style={'fontFamily': 'Arial, sans-serif'}, children=[
         style={'fontFamily': 'Arial, sans-serif'}  # Definindo a fonte da lista suspensa
     ),
     html.Div(style={'marginTop': '20px'}),  # Espaçamento entre dropdown e tabela
-    html.Div(id='tabela-container'),  # Div para mostrar a tabela selecionada com margem
-    html.Div(id='tabela2-container')  # Div para mostrar a tabela selecionada com margem
+    html.Div(id='tabela-container', style={'margin': '20px'}),  # Div para mostrar a tabela selecionada com margem
+    html.Div(id='tabela2-container', style={'margin': '20px'})  # Div para mostrar a tabela selecionada com margem
 ])
 
 def atualizar_tabela(selecao):
