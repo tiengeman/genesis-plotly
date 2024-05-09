@@ -6,6 +6,7 @@ from dash.dependencies import Input, Output
 import pages.pagina1 as pagina1
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+server = app.server
 
 # Layout
 sidebar = dbc.Nav(
