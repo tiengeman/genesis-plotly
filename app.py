@@ -3,11 +3,12 @@ import dash
 import dash_bootstrap_components as dbc
 from dash import html, dcc
 from dash.dependencies import Input, Output, State
-import pages.pagina1 as pagina1
+import pages.gerencial as gerencial
+import pages.home as home
 
 # Constants
 HOME_URL = '/home'
-PAGE1_URL = '/page1'
+PAGE1_URL = '/gerencial'
 logo = 'https://i0.wp.com/engeman.net/wp-content/uploads/2024/04/LOGO_ENGEMAN_HORIZONTAL-e1714498268589.png?w=851&ssl=1'
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP])
@@ -79,18 +80,15 @@ app.layout = html.Div([
 )
 def update_content(pathname):
     if pathname == PAGE1_URL:
-        return pagina1.layout
+        return gerencial.layout
     else:
-        return html.Div([
-            html.H1('Home'),
-            html.P('This is a simple text message.'),
-        ])
+        return home.layout
 
 def update_table(output_id, value):
     if output_id == 'tabela-container':
-        return pagina1.atualizar_tabela(value)
+        return gerencial.atualizar_tabela(value)
     elif output_id == 'tabela2-container':
-        return pagina1.atualizar_tabela2(value)
+        return gerencial.atualizar_tabela2(value)
 
 @app.callback(
     Output('tabela-container', 'children'),
