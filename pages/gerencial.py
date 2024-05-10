@@ -50,7 +50,11 @@ def atualizar_tabela2(selecao):
         return html.P("Nenhuma tabela disponível para esta seleção.")
 
 def format_numeric_columns(df, columns):
+    # Configura a localidade para o Brasil
+    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+
     for col in columns:
+        # Aplica a formatação para cada valor na coluna
         df[col] = df[col].apply(lambda x: locale.format_string('%1.2f', x, grouping=True))
 
 def create_datatable(df, colors):
