@@ -5,10 +5,10 @@ from dash import html, dcc
 from dash.dependencies import Input, Output, State
 import pages.gerencial as gerencial
 import pages.home as home
+import pages.diretoria as diretoria
+import pages.relacao as relacao
 
 # Constants
-HOME_URL = '/home'
-PAGE1_URL = '/gerencial'
 logo = 'https://i0.wp.com/engeman.net/wp-content/uploads/2024/04/LOGO_ENGEMAN_HORIZONTAL-e1714498268589.png?w=851&ssl=1'
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP])
@@ -16,9 +16,10 @@ server = app.server
 
 sidebar = dbc.Nav(
     [
-        dbc.NavItem(dbc.NavLink('Home', href=HOME_URL, className='nav-link')),
-        dbc.NavItem(dbc.NavLink('Gerencial', href=PAGE1_URL, className='nav-link')),
-        #...
+        dbc.NavItem(dbc.NavLink('Home', href='/home', className='nav-link')),
+        dbc.NavItem(dbc.NavLink('Gerencial', href='/gerencial', className='nav-link')),
+        dbc.NavItem(dbc.NavLink('Diretoria', href='/diretoria', className='nav-link')),
+        dbc.NavItem(dbc.NavLink('Relacao', href='/relacao', className='nav-link')),
     ],
     vertical=True,  # Make the nav items stack vertically
     pills=True,  # Make the nav items take up the full width of the sidebar
@@ -79,8 +80,12 @@ app.layout = html.Div([
     [Input('url', 'pathname')]
 )
 def update_content(pathname):
-    if pathname == PAGE1_URL:
+    if pathname == '/gerencial':
         return gerencial.layout
+    elif pathname == '/diretoria':
+        return diretoria.layout
+    elif pathname == '/relacao':
+        return relacao.layout
     else:
         return home.layout
 
