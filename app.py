@@ -19,7 +19,7 @@ sidebar = dbc.Nav(
         dbc.NavItem(dbc.NavLink('Home', href='/home', className='nav-link')),
         dbc.NavItem(dbc.NavLink('Gerencial', href='/gerencial', className='nav-link')),
         dbc.NavItem(dbc.NavLink('Diretoria', href='/diretoria', className='nav-link')),
-        dbc.NavItem(dbc.NavLink('Relacao', href='/relacao', className='nav-link')),
+        dbc.NavItem(dbc.NavLink('Relação', href='/relacao', className='nav-link')),
     ],
     vertical=True,  # Make the nav items stack vertically
     pills=True,  # Make the nav items take up the full width of the sidebar
@@ -31,9 +31,10 @@ offcanvas = html.Div(
             html.I(className="bi bi-list"),  # Use Bootstrap Icon
             id="open-offcanvas",
             n_clicks=0,
-            color='#FF4E00',
-            size="lg",  # Add a size to the button
-            style={"font-size": "1.75em"},  # Increase the font size
+            size="md",  # Add a size to the button
+            color = '#FF4E00',
+            style={"font-size": "1.60em"},  # Set the background color to #FF4E00
+            className='btn-white',
         ),
         dbc.Offcanvas(
             sidebar,
@@ -49,18 +50,19 @@ header = dbc.Navbar(
     dbc.Row(
         [
             dbc.Col(offcanvas),
-            dbc.Col(
-                html.A(
-                    html.Img(src=logo, height="60px"),
-                    href="/home",
-                    style={"textDecoration": "none"}  # Add this style to remove the default underline
-                )
+            dbc.Col( #adicionar a imagem depois
+                # html.A(
+                #     html.Img(src=logo, height="60px"),
+                #     href="/home",
+                #     style={"textDecoration": "none"}  # Add this style to remove the default underline
+                # )
             ),
         ]
     ),
-    color='#DCDCDC',
+    color='#FF4E00',
     dark=True,
     className='justify-content-between',  # Add this class to justify the content
+    style={'height': '50px'}  # Reduce the height of the header
 )
 
 # Content area

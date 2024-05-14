@@ -15,7 +15,7 @@ colors = {
 
 # Define a layout with a centered container
 layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center'}, children=[
-    html.H1(children='Performance Mensal por Competência', style={'color': colors['orange'], 'marginTop': '10px'}),
+    html.H1(children='Performance Mensal por Competência', style={'color': '#616468', 'marginTop': '10px'}),
     html.Hr(style={'backgroundColor': colors['orange']}),  # Linha horizontal laranja
     html.Div(style={'marginTop': '20px'}),
     # Lista suspensa

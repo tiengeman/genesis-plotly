@@ -53,20 +53,29 @@ def tabela(mes): #função que gera a tabela principal do resumo
 
 def tabela_2(mes):
     lista_contrato = ['INVESTIMENTOS (CONTRATO)', 'EXPANSÃO - FILIAL MACAÉ', 'EXPANSÃO - MATRIZ RECIFE', 'DEPÓSITOS JUDICIAIS', 'ENGEMAN TECNOLOGIAS']
-    list_local = ['CAPEX']*len(lista_contrato)
-    lista_cc = ['888', '2180', '2250', '1111', '1930']
+    lista_contrato.append('TOTAL OPERAÇÃO')
+    list_local = ['CAPEX']*(len(lista_contrato)-1)
+    list_local.append("")
+    lista_cc = ['888', '2180', '2250', '1111', '1930', ""]
     list_inativo = [None]*len(lista_contrato)
     list_filial = [None]*len(lista_contrato)
     lista_soma_comp = medicao_capex(mes)
+    lista_soma_comp.append(sum(lista_soma_comp))
     tupla_despesas = back.total_despesa_competencia(mes) #gera uma lista de tuplas com as info
     list_despesas = ordena_lista(lista_contrato, tupla_despesas) #aqui ele ordena os valores de acordo com a lista de contrato
+    del list_despesas[-1]
+    list_despesas.append(sum(list_despesas))
     list_lucro = subtrair_listas(lista_soma_comp, list_despesas)
     list_perc = list_perc = perc(lista_soma_comp, list_lucro)
     list_medicao_total = medicao_capex_total()
+    list_medicao_total.append(sum(list_medicao_total))
     tupla_despesa_total = back.total_despesa()
     list_desp_totais = ordena_lista(lista_contrato, tupla_despesa_total)
+    del list_desp_totais[-1]
+    list_desp_totais.append(sum(list_desp_totais))
     list_lucro_total = subtrair_listas(list_medicao_total, list_desp_totais)
     list_perc_total = perc(list_medicao_total, list_lucro_total)
+
     df = pd.DataFrame.from_dict(data={'LOCAL':list_local, 
                                       'CONTRATO':lista_contrato, 
                                       'C.CUSTOS':lista_cc, 
