@@ -1,5 +1,6 @@
 import pandas as pd
-import back.banco_teste
+# import back.banco_teste
+import banco_teste
 from datetime import datetime
 # from banco import client, DB_NAME,COLLECTION_NAME
 
@@ -206,6 +207,44 @@ def competencias(db=back.db):
 
     return comp
 
+def impostos_medicao(competencia,db=back.db):
+    colecao_impostos = db.get_collection('Despesas Impostos')
+
+    pipeline_impostos = [
+        {"$match": {"competencia-despesa": competencia}},
+        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa-imposto':{'$sum':'$valor-orginal-despesa'}}}
+    ]
+
+    total_imposto = colecao_impostos.aggregate(pipeline_impostos)
+
+    lista_contratos_imposto = []
+    despesas_impostos = []
+    
+    for i in total_imposto:
+        lista_contratos_imposto.append(i['_id']['descricao-projeto'])
+        despesas_impostos.append(i['despesa-imposto'])
+
+    return lista_contratos_imposto,despesas_impostos
+
+def deducoes_medicao(competencia,db=banco_teste.db,):
+    colecao_impostos = db.get_collection('Despesas Impostos')
+
+    pipeline_deducoes = [
+        {"$match": {"competencia-despesa": competencia}},
+        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa-imposto':{'$sum':'$valor-orginal-despesa'}}}
+    ]
+
+    total_deducoes = colecao_impostos.aggregate(pipeline_deducoes)
+
+    lista_contratos_deducoes = []
+    despesas_deducoes = []
+    
+    for i in total_deducoes:
+        lista_contratos_deducoes.append(i['_id']['descricao-projeto'])
+        despesas_deducoes.append(i['despesa-imposto'])
+
+    return lista_contratos_deducoes,despesas_deducoes
+
 def ordenar_datas(lista):
     # Define um dicionário para mapear os meses para seus números correspondentes
     meses = {
@@ -246,3 +285,7 @@ def ordenar_datas(lista):
     lista_ordenada = [data.replace(datetime.strptime(data.split('/')[0], '%B').strftime('%B').lower(), meses_pt[datetime.strptime(data.split('/')[0], '%B').strftime('%B').lower()]) for data in lista_ordenada]
 
     return lista_ordenada
+
+retorno1, retorno2 = deducoes_medicao('fevereiro/2024')
+
+print(retorno1)
