@@ -1,6 +1,5 @@
 import pandas as pd
-# import back.banco_teste
-import banco_teste
+import back.banco_teste
 from datetime import datetime
 # from banco import client, DB_NAME,COLLECTION_NAME
 
@@ -226,7 +225,7 @@ def impostos_medicao(competencia,db=back.db):
 
     return lista_contratos_imposto,despesas_impostos
 
-def deducoes_medicao(competencia,db=banco_teste.db,):
+def deducoes_medicao(competencia,db=back.db,):
     colecao_impostos = db.get_collection('Despesas Impostos')
 
     pipeline_deducoes = [
@@ -285,7 +284,3 @@ def ordenar_datas(lista):
     lista_ordenada = [data.replace(datetime.strptime(data.split('/')[0], '%B').strftime('%B').lower(), meses_pt[datetime.strptime(data.split('/')[0], '%B').strftime('%B').lower()]) for data in lista_ordenada]
 
     return lista_ordenada
-
-retorno1, retorno2 = deducoes_medicao('fevereiro/2024')
-
-print(retorno1)
