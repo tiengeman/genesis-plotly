@@ -206,7 +206,7 @@ def competencias(db=back.db):
 
     return comp
 
-def impostos_medicao(db=back.db):
+def impostos(db=back.db):
     colecao_impostos = db.get_collection('Despesas Impostos')
 
     pipeline_impostos = [
@@ -224,11 +224,11 @@ def impostos_medicao(db=back.db):
 
     return lista_contratos_imposto,despesas_impostos
 
-def deducoes_medicao(db=back.db,):
+def deducoes(db=back.db,):
     colecao_impostos = db.get_collection('Despesas Impostos')
 
     pipeline_deducoes = [
-        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa-imposto':{'$sum':'$valor-orginal-despesa'}}}
+        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa-deducao':{'$sum':'$valor-orginal-despesa'}}}
     ]
 
     total_deducoes = colecao_impostos.aggregate(pipeline_deducoes)
