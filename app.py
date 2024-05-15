@@ -7,6 +7,8 @@ import pages.gerencial as gerencial
 import pages.home as home
 import pages.diretoria as diretoria
 import pages.relacao as relacao
+import pages.impostos as impostos
+import pandas as pd
 
 # Constants
 logo = 'https://i0.wp.com/engeman.net/wp-content/uploads/2024/04/LOGO_ENGEMAN_HORIZONTAL-e1714498268589.png?w=851&ssl=1'
@@ -20,6 +22,7 @@ sidebar = dbc.Nav(
         dbc.NavItem(dbc.NavLink('Gerencial', href='/gerencial', className='nav-link')),
         dbc.NavItem(dbc.NavLink('Diretoria', href='/diretoria', className='nav-link')),
         dbc.NavItem(dbc.NavLink('Relação', href='/relacao', className='nav-link')),
+        dbc.NavItem(dbc.NavLink('Impostos', href='/impostos', className='nav-link')),
     ],
     vertical=True,  # Make the nav items stack vertically
     pills=True,  # Make the nav items take up the full width of the sidebar
@@ -88,6 +91,8 @@ def update_content(pathname):
         return diretoria.layout
     elif pathname == '/relacao':
         return relacao.layout
+    elif pathname == '/impostos':
+        return impostos.layout
     else:
         return home.layout
 
@@ -114,6 +119,19 @@ def toggle_offcanvas(n1, is_open):
     if n1:
         return not is_open
     return is_open
+
+# Define the callback to add a new fee to the table
+@app.callback(
+    Output('fees-table', 'data'),
+    [Input('add-fee-button', 'n_clicks')],
+    [State('new-fee-description', 'value'), State('new-fee-amount', 'value'), State('fees-table', 'data')]
+)
+def add_fee_callback(n_clicks, new_fee_description, new_fee_amount, fees_data):
+    if n_clicks > 0:
+        new_fee = {'DESCRIPTION': new_fee_description, 'AMOUNT': new_fee_amount}
+        fees_data = impostos.add_fee(pd.DataFrame(fees_data), new_fee)
+        return fees_data.to_dict('records')
+    return fees_data
 
 if __name__ == '__main__':
     app.run_server(debug=True)
