@@ -16,7 +16,7 @@ def tabela(mes): #função que gera a tabela principal do resumo
     list_local = [None]*len(lista_contrato_final)
     list_inativo = inativo(lista_soma_comp) #gera a lista se é inativo ou não
     del list_inativo[-1]
-    list_inativo.append('')
+    list_inativo.append('NÃO')
     list_filial = [None]*len(lista_contrato_final)
     list_despesas = ordena_lista(lista_contrato_final, tupla_despesas) #aqui ele ordena os valores de acordo com a lista de contrato
     del list_despesas[-1]
@@ -53,11 +53,13 @@ def tabela(mes): #função que gera a tabela principal do resumo
 
 def tabela_2(mes):
     lista_contrato = ['INVESTIMENTOS (CONTRATO)', 'EXPANSÃO - FILIAL MACAÉ', 'EXPANSÃO - MATRIZ RECIFE', 'DEPÓSITOS JUDICIAIS', 'ENGEMAN TECNOLOGIAS']
-    lista_contrato.append('TOTAL OPERAÇÃO')
+    lista_contrato.append('TOTAL CAPEX')
     list_local = ['CAPEX']*(len(lista_contrato)-1)
     list_local.append("")
     lista_cc = ['888', '2180', '2250', '1111', '1930', ""]
     list_inativo = [None]*len(lista_contrato)
+    del list_inativo[-1]
+    list_inativo.append("NÂO")
     list_filial = [None]*len(lista_contrato)
     lista_soma_comp = medicao_capex(mes)
     lista_soma_comp.append(sum(lista_soma_comp))

@@ -10,12 +10,12 @@ colors = {
     'text': '#333333',        # Cor de texto principal em preto
     'orange': '#FF4E00',      # Laranja
     'white': '#FFFFFF',       # Branco
-    'gray': '#CCCCCC'         # Cinza claro para elementos secundários
+    'gray': '#616468'         # Cinza claro para elementos secundários
 }
 
 # Define a layout with a centered container
 layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center'}, children=[
-    html.H1(children='Performance Mensal por Competência', style={'color': '#616468', 'marginTop': '10px'}),
+    html.H1(children='Performance Mensal por Competência', style={'marginTop': '10px'}),
     html.Hr(style={'backgroundColor': colors['orange']}),  # Linha horizontal laranja
     html.Div(style={'marginTop': '20px'}),
     # Lista suspensa
@@ -102,7 +102,30 @@ def create_datatable(df, colors):
                     'filter_query': "{CONTRATO} = 'TOTAL OPERAÇÃO'",
                 },
                 'backgroundColor': colors['gray'],
+                'color': 'white',
                 'fontWeight': 'bold',
+            },
+            {
+                'if': {
+                    'filter_query': "{CONTRATO} = 'TOTAL OPERAÇÃO'",
+                    'column_id': 'INATIVO',
+                },
+                'color': colors['gray'],
+            },
+                        {
+                'if': {
+                    'filter_query': "{CONTRATO} = 'TOTAL CAPEX'",
+                },
+                'backgroundColor': colors['gray'],
+                'color': 'white',
+                'fontWeight': 'bold',
+            },
+            {
+                'if': {
+                    'filter_query': "{CONTRATO} = 'TOTAL CAPEX'",
+                    'column_id': 'INATIVO',
+                },
+                'color': colors['gray'],
             },
             {
                 'if': {
