@@ -206,11 +206,10 @@ def competencias(db=back.db):
 
     return comp
 
-def impostos_medicao(competencia,db=back.db):
+def impostos_medicao(db=back.db):
     colecao_impostos = db.get_collection('Despesas Impostos')
 
     pipeline_impostos = [
-        {"$match": {"competencia-despesa": competencia}},
         {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa-imposto':{'$sum':'$valor-orginal-despesa'}}}
     ]
 
@@ -225,11 +224,10 @@ def impostos_medicao(competencia,db=back.db):
 
     return lista_contratos_imposto,despesas_impostos
 
-def deducoes_medicao(competencia,db=back.db,):
+def deducoes_medicao(db=back.db,):
     colecao_impostos = db.get_collection('Despesas Impostos')
 
     pipeline_deducoes = [
-        {"$match": {"competencia-despesa": competencia}},
         {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa-imposto':{'$sum':'$valor-orginal-despesa'}}}
     ]
 
