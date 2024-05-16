@@ -189,3 +189,9 @@ def remove_capex(lista_contratos, lista_valor, lista_cc): #função para gerar u
         del lista_cc[i]
     
     return lista_contratos, lista_valor, lista_cc
+
+def df_impostos():
+    lista_contrato, lista_impostos = back.impostos()
+    df = pd.DataFrame.from_dict(data={'CONTRATO': lista_contrato,
+                                      'IMPOSTO': lista_impostos})
+    return df

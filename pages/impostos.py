@@ -1,45 +1,75 @@
-# impostos.py
 import dash
 import dash_table
 import dash_core_components as dcc
-import dash_html_components as html
+from dash import html
 from dash.dependencies import Input, Output, State
 import pandas as pd
+from back import *
+from banco import *
+import dash_bootstrap_components as dbc
 
-# Define a constant for the fees data
-FEES_DATA = pd.DataFrame({
-    'ID': [1, 2, 3],
-    'DESCRIPTION': ['Fee 1', 'Fee 2', 'Fee 3'],
-    'AMOUNT': [10.0, 20.0, 30.0]
-})
+# Paleta de cores
+colors = {
+    'background': '#EFEEEE',  # Cinza claro para o fundo da página
+    'text': '#333333',        # Cor de texto principal em preto
+    'orange': '#FF4E00',      # Laranja
+    'white': '#FFFFFF',       # Branco
+    'gray': '#616468'         # Cinza claro para elementos secundários
+}
 
-# Define a function to create the fees table
-def create_fees_table(fees_data):
-    return dash_table.DataTable(
-        id='fees-table',
-        data=fees_data.to_dict('records'),
-        columns=[
-            {'name': 'ID', 'id': 'ID', 'type': 'numeric'},
-            {'name': 'DESCRIPTION', 'id': 'DESCRIPTION', 'type': 'text'},
-            {'name': 'AMOUNT', 'id': 'AMOUNT', 'type': 'numeric'}
-        ],
-        style_cell={'textAlign': 'center', 'padding': '5px'},
-        style_header={'fontWeight': 'bold', 'backgroundColor': '#616468', 'color': 'white'}
-    )
+data_impostos = back.impostos()
 
-# Define a function to add a new fee to the table
-def add_fee(fees_data, new_fee):
-    new_fee_id = max(fees_data['ID']) + 1
-    new_fee_row = pd.DataFrame({'ID': [new_fee_id], 'DESCRIPTION': [new_fee['DESCRIPTION']], 'AMOUNT': [new_fee['AMOUNT']]})
-    fees_data = pd.concat([fees_data, new_fee_row])
-    return fees_data
+modal = html.Div(
+    [
+        dbc.Row(dbc.Col(dbc.Button("Cadastrar", id="open-centered"), width="auto")),
+        dbc.Modal(
+            [
+                dbc.ModalHeader(dbc.ModalTitle("Cadastro de Impostos"), close_button=True),
+                dbc.ModalBody("This modal is vertically centered"),
+                dbc.ModalFooter(
+                    dbc.Button(
+                        "Close",
+                        id="close-centered",
+                        className="ms-auto",
+                        n_clicks=0,
+                    )
+                ),
+            ],
+            id="modal-centered",
+            centered=True,
+            is_open=False,
+        ),
+    ]
+)
 
-# Create the Impostos page layout
-layout = html.Div([
-    html.H1('Impostos'),
-    html.Hr(),
-    create_fees_table(FEES_DATA),
-    html.Button('Add New Fee', id='add-fee-button', n_clicks=0),
-    dcc.Input(id='new-fee-description', type='text', placeholder='Description'),
-    dcc.Input(id='new-fee-amount', type='number', placeholder='Amount')
+# Define a layout with a centered container
+layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center'}, children=[
+    html.H1(children='Impostos', style={'marginTop': '10px', 'color': colors['gray'], 'fontWeight': 'bold'}),
+    html.Hr(style={'backgroundColor': colors['orange']}),  # Linha horizontal laranja
+    html.Div(style={'marginTop': '20px'}),  # Espaçamento entre dropdown e tabela
+    html.Div(id='tabela-impostos-container', style={'margin': '20px'}, children=[
+        dbc.Row(
+            modal,
+        ),
+        html.Div(style={'marginTop': '20px'}),
+        dash_table.DataTable(
+            id='tabela-impostos',
+            data=df_impostos().to_dict('records'),
+            filter_action="native",
+            columns=[{'name': 'CONTRATO', 'id': 'CONTRATO', 'type': 'text'},
+                     {'name': 'IMPOSTO', 'id': 'IMPOSTO', 'type': 'numeric'},],
+            style_cell={'textAlign': 'center', 'padding': '5px', 'fontFamily': 'Arial, sans-serif', 'fontSize': '0.8em', 'backgroundColor': colors['white'], 'color': colors['text']},  # Ajustando o tamanho da fonte
+            style_header={
+                'fontWeight': 'bold',
+                'backgroundColor': colors['gray'],
+                'color': colors['white'],
+            },
+            style_data_conditional=[
+            {
+                'if': {'row_index': 'odd'},
+                'backgroundColor': colors['background'],
+            },
+            ]
+        ),
+    ])
 ])

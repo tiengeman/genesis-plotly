@@ -120,18 +120,15 @@ def toggle_offcanvas(n1, is_open):
         return not is_open
     return is_open
 
-# Define the callback to add a new fee to the table
 @app.callback(
-    Output('fees-table', 'data'),
-    [Input('add-fee-button', 'n_clicks')],
-    [State('new-fee-description', 'value'), State('new-fee-amount', 'value'), State('fees-table', 'data')]
+    Output("modal-centered", "is_open"),
+    [Input("open-centered", "n_clicks"), Input("close-centered", "n_clicks")],
+    [State("modal-centered", "is_open")],
 )
-def add_fee_callback(n_clicks, new_fee_description, new_fee_amount, fees_data):
-    if n_clicks > 0:
-        new_fee = {'DESCRIPTION': new_fee_description, 'AMOUNT': new_fee_amount}
-        fees_data = impostos.add_fee(pd.DataFrame(fees_data), new_fee)
-        return fees_data.to_dict('records')
-    return fees_data
+def toggle_modal(n1, n2, is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
 
 if __name__ == '__main__':
     app.run_server(debug=True)
