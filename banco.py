@@ -2,7 +2,7 @@ import pandas as pd
 import back.queries
 import back.banco_teste
 
-def tabela(mes): #função que gera a tabela principal do resumo
+def tabela(mes): #função que gera a tabela principal da aba gerencial
     lista_contrato, lista_soma_comp, lista_cc = back.medicao(mes)
     lista_contrato.append('TOTAL OPERAÇÃO')
     lista_contrato_final, lista_soma_comp, lista_cc = remove_capex(lista_contrato, lista_soma_comp, lista_cc)
@@ -51,6 +51,7 @@ def tabela(mes): #função que gera a tabela principal do resumo
     
     return df
 
+# tabela do capex
 def tabela_2(mes):
     lista_contrato = ['INVESTIMENTOS (CONTRATO)', 'EXPANSÃO - FILIAL MACAÉ', 'EXPANSÃO - MATRIZ RECIFE', 'DEPÓSITOS JUDICIAIS', 'ENGEMAN TECNOLOGIAS']
     lista_contrato.append('TOTAL CAPEX')
@@ -146,7 +147,7 @@ def merge_lists_into_tuples(list1, list2): #função para juntar duas listas e f
     merged_list = list(zip(list1, list2))
     return merged_list
 
-def medicao_capex(mes):
+def medicao_capex(mes): # gera a coluna de medição para o capex
     lista_capex = ['INVESTIMENTOS (CONTRATO)', 'EXPANSÃO - FILIAL MACAÉ', 'EXPANSÃO - MATRIZ RECIFE', 'DEPÓSITOS JUDICIAIS', 'ENGEMAN TECNOLOGIAS']
     medicao = []
     lista_contrato, lista_soma_comp, lista_cc = back.medicao(mes)
@@ -161,7 +162,7 @@ def medicao_capex(mes):
 
     return medicao
         
-def medicao_capex_total():
+def medicao_capex_total(): # gera a coluna de medição total para o capex
     lista_capex = ['INVESTIMENTOS (CONTRATO)', 'EXPANSÃO - FILIAL MACAÉ', 'EXPANSÃO - MATRIZ RECIFE', 'DEPÓSITOS JUDICIAIS', 'ENGEMAN TECNOLOGIAS']
     medicao_total = []
     lista_cont_total, lista_valor_total, lista_cc_total = back.medicao_total()
@@ -190,8 +191,13 @@ def remove_capex(lista_contratos, lista_valor, lista_cc): #função para gerar u
     
     return lista_contratos, lista_valor, lista_cc
 
-def df_impostos():
+def df_impostos(): # forma o df com os impostos
     lista_contrato, lista_impostos = back.impostos()
     df = pd.DataFrame.from_dict(data={'CONTRATO': lista_contrato,
                                       'IMPOSTO': lista_impostos})
     return df
+
+def format_numeric_columns(df, columns): # formata as colunas no formato de moeda
+    for col in columns:
+        # Aplica a formatação para cada valor na coluna
+        df[col] = df[col].apply(lambda x: '{:,.2f}'.format(x).replace('.', '*').replace(',', '.').replace('*', ','))

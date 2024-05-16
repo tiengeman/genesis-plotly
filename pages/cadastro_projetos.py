@@ -1,35 +1,31 @@
-import dash
-import dash_table
-import dash_core_components as dcc
+from dash import dash_table
 from dash import html
-from dash.dependencies import Input, Output, State
-import pandas as pd
 from back import *
 from banco import *
 import dash_bootstrap_components as dbc
+from constants import *
 
-# Paleta de cores
-colors = {
-    'background': '#EFEEEE',  # Cinza claro para o fundo da página
-    'text': '#333333',        # Cor de texto principal em preto
-    'orange': '#FF4E00',      # Laranja
-    'white': '#FFFFFF',       # Branco
-    'gray': '#616468'         # Cinza claro para elementos secundários
-}
+# modelo do formulário de cadastro de projeto
+form = dbc.Form(
+    [
+        dbc.Row([dbc.Label("Projeto", width=2),dbc.Col(dbc.Input(type="text", id="projeto", placeholder="Insira o nome do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("Imposto", width=2),dbc.Col(dbc.Input(type="number", id="imposto", placeholder="Insira o valor do imposto"))],className="mb-3")
+    ]
+)
 
-data_impostos = back.impostos()
-
+# modelo do modal
 modal = html.Div(
     [
-        dbc.Row(dbc.Col(dbc.Button("Cadastrar", id="open-centered"), width="auto")),
+        dbc.Row(dbc.Col(dbc.Button("Cadastrar", id="open-centered", style={'backgroundColor': colors['orange']}), width="auto")),
         dbc.Modal(
             [
-                dbc.ModalHeader(dbc.ModalTitle("Cadastro de Impostos"), close_button=True),
-                dbc.ModalBody("This modal is vertically centered"),
+                dbc.ModalHeader(dbc.ModalTitle("Cadastro de Projetos"), close_button=True),
+                dbc.ModalBody(form),
                 dbc.ModalFooter(
                     dbc.Button(
-                        "Close",
+                        "Submit",
                         id="close-centered",
+                        style={'backgroundColor': colors['orange']},
                         className="ms-auto",
                         n_clicks=0,
                     )
@@ -42,19 +38,28 @@ modal = html.Div(
     ]
 )
 
+# busca info no banco
+df = df_impostos()
+#formata a coluna que tem numeros
+format_numeric_columns(df, ["IMPOSTO"])
+
+#div para mostrar os valores adicionados
+input_values = html.Div(id="input-values")
+
 # Define a layout with a centered container
 layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center'}, children=[
-    html.H1(children='Impostos', style={'marginTop': '10px', 'color': colors['gray'], 'fontWeight': 'bold'}),
-    html.Hr(style={'backgroundColor': colors['orange']}),  # Linha horizontal laranja
-    html.Div(style={'marginTop': '20px'}),  # Espaçamento entre dropdown e tabela
+    html.H1(children='Cadastro de Projeto', style={'marginTop': '10px', 'color': colors['gray'], 'fontWeight': 'bold'}),
+    html.Hr(style={'backgroundColor': colors['orange']}),
+    html.Div(style={'marginTop': '20px'}),
     html.Div(id='tabela-impostos-container', style={'margin': '20px'}, children=[
         dbc.Row(
             modal,
         ),
         html.Div(style={'marginTop': '20px'}),
+        input_values,  # Add the input_values div here
         dash_table.DataTable(
             id='tabela-impostos',
-            data=df_impostos().to_dict('records'),
+            data=df.to_dict('records'),
             filter_action="native",
             columns=[{'name': 'CONTRATO', 'id': 'CONTRATO', 'type': 'text'},
                      {'name': 'IMPOSTO', 'id': 'IMPOSTO', 'type': 'numeric'},],
