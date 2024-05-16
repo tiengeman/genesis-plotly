@@ -210,7 +210,7 @@ def impostos(db=back.db):
     colecao_impostos = db.get_collection('Despesas Impostos')
 
     pipeline_impostos = [
-        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa-imposto':{'$sum':'$valor-orginal-despesa'}}}
+        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa-imposto':{'$sum':'$valor-original-despesa'}}}
     ]
 
     total_imposto = colecao_impostos.aggregate(pipeline_impostos)
@@ -228,7 +228,7 @@ def deducoes(db=back.db,):
     colecao_impostos = db.get_collection('Despesas Impostos')
 
     pipeline_deducoes = [
-        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa-deducao':{'$sum':'$valor-orginal-despesa'}}}
+        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa-deducao':{'$sum':'$valor-original-despesa'}}}
     ]
 
     total_deducoes = colecao_impostos.aggregate(pipeline_deducoes)
