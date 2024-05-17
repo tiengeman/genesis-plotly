@@ -41,7 +41,7 @@ modal = html.Div(
 # busca info no banco
 df = df_impostos()
 #formata a coluna que tem numeros
-format_numeric_columns(df, ["IMPOSTO"])
+# format_numeric_columns(df, ["IMPOSTO"])
 
 #div para mostrar os valores adicionados
 input_values = html.Div(id="input-values")
@@ -69,8 +69,7 @@ layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center
             id='tabela-impostos',
             data=df.to_dict('records'),
             filter_action="native",
-            columns=[{'name': 'CONTRATO', 'id': 'CONTRATO', 'type': 'text'},
-                     {'name': 'IMPOSTO', 'id': 'IMPOSTO', 'type': 'numeric'},],
+            columns=[{"name": i, "id": i} for i in df.columns],
             style_cell={'textAlign': 'center', 'padding': '5px', 'fontFamily': 'Arial, sans-serif', 'fontSize': '0.8em', 'backgroundColor': colors['white'], 'color': colors['text']},  # Ajustando o tamanho da fonte
             style_header={
                 'fontWeight': 'bold',

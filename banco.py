@@ -201,3 +201,8 @@ def format_numeric_columns(df, columns): # formata as colunas no formato de moed
     for col in columns:
         # Aplica a formatação para cada valor na coluna
         df[col] = df[col].apply(lambda x: '{:,.2f}'.format(x).replace('.', '*').replace(',', '.').replace('*', ','))
+
+def cad_contratos():
+    lista = back.cad_contratos()
+    df = pd.DataFrame(lista)
+    return df
