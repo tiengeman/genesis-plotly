@@ -1,17 +1,8 @@
 from dash import html, dcc
 from dash import dash_table
-import locale
 import dash.dash_table.FormatTemplate as FormatTemplate
 from banco import *
-
-# Paleta de cores
-colors = {
-    'background': '#EFEEEE',  # Cinza claro para o fundo da página
-    'text': '#333333',        # Cor de texto principal em preto
-    'orange': '#FF4E00',      # Laranja
-    'white': '#FFFFFF',       # Branco
-    'gray': '#616468'         # Cinza claro para elementos secundários
-}
+from constants import *
 
 # Define a layout with a centered container
 layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center'}, children=[
@@ -30,6 +21,7 @@ layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center
     html.Div(id='tabela2-container', style={'margin': '20px'})  # Div para mostrar a tabela selecionada com margem
 ])
 
+#função para atualizar a tabela, é chamada no callback quando uma competencia é selecionada
 def atualizar_tabela(selecao):
     if selecao:
         df_tabela = tabela(selecao)
@@ -38,6 +30,7 @@ def atualizar_tabela(selecao):
     else:
         return html.P("Nenhuma tabela disponível para esta seleção.")
 
+#função para atualizar a tabela, é chamada no callback quando uma competencia é selecionada
 def atualizar_tabela2(selecao):
     if selecao:
         df_tabela = tabela_2(selecao)
@@ -46,11 +39,7 @@ def atualizar_tabela2(selecao):
     else:
         return html.P("Nenhuma tabela disponível para esta seleção.")
 
-def format_numeric_columns(df, columns):
-    for col in columns:
-        # Aplica a formatação para cada valor na coluna
-        df[col] = df[col].apply(lambda x: '{:,.2f}'.format(x).replace('.', '*').replace(',', '.').replace('*', ','))
-
+# função de criação de tabela
 def create_datatable(df, colors):
     return dash_table.DataTable(
         id='tabela',
@@ -87,11 +76,13 @@ def create_datatable(df, colors):
             {'if': {'column_id': 'LUCRO TOTAL'}, 'width': '7%', 'textAlign': 'right'},
             {'if': {'column_id': '% TOTAL'}, 'width': '4%', 'textAlign': 'right'},
         ],
+        # estilo do cabeçalho tabela
         style_header={
             'fontWeight': 'bold',
             'backgroundColor': '#616468',
             'color': colors['white'],
         },
+        # estiliza os dados das tabelas gerenciais
         style_data_conditional=[
             {
                 'if': {'row_index': 'odd'},

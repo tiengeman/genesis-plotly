@@ -1,4 +1,3 @@
-# app.py
 import dash
 import dash_bootstrap_components as dbc
 from dash import html, dcc
@@ -7,36 +6,38 @@ import pages.gerencial as gerencial
 import pages.home as home
 import pages.diretoria as diretoria
 import pages.relacao as relacao
-import pages.impostos as impostos
-import pandas as pd
+import pages.cadastro_projetos as cadastro_projetos
+from constants import *
 
 # Constants
-logo = 'https://i0.wp.com/engeman.net/wp-content/uploads/2024/04/LOGO_ENGEMAN_HORIZONTAL-e1714498268589.png?w=851&ssl=1'
+# logo = 'https://i0.wp.com/engeman.net/wp-content/uploads/2024/04/LOGO_ENGEMAN_HORIZONTAL-e1714498268589.png?w=851&ssl=1'
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP])
 server = app.server
 
+#conteúdo dentro do menu
 sidebar = dbc.Nav(
     [
         dbc.NavItem(dbc.NavLink('Home', href='/home', className='nav-link')),
         dbc.NavItem(dbc.NavLink('Gerencial', href='/gerencial', className='nav-link')),
         dbc.NavItem(dbc.NavLink('Diretoria', href='/diretoria', className='nav-link')),
         dbc.NavItem(dbc.NavLink('Relação', href='/relacao', className='nav-link')),
-        dbc.NavItem(dbc.NavLink('Impostos', href='/impostos', className='nav-link')),
+        dbc.NavItem(dbc.NavLink('Cadastro Projetos', href='/cadastro_projetos', className='nav-link')),
     ],
     vertical=True,  # Make the nav items stack vertically
     pills=True,  # Make the nav items take up the full width of the sidebar
 )
 
+# botão para abrir o menu
 offcanvas = html.Div(
     [
         dbc.Button(
-            html.I(className="bi bi-list"),  # Use Bootstrap Icon
+            html.I(className="bi bi-list"),
             id="open-offcanvas",
             n_clicks=0,
-            size="md",  # Add a size to the button
+            size="md", 
             color = '#FF4E00',
-            style={"font-size": "1.60em"},  # Set the background color to #FF4E00
+            style={"font-size": "1.60em"},
             className='btn-white',
         ),
         dbc.Offcanvas(
@@ -64,22 +65,25 @@ header = dbc.Navbar(
     ),
     color='#FF4E00',
     dark=True,
-    className='justify-content-between',  # Add this class to justify the content
-    style={'height': '50px'}  # Reduce the height of the header
+    className='justify-content-between', 
+    style={'height': '50px'} 
 )
 
-# Content area
+# Div onde mostra o conteúdo de cada página
 content_area = html.Div(id='content')
 
+# Layout geral, caebçalho + content area
 app.layout = html.Div([
     header,
     dcc.Location(id='url', refresh=False),
     dbc.Row([
-        dbc.Col(content_area),  # Make the content area take up 10 columns
+        dbc.Col(content_area),
     ]),
 ])
 
-# Callbacks
+#====================================================================== Callbacks ================================================================================================
+
+#callback para mudar de página de acordo com o menu
 @app.callback(
     Output('content', 'children'),
     [Input('url', 'pathname')]
@@ -91,8 +95,8 @@ def update_content(pathname):
         return diretoria.layout
     elif pathname == '/relacao':
         return relacao.layout
-    elif pathname == '/impostos':
-        return impostos.layout
+    elif pathname == '/cadastro_projetos':
+        return cadastro_projetos.layout
     else:
         return home.layout
 
@@ -102,6 +106,7 @@ def update_table(output_id, value):
     elif output_id == 'tabela2-container':
         return gerencial.atualizar_tabela2(value)
 
+#callback para atualizar as tabelas gerenciais de acordo com a competencia
 @app.callback(
     Output('tabela-container', 'children'),
     Output('tabela2-container', 'children'),
@@ -110,6 +115,7 @@ def update_table(output_id, value):
 def update_tables(value):
     return update_table('tabela-container', value), update_table('tabela2-container', value)
     
+#callback para abrir o menu
 @app.callback(
     Output("offcanvas", "is_open"),
     Input("open-offcanvas", "n_clicks"),
@@ -120,18 +126,27 @@ def toggle_offcanvas(n1, is_open):
         return not is_open
     return is_open
 
-# Define the callback to add a new fee to the table
+#callback para abrir o modal de cadastro dos impostos
 @app.callback(
-    Output('fees-table', 'data'),
-    [Input('add-fee-button', 'n_clicks')],
-    [State('new-fee-description', 'value'), State('new-fee-amount', 'value'), State('fees-table', 'data')]
+    Output("modal-centered", "is_open"),
+    [Input("open-centered", "n_clicks"), Input("close-centered", "n_clicks")],
+    [State("modal-centered", "is_open")],
 )
-def add_fee_callback(n_clicks, new_fee_description, new_fee_amount, fees_data):
-    if n_clicks > 0:
-        new_fee = {'DESCRIPTION': new_fee_description, 'AMOUNT': new_fee_amount}
-        fees_data = impostos.add_fee(pd.DataFrame(fees_data), new_fee)
-        return fees_data.to_dict('records')
-    return fees_data
+def toggle_modal(n1, n2, is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
+
+#callback para salvar itens do cadastro
+@app.callback(
+    Output("input-values", "children"),
+    [Input("close-centered", "n_clicks")],
+    [State("projeto", "value"), State("imposto", "value")],
+)
+def get_input_values(n, projeto, imposto):
+    if n:
+        return f"Projeto: {projeto}, Imposto: {imposto}"
+    return ""
 
 if __name__ == '__main__':
     app.run_server(debug=True)
