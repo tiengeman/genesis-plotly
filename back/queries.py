@@ -225,14 +225,14 @@ def impostos(db=back.db):
     return lista_contratos_imposto,despesas_impostos
 
 # Função que irá retornar uma lista com dicionário de todos os elementos da tabela de Cadastro Contratos
-def cad_contratos(db=back.db):
+def cad_impostos(db=back.db):
     colecao = db.get_collection('Cadastro Contratos')
 
-    # lista que vai guardar todos elementos que tem na tabela Cadastro Contratos
+# lista que vai guardar todos elementos que tem na tabela Cadastro Contratos
     lista = []
-    
-    for i in colecao.find():
-        lista.append(i)
+    for i in colecao.find().limit(5):
+        valores = i.values()
+        lista.append(list(valores))
 
     return lista
 
