@@ -8,6 +8,8 @@ import pages.diretoria as diretoria
 import pages.relacao as relacao
 import pages.cadastro_projetos as cadastro_projetos
 from constants import *
+from dash.exceptions import PreventUpdate
+from pages.cadastro_projetos import df as df_projetos
 
 # Constants
 # logo = 'https://i0.wp.com/engeman.net/wp-content/uploads/2024/04/LOGO_ENGEMAN_HORIZONTAL-e1714498268589.png?w=851&ssl=1'
@@ -63,7 +65,7 @@ header = dbc.Navbar(
             ),
         ]
     ),
-    color='#FF4E00',
+    color=colors['orange'],
     dark=True,
     className='justify-content-between', 
     style={'height': '50px'} 
@@ -147,6 +149,14 @@ def get_input_values(n, projeto, imposto):
     if n:
         return f"Projeto: {projeto}, Imposto: {imposto}"
     return ""
+
+@app.callback(
+    Output('tabela-impostos', 'editable'),
+    Input('edit-switch', 'value')
+)
+def toggle_editability(value):
+    return value
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)

@@ -16,7 +16,7 @@ form = dbc.Form(
 # modelo do modal
 modal = html.Div(
     [
-        dbc.Row(dbc.Col(dbc.Button("Cadastrar", id="open-centered", style={'backgroundColor': colors['orange']}), width="auto")),
+        dbc.Button("Cadastrar", id="open-centered", style={'backgroundColor': colors['orange']}),
         dbc.Modal(
             [
                 dbc.ModalHeader(dbc.ModalTitle("Cadastro de Projetos"), close_button=True),
@@ -46,14 +46,22 @@ format_numeric_columns(df, ["IMPOSTO"])
 #div para mostrar os valores adicionados
 input_values = html.Div(id="input-values")
 
+# switch para edição da tabela
+switch = html.Div([
+    dbc.Switch(id="edit-switch", style={"color": colors['gray']}, value=False, label="Editar",
+               input_style={"height": "20px", "background-color": colors['orange']})
+], className="ms-auto")
+
 # Define a layout with a centered container
 layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center'}, children=[
     html.H1(children='Cadastro de Projeto', style={'marginTop': '10px', 'color': colors['gray'], 'fontWeight': 'bold'}),
     html.Hr(style={'backgroundColor': colors['orange']}),
     html.Div(style={'marginTop': '20px'}),
     html.Div(id='tabela-impostos-container', style={'margin': '20px'}, children=[
-        dbc.Row(
-            modal,
+        dbc.Stack([
+            modal, switch
+        ],
+        direction="horizontal",
         ),
         html.Div(style={'marginTop': '20px'}),
         input_values,  # Add the input_values div here
