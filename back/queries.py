@@ -224,23 +224,17 @@ def impostos(db=back.db):
 
     return lista_contratos_imposto,despesas_impostos
 
-def deducoes(db=back.db,):
-    colecao_impostos = db.get_collection('Despesas Impostos')
+# Função que irá retornar uma lista com dicionário de todos os elementos da tabela de Cadastro Contratos
+def cad_contratos(db=back.db):
+    colecao = db.get_collection('Cadastro Contratos')
 
-    pipeline_deducoes = [
-        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa-deducao':{'$sum':'$valor-original-despesa'}}}
-    ]
-
-    total_deducoes = colecao_impostos.aggregate(pipeline_deducoes)
-
-    lista_contratos_deducoes = []
-    despesas_deducoes = []
+    # lista que vai guardar todos elementos que tem na tabela Cadastro Contratos
+    lista = []
     
-    for i in total_deducoes:
-        lista_contratos_deducoes.append(i['_id']['descricao-projeto'])
-        despesas_deducoes.append(i['despesa-imposto'])
+    for i in colecao.find():
+        lista.append(i)
 
-    return lista_contratos_deducoes,despesas_deducoes
+    return lista
 
 def ordenar_datas(lista):
     # Define um dicionário para mapear os meses para seus números correspondentes
