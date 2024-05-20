@@ -8,8 +8,32 @@ from constants import *
 # modelo do formulário de cadastro de projeto
 form = dbc.Form(
     [
-        dbc.Row([dbc.Label("Projeto", width=2),dbc.Col(dbc.Input(type="text", id="projeto", placeholder="Insira o nome do projeto"))],className="mb-3"),
-        dbc.Row([dbc.Label("Imposto", width=2),dbc.Col(dbc.Input(type="number", id="imposto", placeholder="Insira o valor do imposto"))],className="mb-3")
+        dbc.Row([dbc.Label("OS", width=2),dbc.Col(dbc.Input(type="text", id="OS", placeholder="Insira a OS do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("TIPO", width=2),dbc.Col(dbc.Input(type="text", id="TIPO", placeholder="Insira o tipo do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("ENQUADRAMENTO", width=2),dbc.Col(dbc.Input(type="text", id="ENQUADRAMENTO", placeholder="Insira o enquadramento do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("CLIENTE", width=2),dbc.Col(dbc.Input(type="text", id="CLIENTE", placeholder="Insira o cliente"))],className="mb-3"),
+        dbc.Row([dbc.Label("DESCRIÇÃO", width=2),dbc.Col(dbc.Input(type="text", id="DESCRIÇÃO", placeholder="Insira a descrição do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("ICJ", width=2),dbc.Col(dbc.Input(type="text", id="ICJ", placeholder="Insira o código ICJ do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("SAP", width=2),dbc.Col(dbc.Input(type="text", id="SAP", placeholder="Insira o código SAP do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("INÍCIO", width=2),dbc.Col(dbc.Input(type="date", id="INÍCIO", placeholder="Insira a data de início do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("FIM", width=2),dbc.Col(dbc.Input(type="date", id="FIM", placeholder="Insira a data de fim do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("ADITIVOS", width=2),dbc.Col(dbc.Input(type="text", id="ADITIVOS", placeholder="Insira os aditivos do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("VALOR", width=2),dbc.Col(dbc.Input(type="number", id="VALOR", placeholder="Insira o valor do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("PRAZO MES", width=2),dbc.Col(dbc.Input(type="number", id="PRAZO MES", placeholder="Insira o prazo do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("PRAZO DIAS", width=2),dbc.Col(dbc.Input(type="number", id="PRAZO DIAS", placeholder="Insira o prazo do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("STATUS", width=2),dbc.Col(dbc.Input(type="text", id="STATUS", placeholder="Insira o status do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("RESPONSÁVEL", width=2),dbc.Col(dbc.Input(type="text", id="RESPONSÁVEL", placeholder="Insira o resposnsável pelo projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("FILIAL", width=2),dbc.Col(dbc.Input(type="text", id="FILIAL", placeholder="Insira a filial do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("PROJETO", width=2),dbc.Col(dbc.Input(type="text", id="PROJETO", placeholder="Insira o código do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("PROJETO SAPIENS", width=2),dbc.Col(dbc.Input(type="text", id="PROJETO SAPIENS", placeholder="Insira o código sapiens do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("ISS", width=2),dbc.Col(dbc.Input(type="number", id="ISS", placeholder="Insira o ISS do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("ADM CENTRAL", width=2),dbc.Col(dbc.Input(type="number", id="ADM CENTRAL", placeholder="Insira o valor adm central do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("PIS", width=2),dbc.Col(dbc.Input(type="number", id="PIS", placeholder="Insira o PIS do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("COFINS", width=2),dbc.Col(dbc.Input(type="number", id="COFINS", placeholder="Insira o COFINS do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("CSLL", width=2),dbc.Col(dbc.Input(type="number", id="CSLL", placeholder="Insira o CSLL do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("IRPJ", width=2),dbc.Col(dbc.Input(type="number", id="IRPJ", placeholder="Insira o IRPJ do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("sei la", width=2),dbc.Col(dbc.Input(type="number", id="sei la", placeholder="não sei o que é isso"))],className="mb-3"),
+        dbc.Row([dbc.Label("sei la2", width=2),dbc.Col(dbc.Input(type="number", id="sei la2", placeholder="não sei o que é isso 2"))],className="mb-3"),
     ]
 )
 
@@ -39,9 +63,9 @@ modal = html.Div(
 )
 
 # busca info no banco
-df = df_impostos()
+df = cad_contratos()
 #formata a coluna que tem numeros
-# format_numeric_columns(df, ["IMPOSTO"])
+# format_numeric_columns(df, ["VALOR"])
 
 #div para mostrar os valores adicionados
 input_values = html.Div(id="input-values")
@@ -81,7 +105,8 @@ layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center
                 'if': {'row_index': 'odd'},
                 'backgroundColor': colors['background'],
             },
-            ]
+            ],
+            style_table={'overflowX': 'auto', 'width': '1475px'},  # Definindo o tamanho da tabela
         ),
     ])
 ])

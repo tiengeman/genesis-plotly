@@ -230,7 +230,7 @@ def cad_contratos(db=back.db):
 
 # lista que vai guardar todos elementos que tem na tabela Cadastro Contratos
     lista = []
-    for i in colecao.find().limit(5):
+    for i in colecao.find():
         valores = i.values()
         lista.append(list(valores))
 

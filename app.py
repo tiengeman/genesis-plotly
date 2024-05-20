@@ -143,11 +143,16 @@ def toggle_modal(n1, n2, is_open):
 @app.callback(
     Output("input-values", "children"),
     [Input("close-centered", "n_clicks")],
-    [State("projeto", "value"), State("imposto", "value")],
+    [State("OS", "value"), State("TIPO", "value")], State("ENQUADRAMENTO", "value"), State("CLIENTE", "value"), State("DESCRIÇÃO", "value"), State("ICJ", "value"), State("SAP", "value"), State("INÍCIO", "value")
+    , State("FIM", "value"), State("ADITIVOS", "value"), State("VALOR", "value"), State("PRAZO MES", "value"), State("PRAZO DIAS", "value"), State("STATUS", "value"), State("RESPONSÁVEL", "value"), State("FILIAL", "value")
+    , State("PROJETO", "value"), State("PROJETO SAPIENS", "value"), State("ISS", "value"), State("ADM CENTRAL", "value"), State("PIS", "value"), State("COFINS", "value"), State("CSLL", "value"), State("IRPJ", "value")
+    , State("sei la", "value"), State("sei la2", "value"), #adicionar todos os elementos aqui, pra poder retornar a lista
 )
-def get_input_values(n, projeto, imposto):
-    if n:
-        return f"Projeto: {projeto}, Imposto: {imposto}"
+def get_input_values(n, os, tipo, enq, cliente, desc, icj, sap, inicio, fim, adt, valor, prazom, prazod, status, resp, filial, projeto, projsap, iss, admcentral, pis, cofins, csll, irpj, seila, seila2):
+    if n: #depois, jogar a função para mandar essas info para o back
+        lista_input = [os,tipo,enq,cliente,desc,icj,sap,inicio,fim,adt,valor,prazom,prazod,status,resp,filial,projeto,projsap,iss,admcentral,pis,cofins,csll,irpj,seila,seila2]
+        print(lista_input)
+        return lista_input
     return ""
 
 @app.callback(
