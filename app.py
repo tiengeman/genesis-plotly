@@ -10,6 +10,7 @@ import pages.cadastro_projetos as cadastro_projetos
 from constants import *
 from dash.exceptions import PreventUpdate
 from pages.cadastro_projetos import df as df_projetos
+from banco import *
 
 # Constants
 # logo = 'https://i0.wp.com/engeman.net/wp-content/uploads/2024/04/LOGO_ENGEMAN_HORIZONTAL-e1714498268589.png?w=851&ssl=1'
@@ -143,20 +144,25 @@ def toggle_modal(n1, n2, is_open):
 @app.callback(
     Output("input-values", "children"),
     [Input("close-centered", "n_clicks")],
-    [State("projeto", "value"), State("imposto", "value")],
+    [State("OS", "value"), State("TIPO", "value")], State("ENQUADRAMENTO", "value"), State("CLIENTE", "value"), State("DESCRIÇÃO", "value"), State("ICJ", "value"), State("SAP", "value"), State("INÍCIO", "value")
+    , State("FIM", "value"), State("ADITIVOS", "value"), State("VALOR", "value"), State("PRAZOMES", "value"), State("PRAZODIAS", "value"), State("STATUS", "value"), State("RESPONSÁVEL", "value"), State("FILIAL", "value")
+    , State("PROJETO", "value"), State("PROJETO SAPIENS", "value"), State("ISS", "value"), State("ADM CENTRAL", "value"), State("PIS", "value"), State("COFINS", "value"), State("CSLL", "value"), State("IRPJ", "value")
+    , State("INVESTIMENTOS", "value"), State("ICMS", "value"), #adicionar todos os elementos aqui, pra poder retornar a lista
 )
-def get_input_values(n, projeto, imposto):
-    if n:
-        return f"Projeto: {projeto}, Imposto: {imposto}"
+def get_input_values(n, os, tipo, enq, cliente, desc, icj, sap, inicio, fim, adt, valor, prazom, prazod, status, resp, filial, projeto, projsap, iss, admcentral, pis, cofins, csll, irpj, invest, icms):
+    if n: #depois, jogar a função para mandar essas info para o back
+        lista_input = [os,tipo,enq,cliente,desc,icj,sap,inicio,fim,adt,valor,prazom,prazod,status,resp,filial,projeto,projsap,iss,admcentral,pis,cofins,csll,irpj,invest,icms]
+
+        return lista_input
     return ""
 
 @app.callback(
-    Output('tabela-impostos', 'editable'),
+    Output('tabela-impostos', 'columns'),
     Input('edit-switch', 'value')
 )
 def toggle_editability(value):
-    return value
-
+    columns = [{"name": i, "id": i, "editable": value} if i not in ["VALOR", "PRAZOMES", "PRAZODIAS"] else {"name": i, "id": i} for i in cad_contratos().columns]
+    return columns
 
 if __name__ == '__main__':
     app.run_server(debug=True)
