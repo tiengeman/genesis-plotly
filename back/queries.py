@@ -206,31 +206,27 @@ def competencias(db=back.db):
 
     return comp
 
-def impostos(db=back.db):
-    colecao_impostos = db.get_collection('Despesas Impostos')
+# Função que irá retornar uma lista de listas de alguns dos elementos da tabela de Cadastro Impostos
+def cad_impostos(db=back.db):
+    colecao_impostos = db.get_collection('Cadastro Impostos')
 
-    pipeline_impostos = [
-        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa-imposto':{'$sum':'$valor-original-despesa'}}}
-    ]
+    # Filtro que puxa apenas as colunas especificadas
+    filtro = colecao_impostos.find({},{'receitatotal-impostos':1,'pisretido-impostos': 1,'pispago-impostos': 1,'cofinsretido-impostos': 1,'cofinspago-impostos': 1,'datafechamento-impostos':1,'competencia-impostos':1})
+    lista = []
 
-    total_imposto = colecao_impostos.aggregate(pipeline_impostos)
+    for i in filtro:
+        valores = i.values()
+        lista.append(list(valores))
+        
+    return lista
 
-    lista_contratos_imposto = []
-    despesas_impostos = []
-    
-    for i in total_imposto:
-        lista_contratos_imposto.append(i['_id']['descricao-projeto'])
-        despesas_impostos.append(i['despesa-imposto'])
-
-    return lista_contratos_imposto,despesas_impostos
-
-# Função que irá retornar uma lista com dicionário de todos os elementos da tabela de Cadastro Contratos
+# Função que irá retornar uma lista de listas de todos os elementos da tabela de Cadastro Contratos
 def cad_contratos(db=back.db):
     colecao = db.get_collection('Cadastro Contratos')
 
 # lista que vai guardar todos elementos que tem na tabela Cadastro Contratos
     lista = []
-    for i in colecao.find().limit(5):
+    for i in colecao.find():
         valores = i.values()
         lista.append(list(valores))
 
