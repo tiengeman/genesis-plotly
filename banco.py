@@ -205,7 +205,7 @@ def format_numeric_columns(df, columns): # formata as colunas no formato de moed
 def cad_contratos():
     lista = back.cad_contratos()
     nome_colunas = ['ID', 'OS', 'TIPO', 'ENQUADRAMENTO', 'CLIENTE', 'DESC', 'ICJ', 'SAP', 'INICIO', 'FIM', 'ADITIVOS', 'VALOR', 'PRAZOMES', 'PRAZODIAS', 'STATUS', 'RESPONSAVEL', 'FILIAL',
-                    'PROJETO', 'PROJETOSAPIENS', 'ISS', 'ADMCENTRAL', 'PIS', 'COFINS', 'CSLL', 'IRPJ', "sei la", 'sei la2']
+                    'PROJETO', 'PROJETOSAPIENS', 'ISS', 'ADMCENTRAL', 'PIS', 'COFINS', 'CSLL', 'IRPJ', "INVESTIMENTOS", 'ICMS']
     dicionario_de_listas = {coluna: [] for coluna in nome_colunas}
     for linha in lista:
         for i, valor in enumerate(linha):

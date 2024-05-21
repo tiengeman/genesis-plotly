@@ -19,8 +19,8 @@ form = dbc.Form(
         dbc.Row([dbc.Label("FIM", width=2),dbc.Col(dbc.Input(type="date", id="FIM", placeholder="Insira a data de fim do projeto"))],className="mb-3"),
         dbc.Row([dbc.Label("ADITIVOS", width=2),dbc.Col(dbc.Input(type="text", id="ADITIVOS", placeholder="Insira os aditivos do projeto"))],className="mb-3"),
         dbc.Row([dbc.Label("VALOR", width=2),dbc.Col(dbc.Input(type="number", id="VALOR", placeholder="Insira o valor do projeto"))],className="mb-3"),
-        dbc.Row([dbc.Label("PRAZO MES", width=2),dbc.Col(dbc.Input(type="number", id="PRAZO MES", placeholder="Insira o prazo do projeto"))],className="mb-3"),
-        dbc.Row([dbc.Label("PRAZO DIAS", width=2),dbc.Col(dbc.Input(type="number", id="PRAZO DIAS", placeholder="Insira o prazo do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("PRAZOMES", width=2),dbc.Col(dbc.Input(type="number", id="PRAZOMES", placeholder="Insira o prazo do projeto"))],className="mb-3"),
+        dbc.Row([dbc.Label("PRAZODIAS", width=2),dbc.Col(dbc.Input(type="number", id="PRAZODIAS", placeholder="Insira o prazo do projeto"))],className="mb-3"),
         dbc.Row([dbc.Label("STATUS", width=2),dbc.Col(dbc.Input(type="text", id="STATUS", placeholder="Insira o status do projeto"))],className="mb-3"),
         dbc.Row([dbc.Label("RESPONSÁVEL", width=2),dbc.Col(dbc.Input(type="text", id="RESPONSÁVEL", placeholder="Insira o resposnsável pelo projeto"))],className="mb-3"),
         dbc.Row([dbc.Label("FILIAL", width=2),dbc.Col(dbc.Input(type="text", id="FILIAL", placeholder="Insira a filial do projeto"))],className="mb-3"),
@@ -32,8 +32,8 @@ form = dbc.Form(
         dbc.Row([dbc.Label("COFINS", width=2),dbc.Col(dbc.Input(type="number", id="COFINS", placeholder="Insira o COFINS do projeto"))],className="mb-3"),
         dbc.Row([dbc.Label("CSLL", width=2),dbc.Col(dbc.Input(type="number", id="CSLL", placeholder="Insira o CSLL do projeto"))],className="mb-3"),
         dbc.Row([dbc.Label("IRPJ", width=2),dbc.Col(dbc.Input(type="number", id="IRPJ", placeholder="Insira o IRPJ do projeto"))],className="mb-3"),
-        dbc.Row([dbc.Label("sei la", width=2),dbc.Col(dbc.Input(type="number", id="sei la", placeholder="não sei o que é isso"))],className="mb-3"),
-        dbc.Row([dbc.Label("sei la2", width=2),dbc.Col(dbc.Input(type="number", id="sei la2", placeholder="não sei o que é isso 2"))],className="mb-3"),
+        dbc.Row([dbc.Label("INVESTIMENTOS", width=2),dbc.Col(dbc.Input(type="number", id="INVESTIMENTOS", placeholder="Insira o investimento do projetos"))],className="mb-3"),
+        dbc.Row([dbc.Label("ICMS", width=2),dbc.Col(dbc.Input(type="number", id="ICMS", placeholder="Insira o ICMS do projetos"))],className="mb-3"),
     ]
 )
 
@@ -88,12 +88,12 @@ layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center
         direction="horizontal",
         ),
         html.Div(style={'marginTop': '20px'}),
-        input_values,  # Add the input_values div here
+        input_values,  # Adicione a div input_values aqui
         dash_table.DataTable(
             id='tabela-impostos',
-            data=df.to_dict('records'),
+            data=cad_contratos().to_dict('records'),
             filter_action="native",
-            columns=[{"name": i, "id": i} for i in df.columns],
+            columns=[{"name": i, "id": i} for i in cad_contratos().columns],
             style_cell={'textAlign': 'center', 'padding': '5px', 'fontFamily': 'Arial, sans-serif', 'fontSize': '0.8em', 'backgroundColor': colors['white'], 'color': colors['text']},  # Ajustando o tamanho da fonte
             style_header={
                 'fontWeight': 'bold',
@@ -106,7 +106,8 @@ layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center
                 'backgroundColor': colors['background'],
             },
             ],
-            style_table={'overflowX': 'auto', 'width': '1475px'},  # Definindo o tamanho da tabela
+            style_table={'overflowX': 'auto', 'width': '100%'},  # Definindo o tamanho da tabela
+            editable=False  # Certifique-se de que a tabela é editável
         ),
     ])
 ])
