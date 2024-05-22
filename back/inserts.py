@@ -27,7 +27,7 @@ def insere_impostos():
 def inserir_contrato(lista,db=back.db):
     colecao = db.get_collection('Cadastro Contratos')
 
-    colecao.insert_one = [{
+    colecao.insert_one({
         'os-contratos'              :lista[0],
         'tipo-contratos'            :lista[1],
         'enquadramento-contratos'   :lista[2],
@@ -54,4 +54,4 @@ def inserir_contrato(lista,db=back.db):
         'irpj-contrato'             :lista[23],
         'icms-contrato'             :lista[24],
         'investimento-contrato'     :lista[25]
-    }]
+    })
