@@ -11,6 +11,7 @@ from constants import *
 from dash.exceptions import PreventUpdate
 from pages.cadastro_projetos import df as df_projetos
 from banco import *
+from back.inserts import *
 
 # Constants
 # logo = 'https://i0.wp.com/engeman.net/wp-content/uploads/2024/04/LOGO_ENGEMAN_HORIZONTAL-e1714498268589.png?w=851&ssl=1'
@@ -152,10 +153,10 @@ def toggle_modal(n1, n2, is_open):
 def get_input_values(n, os, tipo, enq, cliente, desc, icj, sap, inicio, fim, adt, valor, prazom, prazod, status, resp, filial, projeto, projsap, iss, admcentral, pis, cofins, csll, irpj, invest, icms):
     if n: #depois, jogar a função para mandar essas info para o back
         lista_input = [os,tipo,enq,cliente,desc,icj,sap,inicio,fim,adt,valor,prazom,prazod,status,resp,filial,projeto,projsap,iss,admcentral,pis,cofins,csll,irpj,invest,icms]
-
-        return lista_input
+        return enviar_contratos(lista_input)
     return ""
 
+# callback para deixar apenas algumas colunas editáveis na tela de cadastro de projetos
 @app.callback(
     Output('tabela-impostos', 'columns'),
     Input('edit-switch', 'value')

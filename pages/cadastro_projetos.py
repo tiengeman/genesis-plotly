@@ -58,6 +58,7 @@ modal = html.Div(
             id="modal-centered",
             centered=True,
             is_open=False,
+            className="modal-lg"
         ),
     ]
 )

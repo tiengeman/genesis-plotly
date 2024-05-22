@@ -1,6 +1,7 @@
 import pandas as pd
 import back.queries
 import back.banco_teste
+from back.inserts import inserir_contrato
 
 def tabela(mes): #função que gera a tabela principal da aba gerencial
     lista_contrato, lista_soma_comp, lista_cc = back.medicao(mes)
@@ -213,3 +214,10 @@ def cad_contratos():
     del dicionario_de_listas['ID']
     df = pd.DataFrame.from_dict(data=dicionario_de_listas)
     return df
+
+def enviar_contratos(lista):
+    try:
+        inserir_contrato(lista)
+        return "Cadastro realizado com sucesso"
+    except Exception as e:
+        return str(e)
