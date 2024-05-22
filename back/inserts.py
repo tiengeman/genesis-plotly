@@ -25,7 +25,7 @@ import back.banco_teste
 
 
 def inserir_contrato(lista,db=back.db):
-    colecao = db.get_collection('')
+    colecao = db.get_collection('Cadastro Contratos')
 
     colecao.insert_one = [{
         'os-contratos'              :lista[0],
