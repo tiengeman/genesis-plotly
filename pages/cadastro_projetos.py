@@ -4,7 +4,6 @@ from back import *
 from banco import *
 import dash_bootstrap_components as dbc
 from constants import *
-import dash_core_components as dcc
 
 # modelo do formulário de cadastro de projeto
 form = dbc.Form(
@@ -96,6 +95,11 @@ switch = html.Div([
                input_style={"height": "20px", "background-color": colors['orange']})
 ], className="ms-auto")
 
+# Adicione um botão que chama a função de callback para atualizar a tabela
+refresh_button = html.Div([
+    dbc.Button("Atualizar Tabela", id="refresh-button", style={'backgroundColor': colors['gray']})
+])
+
 # Define a layout with a centered container
 layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center'}, children=[
     html.H1(children='Cadastro de Projeto', style={'marginTop': '10px', 'color': colors['gray'], 'fontWeight': 'bold'}),
@@ -103,7 +107,10 @@ layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center
     html.Div(style={'marginTop': '20px'}),
     html.Div(id='tabela-impostos-container', style={'margin': '20px'}, children=[
         dbc.Stack([
-            modal, switch
+            modal,
+            html.Div(style={'margin': '10px'}),
+            refresh_button,
+            switch
         ],
         direction="horizontal",
         ),
@@ -128,7 +135,7 @@ layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center
             ],
             style_table={'overflowX': 'auto', 'width': '100%'},  # Definindo o tamanho da tabela
             editable=False  # Certifique-se de que a tabela é editável
-        ),
+        ), 
     ]),
     message_modal  # Adicione o message_modal aqui
 ])

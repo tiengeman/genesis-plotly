@@ -199,5 +199,19 @@ def toggle_editability(value):
     columns = [{"name": i, "id": i, "editable": value} if i not in ["VALOR", "PRAZOMES", "PRAZODIAS"] else {"name": i, "id": i} for i in cad_contratos().columns]
     return columns
 
+# Crie a callback para atualizar a tabela quando o botão for clicado
+@app.callback(
+    Output('tabela-impostos', 'data'),
+    [Input('refresh-button', 'n_clicks')]
+)
+def update_table(n_clicks):
+    if n_clicks is None:
+        raise PreventUpdate
+    else:
+        # Atualize o dataframe df chamando a função cad_contratos() novamente
+        df = cad_contratos()
+        # Retorne os dados atualizados da tabela
+        return df.to_dict('records')
+
 if __name__ == '__main__':
     app.run_server(debug=True)
