@@ -143,18 +143,52 @@ def toggle_modal(n1, n2, is_open):
 
 #callback para salvar itens do cadastro
 @app.callback(
-    Output("input-values", "children"),
-    [Input("close-centered", "n_clicks")],
-    [State("OS", "value"), State("TIPO", "value")], State("ENQUADRAMENTO", "value"), State("CLIENTE", "value"), State("DESCRIÇÃO", "value"), State("ICJ", "value"), State("SAP", "value"), State("INÍCIO", "value")
-    , State("FIM", "value"), State("ADITIVOS", "value"), State("VALOR", "value"), State("PRAZOMES", "value"), State("PRAZODIAS", "value"), State("STATUS", "value"), State("RESPONSÁVEL", "value"), State("FILIAL", "value")
-    , State("PROJETO", "value"), State("PROJETO SAPIENS", "value"), State("ISS", "value"), State("ADM CENTRAL", "value"), State("PIS", "value"), State("COFINS", "value"), State("CSLL", "value"), State("IRPJ", "value")
-    , State("INVESTIMENTOS", "value"), State("ICMS", "value"), #adicionar todos os elementos aqui, pra poder retornar a lista
+    [
+        Output("message-modal", "is_open"),
+        Output("message-modal-header", "children"),
+        Output("message-modal-body", "children"),
+    ],
+    [
+        Input("close-centered", "n_clicks"),
+        Input("close-message-modal", "n_clicks"),
+    ],
+    [
+        State("OS", "value"), State("TIPO", "value"), State("ENQUADRAMENTO", "value"),
+        State("CLIENTE", "value"), State("DESCRIÇÃO", "value"), State("ICJ", "value"),
+        State("SAP", "value"), State("INÍCIO", "value"), State("FIM", "value"),
+        State("ADITIVOS", "value"), State("VALOR", "value"), State("PRAZOMES", "value"),
+        State("PRAZODIAS", "value"), State("STATUS", "value"), State("RESPONSÁVEL", "value"),
+        State("FILIAL", "value"), State("PROJETO", "value"), State("PROJETO SAPIENS", "value"),
+        State("ISS", "value"), State("ADM CENTRAL", "value"), State("PIS", "value"),
+        State("COFINS", "value"), State("CSLL", "value"), State("IRPJ", "value"),
+        State("INVESTIMENTOS", "value"), State("ICMS", "value"),
+    ],
 )
-def get_input_values(n, os, tipo, enq, cliente, desc, icj, sap, inicio, fim, adt, valor, prazom, prazod, status, resp, filial, projeto, projsap, iss, admcentral, pis, cofins, csll, irpj, invest, icms):
-    if n: #depois, jogar a função para mandar essas info para o back
-        lista_input = [os,tipo,enq,cliente,desc,icj,sap,inicio,fim,adt,valor,prazom,prazod,status,resp,filial,projeto,projsap,iss,admcentral,pis,cofins,csll,irpj,invest,icms]
-        return enviar_contratos(lista_input)
-    return ""
+def update_message_modal(submit_clicks, close_clicks, os, tipo, enq, cliente, desc, icj, sap, inicio, fim, adt, valor, prazom,
+                         prazod, status, resp, filial, projeto, projsap, iss, admcentral, pis,
+                         cofins, csll, irpj, invest, icms):
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        raise dash.exceptions.PreventUpdate
+
+    triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+    if triggered_id == "close-centered":
+        if submit_clicks:
+            lista_input = [os, tipo, enq, cliente, desc, icj, sap, inicio, fim, adt, valor, prazom,
+                           prazod, status, resp, filial, projeto, projsap, iss, admcentral, pis,
+                           cofins, csll, irpj, invest, icms]
+            message = enviar_contratos(lista_input)
+            if "sucesso" in message.lower():
+                return True, "Sucesso!", message
+            else:
+                return True, "Erro!", message
+        else:
+            raise dash.exceptions.PreventUpdate
+    elif triggered_id == "close-message-modal":
+        return False, "", ""
+    else:
+        raise dash.exceptions.PreventUpdate
 
 # callback para deixar apenas algumas colunas editáveis na tela de cadastro de projetos
 @app.callback(

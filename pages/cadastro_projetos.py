@@ -4,6 +4,7 @@ from back import *
 from banco import *
 import dash_bootstrap_components as dbc
 from constants import *
+import dash_core_components as dcc
 
 # modelo do formulário de cadastro de projeto
 form = dbc.Form(
@@ -63,6 +64,24 @@ modal = html.Div(
     ]
 )
 
+# Novo modal para exibir mensagens
+message_modal = html.Div(
+    [
+        dbc.Modal(
+            [
+                dbc.ModalHeader(id="message-modal-header"),
+                dbc.ModalBody(id="message-modal-body"),
+                dbc.ModalFooter(
+                    dbc.Button("Fechar", id="close-message-modal", className="ml-auto")
+                ),
+            ],
+            id="message-modal",
+            centered=True,
+            is_open=False,
+        ),
+    ]
+)
+
 # busca info no banco
 df = cad_contratos()
 #formata a coluna que tem numeros
@@ -110,5 +129,6 @@ layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center
             style_table={'overflowX': 'auto', 'width': '100%'},  # Definindo o tamanho da tabela
             editable=False  # Certifique-se de que a tabela é editável
         ),
-    ])
+    ]),
+    message_modal  # Adicione o message_modal aqui
 ])
