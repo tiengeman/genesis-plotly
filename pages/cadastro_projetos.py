@@ -4,6 +4,7 @@ from back import *
 from banco import *
 import dash_bootstrap_components as dbc
 from constants import *
+import dash.dash_table.FormatTemplate as FormatTemplate
 
 # modelo do formulário de cadastro de projeto
 form = dbc.Form(
@@ -120,7 +121,35 @@ layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center
             id='tabela-impostos',
             data=cad_contratos().to_dict('records'),
             filter_action="native",
-            columns=[{"name": i, "id": i} for i in cad_contratos().columns],
+            columns=[
+                {'name': 'OS', 'id': 'OS', 'type': 'text'},
+                {'name': 'TIPO', 'id': 'TIPO', 'type': 'text'},
+                {'name': 'ENQUADRAMENTO', 'id': 'ENQUADRAMENTO', 'type': 'text'},
+                {'name': 'CLIENTE', 'id': 'CLIENTE', 'type': 'text'},
+                {'name': 'DESC', 'id': 'DESC', 'type': 'text'},
+                {'name': 'ICJ', 'id': 'ICJ', 'type': 'text'},
+                {'name': 'SAP', 'id': 'SAP', 'type': 'text'},
+                {'name': 'INICIO', 'id': 'INICIO', 'type': 'datetime'},
+                {'name': 'FIM', 'id': 'FIM', 'type': 'datetime'},
+                {'name': 'ADITIVOS', 'id': 'ADITIVOS', 'type': 'text'},
+                {'name': 'VALOR', 'id': 'VALOR', 'type': 'numeric'},
+                {'name': 'PRAZOMES', 'id': 'PRAZOMES', 'type': 'numeric'},
+                {'name': 'PRAZODIAS', 'id': 'PRAZODIAS', 'type': 'numeric'},
+                {'name': 'STATUS', 'id': 'STATUS', 'type': 'text'},
+                {'name': 'RESPONSAVEL', 'id': 'RESPONSAVEL', 'type': 'text'},
+                {'name': 'FILIAL', 'id': 'FILIAL', 'type': 'numeric'},
+                {'name': 'PROJETO', 'id': 'PROJETO', 'type': 'numeric'},
+                {'name': 'PROJETOSAPIENS', 'id': 'PROJETOSAPIENS', 'type': 'numeric'},
+                {'name': 'ISS', 'id': 'ISS', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
+                {'name': 'ADMCENTRAL', 'id': 'ADMCENTRAL', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
+                {'name': 'PIS', 'id': 'PIS', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
+                {'name': 'COFINS', 'id': 'COFINS', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
+                {'name': 'CSLL', 'id': 'CSLL', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
+                {'name': 'IRPJ', 'id': 'IRPJ', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
+                {'name': 'INVESTIMENTOS', 'id': 'INVESTIMENTOS', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
+                {'name': 'ICMS', 'id': 'ICMS', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
+
+            ],
             style_cell={'textAlign': 'center', 'padding': '5px', 'fontFamily': 'Arial, sans-serif', 'fontSize': '0.8em', 'backgroundColor': colors['white'], 'color': colors['text']},  # Ajustando o tamanho da fonte
             style_header={
                 'fontWeight': 'bold',
