@@ -41,7 +41,7 @@ form = dbc.Form(
 # modelo do modal
 modal = html.Div(
     [
-        dbc.Button("Cadastrar", id="open-centered", style={'backgroundColor': colors['orange']}),
+        dbc.Button("Cadastrar", id="open-centered-projetos", style={'backgroundColor': colors['orange']}),
         dbc.Modal(
             [
                 dbc.ModalHeader(dbc.ModalTitle("Cadastro de Projetos"), close_button=True),
@@ -49,14 +49,14 @@ modal = html.Div(
                 dbc.ModalFooter(
                     dbc.Button(
                         "Submit",
-                        id="close-centered",
+                        id="close-centered-projetos",
                         style={'backgroundColor': colors['orange']},
                         className="ms-auto",
                         n_clicks=0,
                     )
                 ),
             ],
-            id="modal-centered",
+            id="modal-centered-projetos",
             centered=True,
             is_open=False,
             className="modal-lg"
@@ -69,13 +69,13 @@ message_modal = html.Div(
     [
         dbc.Modal(
             [
-                dbc.ModalHeader(id="message-modal-header"),
-                dbc.ModalBody(id="message-modal-body"),
+                dbc.ModalHeader(id="message-modal-header-projetos"),
+                dbc.ModalBody(id="message-modal-body-projetos"),
                 dbc.ModalFooter(
-                    dbc.Button("Fechar", id="close-message-modal", className="ml-auto")
+                    dbc.Button("Fechar", id="close-message-modal-projetos", className="ml-auto")
                 ),
             ],
-            id="message-modal",
+            id="message-modal-projetos",
             centered=True,
             is_open=False,
         ),
@@ -87,7 +87,7 @@ message_modal = html.Div(
 
 # switch para edição da tabela
 switch = html.Div([
-    dbc.Switch(id="edit-switch", style={"color": colors['gray']}, value=False, label="Editar",
+    dbc.Switch(id="edit-switch-contratos", style={"color": colors['gray']}, value=False, label="Editar",
                input_style={"height": "20px", "background-color": colors['orange']})
 ], className="ms-auto")
 

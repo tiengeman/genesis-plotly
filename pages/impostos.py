@@ -84,7 +84,7 @@ message_modal = html.Div(
 
 # switch para edição da tabela
 switch = html.Div([
-    dbc.Switch(id="edit-switch", style={"color": colors['gray']}, value=False, label="Editar",
+    dbc.Switch(id="edit-switch-impostos", style={"color": colors['gray']}, value=False, label="Editar",
                input_style={"height": "20px", "background-color": colors['orange']})
 ], className="ms-auto")
 

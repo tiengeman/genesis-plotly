@@ -133,11 +133,13 @@ def toggle_offcanvas(n1, is_open):
         return not is_open
     return is_open
 
+# ============================================ MODAL CADASTRO ====================================================
+
 #callback para abrir o modal de cadastro de projetos
 @app.callback(
-    Output("modal-centered", "is_open"),
-    [Input("open-centered", "n_clicks"), Input("close-centered", "n_clicks")],
-    [State("modal-centered", "is_open")],
+    Output("modal-centered-projetos", "is_open"),
+    [Input("open-centered-projetos", "n_clicks"), Input("close-centered-projetos", "n_clicks")],
+    [State("modal-centered-projetos", "is_open")],
 )
 def toggle_modal(n1, n2, is_open):
     if n1 or n2:
@@ -147,13 +149,13 @@ def toggle_modal(n1, n2, is_open):
 #callback para salvar itens do cadastro
 @app.callback(
     [
-        Output("message-modal", "is_open"),
-        Output("message-modal-header", "children"),
-        Output("message-modal-body", "children"),
+        Output("message-modal-projetos", "is_open"),
+        Output("message-modal-header-projetos", "children"),
+        Output("message-modal-body-projetos", "children"),
     ],
     [
-        Input("close-centered", "n_clicks"),
-        Input("close-message-modal", "n_clicks"),
+        Input("close-centered-projetos", "n_clicks"),
+        Input("close-message-modal-projetos", "n_clicks"),
     ],
     [
         State("OS", "value"), State("TIPO", "value"), State("ENQUADRAMENTO", "value"),
@@ -176,7 +178,7 @@ def update_message_modal(submit_clicks, close_clicks, os, tipo, enq, cliente, de
 
     triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
-    if triggered_id == "close-centered":
+    if triggered_id == "close-centered-projetos":
         if submit_clicks:
             lista_input = [os, tipo, enq, cliente, desc, icj, sap, inicio, fim, adt, valor, prazom,
                            prazod, status, resp, filial, projeto, projsap, iss, admcentral, pis,
@@ -188,21 +190,33 @@ def update_message_modal(submit_clicks, close_clicks, os, tipo, enq, cliente, de
                 return True, "Erro!", message
         else:
             raise dash.exceptions.PreventUpdate
-    elif triggered_id == "close-message-modal":
+    elif triggered_id == "close-message-modal-projetos":
         return False, "", ""
     else:
         raise dash.exceptions.PreventUpdate
 
+#========================================= SWITCH TABELA EDITÁVEL ====================================================
+
 # callback para deixar apenas algumas colunas editáveis na tela de cadastro de projetos
 @app.callback(
     Output('tabela-projetos', 'columns'),
-    Input('edit-switch', 'value')
+    Input('edit-switch-contratos', 'value')
 )
 def toggle_editability(value):
     columns = [{"name": i, "id": i, "editable": value} if i not in ["VALOR", "PRAZOMES", "PRAZODIAS"] else {"name": i, "id": i} for i in cad_contratos().columns]
     return columns
 
-# -----------------------------------------------------------------------------------------
+# callback para deixar apenas algumas colunas editáveis na tela de cadastro de projetos
+@app.callback(
+    Output('tabela-impostos', 'columns'),
+    Input('edit-switch-impostos', 'value')
+)
+def toggle_editability(value):
+    columns = [{"name": i, "id": i, "editable": value} if i not in [] else {"name": i, "id": i} for i in cad_impostos().columns]
+    return columns
+
+# ============================================== BOTÃO ATUALIZAR ===========================================================
+
 # Crie a callback para atualizar a tabela quando o botão for clicado
 @app.callback(
     Output('tabela-projetos', 'data'),
