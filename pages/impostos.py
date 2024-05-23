@@ -44,7 +44,7 @@ modal = html.Div(
         dbc.Button("Cadastrar", id="open-centered", style={'backgroundColor': colors['orange']}),
         dbc.Modal(
             [
-                dbc.ModalHeader(dbc.ModalTitle("Cadastro de Projetos"), close_button=True),
+                dbc.ModalHeader(dbc.ModalTitle("Cadastro de Impostos"), close_button=True),
                 dbc.ModalBody(form),
                 dbc.ModalFooter(
                     dbc.Button(
@@ -82,9 +82,6 @@ message_modal = html.Div(
     ]
 )
 
-#formata a coluna que tem numeros
-# format_numeric_columns(df, ["VALOR"])
-
 # switch para edição da tabela
 switch = html.Div([
     dbc.Switch(id="edit-switch", style={"color": colors['gray']}, value=False, label="Editar",
@@ -93,15 +90,15 @@ switch = html.Div([
 
 # Adicione um botão que chama a função de callback para atualizar a tabela
 refresh_button = html.Div([
-    dbc.Button("Atualizar Tabela", id="refresh-button-contratos", style={'backgroundColor': colors['gray']})
+    dbc.Button("Atualizar Tabela", id="refresh-button-impostos", style={'backgroundColor': colors['gray']})
 ])
 
 # Define a layout with a centered container
 layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center'}, children=[
-    html.H1(children='Cadastro de Projeto', style={'marginTop': '10px', 'color': colors['gray'], 'fontWeight': 'bold'}),
+    html.H1(children='Cadastro de Impostos', style={'marginTop': '10px', 'color': colors['gray'], 'fontWeight': 'bold'}),
     html.Hr(style={'backgroundColor': colors['orange']}),
     html.Div(style={'marginTop': '20px'}),
-    html.Div(id='tabela-projetos-container', style={'margin': '20px'}, children=[
+    html.Div(id='tabela-impostos-container', style={'margin': '20px'}, children=[
         dbc.Stack([
             modal,
             html.Div(style={'margin': '10px'}),
@@ -112,37 +109,17 @@ layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center
         ),
         html.Div(style={'marginTop': '20px'}),
         dash_table.DataTable(
-            id='tabela-projetos',
-            data=cad_contratos().to_dict('records'),
+            id='tabela-impostos',
+            data=cad_impostos().to_dict('records'),
             filter_action="native",
             columns=[
-                {'name': 'OS', 'id': 'OS', 'type': 'text'},
-                {'name': 'TIPO', 'id': 'TIPO', 'type': 'text'},
-                {'name': 'ENQUADRAMENTO', 'id': 'ENQUADRAMENTO', 'type': 'text'},
-                {'name': 'CLIENTE', 'id': 'CLIENTE', 'type': 'text'},
-                {'name': 'DESC', 'id': 'DESC', 'type': 'text'},
-                {'name': 'ICJ', 'id': 'ICJ', 'type': 'text'},
-                {'name': 'SAP', 'id': 'SAP', 'type': 'text'},
-                {'name': 'INICIO', 'id': 'INICIO', 'type': 'datetime'},
-                {'name': 'FIM', 'id': 'FIM', 'type': 'datetime'},
-                {'name': 'ADITIVOS', 'id': 'ADITIVOS', 'type': 'text'},
-                {'name': 'VALOR', 'id': 'VALOR', 'type': 'numeric'},
-                {'name': 'PRAZOMES', 'id': 'PRAZOMES', 'type': 'numeric'},
-                {'name': 'PRAZODIAS', 'id': 'PRAZODIAS', 'type': 'numeric'},
-                {'name': 'STATUS', 'id': 'STATUS', 'type': 'text'},
-                {'name': 'RESPONSAVEL', 'id': 'RESPONSAVEL', 'type': 'text'},
-                {'name': 'FILIAL', 'id': 'FILIAL', 'type': 'numeric'},
-                {'name': 'PROJETO', 'id': 'PROJETO', 'type': 'numeric'},
-                {'name': 'PROJETOSAPIENS', 'id': 'PROJETOSAPIENS', 'type': 'numeric'},
-                {'name': 'ISS', 'id': 'ISS', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
-                {'name': 'ADMCENTRAL', 'id': 'ADMCENTRAL', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
-                {'name': 'PIS', 'id': 'PIS', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
-                {'name': 'COFINS', 'id': 'COFINS', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
-                {'name': 'CSLL', 'id': 'CSLL', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
-                {'name': 'IRPJ', 'id': 'IRPJ', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
-                {'name': 'INVESTIMENTOS', 'id': 'INVESTIMENTOS', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
-                {'name': 'ICMS', 'id': 'ICMS', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
-
+                {'name': 'RECEITATOTAL', 'id': 'RECEITATOTAL', 'type': 'numeric'},
+                {'name': 'PISRETIDO', 'id': 'PISRETIDO', 'type': 'numeric'},
+                {'name': 'PISPAGO', 'id': 'PISPAGO', 'type': 'numeric'},
+                {'name': 'COFINSRETIDO', 'id': 'COFINSRETIDO', 'type': 'numeric'},
+                {'name': 'COFINSPAGO', 'id': 'COFINSPAGO', 'type': 'numeric'},
+                {'name': 'DATA FECHAMENTO', 'id': 'DATA FECHAMENTO', 'type': 'datetime'},
+                {'name': 'COMPETENCIA', 'id': 'COMPETENCIA', 'type': 'any'},
             ],
             style_cell={'textAlign': 'center', 'padding': '5px', 'fontFamily': 'Arial, sans-serif', 'fontSize': '0.8em', 'backgroundColor': colors['white'], 'color': colors['text']},  # Ajustando o tamanho da fonte
             style_header={

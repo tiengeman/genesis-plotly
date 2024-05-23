@@ -7,9 +7,9 @@ import pages.home as home
 import pages.diretoria as diretoria
 import pages.relacao as relacao
 import pages.cadastro_projetos as cadastro_projetos
+import pages.impostos as impostos
 from constants import *
 from dash.exceptions import PreventUpdate
-from pages.cadastro_projetos import df as df_projetos
 from banco import *
 from back.inserts import *
 
@@ -27,6 +27,7 @@ sidebar = dbc.Nav(
         dbc.NavItem(dbc.NavLink('Diretoria', href='/diretoria', className='nav-link')),
         dbc.NavItem(dbc.NavLink('Relação', href='/relacao', className='nav-link')),
         dbc.NavItem(dbc.NavLink('Cadastro Projetos', href='/cadastro_projetos', className='nav-link')),
+        dbc.NavItem(dbc.NavLink('Impostos', href='/impostos', className='nav-link')),
     ],
     vertical=True,  # Make the nav items stack vertically
     pills=True,  # Make the nav items take up the full width of the sidebar
@@ -101,6 +102,8 @@ def update_content(pathname):
         return relacao.layout
     elif pathname == '/cadastro_projetos':
         return cadastro_projetos.layout
+    elif pathname == '/impostos':
+        return impostos.layout
     else:
         return home.layout
 
@@ -130,7 +133,7 @@ def toggle_offcanvas(n1, is_open):
         return not is_open
     return is_open
 
-#callback para abrir o modal de cadastro dos impostos
+#callback para abrir o modal de cadastro de projetos
 @app.callback(
     Output("modal-centered", "is_open"),
     [Input("open-centered", "n_clicks"), Input("close-centered", "n_clicks")],
@@ -192,26 +195,41 @@ def update_message_modal(submit_clicks, close_clicks, os, tipo, enq, cliente, de
 
 # callback para deixar apenas algumas colunas editáveis na tela de cadastro de projetos
 @app.callback(
-    Output('tabela-impostos', 'columns'),
+    Output('tabela-projetos', 'columns'),
     Input('edit-switch', 'value')
 )
 def toggle_editability(value):
     columns = [{"name": i, "id": i, "editable": value} if i not in ["VALOR", "PRAZOMES", "PRAZODIAS"] else {"name": i, "id": i} for i in cad_contratos().columns]
     return columns
 
+# -----------------------------------------------------------------------------------------
 # Crie a callback para atualizar a tabela quando o botão for clicado
 @app.callback(
-    Output('tabela-impostos', 'data'),
-    [Input('refresh-button', 'n_clicks')]
+    Output('tabela-projetos', 'data'),
+    [Input('refresh-button-contratos', 'n_clicks')]
 )
 def update_table(n_clicks):
     if n_clicks is None:
         raise PreventUpdate
     else:
         # Atualize o dataframe df chamando a função cad_contratos() novamente
-        df = cad_contratos()
+        df_contratos = cad_contratos()
         # Retorne os dados atualizados da tabela
-        return df.to_dict('records')
+        return df_contratos.to_dict('records')
+    
+# Crie a callback para atualizar a tabela de impostos quando o botão for clicado
+@app.callback(
+    Output('tabela-impostos', 'data'),
+    [Input('refresh-button-impostos', 'n_clicks')]
+)
+def update_table(n_clicks):
+    if n_clicks is None:
+        raise PreventUpdate
+    else:
+        # Atualize o dataframe df chamando a função cad_contratos() novamente
+        df_impostos = cad_impostos()
+        # Retorne os dados atualizados da tabela
+        return df_impostos.to_dict('records')
 
 if __name__ == '__main__':
     app.run_server(debug=True)

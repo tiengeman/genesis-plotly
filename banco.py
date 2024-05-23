@@ -212,8 +212,21 @@ def cad_contratos():
         for i, valor in enumerate(linha):
             dicionario_de_listas[nome_colunas[i]].append(valor)
     del dicionario_de_listas['ID']
-    df = pd.DataFrame.from_dict(data=dicionario_de_listas)
-    return df
+    df_contratos = pd.DataFrame.from_dict(data=dicionario_de_listas)
+
+    return df_contratos
+
+def cad_impostos():
+    lista = back.cad_impostos()
+    nome_colunas = ['ID', 'RECEITATOTAL', 'PISRETIDO', 'PISPAGO', 'COFINSRETIDO', 'COFINSPAGO', 'DATA FECHAMENTO', 'COMPETENCIA']
+    dicionario_de_listas = {coluna: [] for coluna in nome_colunas}
+    for linha in lista:
+        for i, valor in enumerate(linha):
+            dicionario_de_listas[nome_colunas[i]].append(valor)
+    del dicionario_de_listas['ID']
+    df_impostos = pd.DataFrame.from_dict(data=dicionario_de_listas)
+    format_numeric_columns(df_impostos, ["RECEITATOTAL", 'PISRETIDO', 'PISPAGO', 'COFINSRETIDO', 'COFINSPAGO'])
+    return df_impostos
 
 def enviar_contratos(lista):
     try:
