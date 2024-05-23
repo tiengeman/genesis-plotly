@@ -208,7 +208,7 @@ def toggle_editability(value):
     Output('tabela-projetos', 'data'),
     [Input('refresh-button-contratos', 'n_clicks')]
 )
-def update_table(n_clicks):
+def refresh_table(n_clicks):
     if n_clicks is None:
         raise PreventUpdate
     else:
@@ -222,7 +222,7 @@ def update_table(n_clicks):
     Output('tabela-impostos', 'data'),
     [Input('refresh-button-impostos', 'n_clicks')]
 )
-def update_table(n_clicks):
+def refresh_table(n_clicks):
     if n_clicks is None:
         raise PreventUpdate
     else:
