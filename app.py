@@ -194,6 +194,56 @@ def update_message_modal(submit_clicks, close_clicks, os, tipo, enq, cliente, de
         return False, "", ""
     else:
         raise dash.exceptions.PreventUpdate
+    
+#callback para abrir o modal de cadastro de projetos
+@app.callback(
+    Output("modal-centered-impostos", "is_open"),
+    [Input("open-centered-impostos", "n_clicks"), Input("close-centered-impostos", "n_clicks")],
+    [State("modal-centered-impostos", "is_open")],
+)
+def toggle_modal(n1, n2, is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
+
+#callback para salvar itens do cadastro
+@app.callback(
+    [
+        Output("message-modal-impostos", "is_open"),
+        Output("message-modal-header-impostos", "children"),
+        Output("message-modal-body-impostos", "children"),
+    ],
+    [
+        Input("close-centered-impostos", "n_clicks"),
+        Input("close-message-modal-impostos", "n_clicks"),
+    ],
+    [
+        State("RECEITATOTAL", "value"), State("PISRETIDO", "value"), State("PISPAGO", "value"),
+        State("COFINSRETIDO", "value"), State("COFINSPAGO", "value"), State("DATAFECHAMENTO", "value"),
+        State("COMPETENCIA", "value"),
+    ],
+)
+def update_message_modal(submit_clicks, close_clicks, receitatotal, pisretido, pispago, cofinsretido, cofinspago, datafechamento, competencia):
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        raise dash.exceptions.PreventUpdate
+
+    triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+    if triggered_id == "close-centered-impostos":
+        if submit_clicks:
+            lista_input = [close_clicks, receitatotal, pisretido, pispago, cofinsretido, cofinspago, datafechamento, competencia]
+            message = enviar_contratos(lista_input)
+            if "sucesso" in message.lower():
+                return True, "Sucesso!", message
+            else:
+                return True, "Erro!", message
+        else:
+            raise dash.exceptions.PreventUpdate
+    elif triggered_id == "close-message-modal-impostos":
+        return False, "", ""
+    else:
+        raise dash.exceptions.PreventUpdate
 
 #========================================= SWITCH TABELA EDITÁVEL ====================================================
 
