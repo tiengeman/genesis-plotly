@@ -45,7 +45,7 @@ def authorized():
 
         email = result["id_token_claims"]["unique_name"]
         username = email.split("@")[0]
-
+        # verificar se o usuário existe, caso não, cria um novo usuário
         user = get_user(email)
         if user:
             session["user"] = result.get("id_token_claims")
@@ -55,7 +55,7 @@ def authorized():
             session["user"] = result.get("id_token_claims")
             _save_cache(cache)
         
-    return redirect(url_for("index"))
+    return redirect(url_for("app_main")) #esse nome não vai funcionar, mudar depois
 
 @app.route('/logout')
 def logout():
