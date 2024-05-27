@@ -1,7 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, session, request
 from msal import ConfidentialClientApplication
 import uuid
-import webbrowser
 import dash
 import dash_bootstrap_components as dbc
 from dash import html, dcc
@@ -33,7 +32,6 @@ sidebar = dbc.Nav(
         dbc.NavItem(dbc.NavLink('Relação', href='/relacao', className='nav-link')),
         dbc.NavItem(dbc.NavLink('Cadastro Projetos', href='/cadastro_projetos', className='nav-link')),
         dbc.NavItem(dbc.NavLink('Impostos', href='/impostos', className='nav-link')),
-        dbc.NavItem(dbc.NavLink('Login', href='/login', className='nav-link')) # mover área de login para outro canto 
     ],
     vertical=True,
     pills=True,
@@ -66,7 +64,7 @@ user_button = dbc.Button(  # ir para página de login
     n_clicks=0,
     size="md",
     color='#FFFFFF',
-    style={"font-size": "1.60em"},
+    style={"font-size": "1.60em", "color": "#FFFFFF"},
     className='btn-white',
 )
 
@@ -260,6 +258,16 @@ def update_table(n_clicks):
         df_impostos = cad_impostos()
         # Retorne os dados atualizados da tabela
         return df_impostos.to_dict('records')
+
+# Callback para redirecionar para a página de login quando o botão for clicado
+@app.callback(
+    Output('url', 'pathname'),
+    Input('user-button', 'n_clicks')
+)
+def go_to_login(n_clicks):
+    if n_clicks:
+        return '/login'
+    return dash.no_update
 
 if __name__ == '__main__':
     app.run_server(debug=True)

@@ -23,7 +23,7 @@ layout = dbc.Container(
         ),
         dbc.Row(
             dbc.Col(
-                dbc.Button('Login', id='login-button', color='orange', className='me-2'),
+                dbc.Button('Login', id='login-button', style={"backgroundColor": "#FF4E00", "color": "white", "border": "none"}, className='me-2'),
                 width='auto',
                 className='d-flex justify-content-center mb-2'
             )

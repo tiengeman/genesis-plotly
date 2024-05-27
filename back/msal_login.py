@@ -1,14 +1,15 @@
 from flask import Flask, redirect, url_for, session, request
-from msal import ConfidentialClientApplication
+from msal import ConfidentialClientApplication, SerializableTokenCache
 import uuid
+import os
 
 # Autenticação com Microsoft Oauth2
 app = Flask(__name__)
-app.secret_key = '68f170cb6f230e030cd3353b48666511a7bdc74600576a03'
+app.secret_key = os.getenv('SECRET_KEY', '68f170cb6f230e030cd3353b48666511a7bdc74600576a03')
 
-CLIENT_ID = '67e2167c-bb04-48d3-a10f-e9d9d618ad9d'
-CLIENT_SECRET = 's2a8Q~dCSTsX-oPuaZuQSUOcnGjtAIlwv9oyLbWb'
-TENANT_ID = '751b9ffa-fe40-4f7f-90a6-e3276de42583'
+CLIENT_ID = os.getenv('CLIENT_ID', '67e2167c-bb04-48d3-a10f-e9d9d618ad9d')
+CLIENT_SECRET = os.getenv('CLIENT_SECRET', 's2a8Q~dCSTsX-oPuaZuQSUOcnGjtAIlwv9oyLbWb')
+TENANT_ID = os.getenv('TENANT_ID', '751b9ffa-fe40-4f7f-90a6-e3276de42583')
 AUTHORITY = f'https://login.microsoftonline.com/{TENANT_ID}'
 REDIRECT_PATH = '/getAToken'
 SCOPE = ['User.Read']
@@ -62,10 +63,14 @@ def _build_auth_url(authority=None, scopes=None, state=None):
         redirect_uri=url_for('authorized', _external=True))
 
 def _load_cache():
-    return msal.SerializableTokenCache()
+    cache = SerializableTokenCache()
+    if session.get('token_cache'):
+        cache.deserialize(session['token_cache'])
+    return cache
 
 def _save_cache(cache):
-    pass
+    if cache.has_state_changed:
+        session['token_cache'] = cache.serialize()
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
