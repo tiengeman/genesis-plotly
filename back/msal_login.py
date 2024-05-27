@@ -3,13 +3,15 @@ from msal import ConfidentialClientApplication, SerializableTokenCache
 import uuid
 import os
 
+from models import User, create_user, get_user
+
 # Autenticação com Microsoft Oauth2
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', '68f170cb6f230e030cd3353b48666511a7bdc74600576a03')
 
-CLIENT_ID = os.getenv('CLIENT_ID', '67e2167c-bb04-48d3-a10f-e9d9d618ad9d')
-CLIENT_SECRET = os.getenv('CLIENT_SECRET', 's2a8Q~dCSTsX-oPuaZuQSUOcnGjtAIlwv9oyLbWb')
-TENANT_ID = os.getenv('TENANT_ID', '751b9ffa-fe40-4f7f-90a6-e3276de42583')
+CLIENT_ID = '67e2167c-bb04-48d3-a10f-e9d9d618ad9d'
+CLIENT_SECRET = 's2a8Q~dCSTsX-oPuaZuQSUOcnGjtAIlwv9oyLbWb'
+TENANT_ID = '751b9ffa-fe40-4f7f-90a6-e3276de42583'
 AUTHORITY = f'https://login.microsoftonline.com/{TENANT_ID}'
 REDIRECT_PATH = '/getAToken'
 SCOPE = ['User.Read']
@@ -40,8 +42,19 @@ def authorized():
             redirect_uri=url_for('authorized', _external=True))
         if "error" in result:
             return "Token failure: " + result["error_description"]
-        session["user"] = result.get("id_token_claims")
-        _save_cache(cache)
+
+        email = result["id_token_claims"]["unique_name"]
+        username = email.split("@")[0]
+
+        user = get_user(email)
+        if user:
+            session["user"] = result.get("id_token_claims")
+            _save_cache(cache)
+        else:
+            create_user(email, username, "", "Microsoft")
+            session["user"] = result.get("id_token_claims")
+            _save_cache(cache)
+        
     return redirect(url_for("index"))
 
 @app.route('/logout')
@@ -61,6 +74,7 @@ def _build_auth_url(authority=None, scopes=None, state=None):
         scopes or [],
         state=state or str(uuid.uuid4()),
         redirect_uri=url_for('authorized', _external=True))
+
 
 def _load_cache():
     cache = SerializableTokenCache()
