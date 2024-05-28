@@ -2,10 +2,9 @@ import dash
 import dash_bootstrap_components as dbc
 from dash import html, dcc
 from dash.dependencies import Input, Output, State
-import webbrowser
+from msal_login import initiate_microsoft_login   #algum erro ao importar, acho que não imorta por estar em outra pasta
 
 
-# Definição do layout da página de login
 layout = dbc.Container(
     [
         dbc.Row(
@@ -46,6 +45,7 @@ layout = dbc.Container(
 )
 
 @dash.callback(
+    Output('url', 'href'),
     Output('output-message', 'children'),
     [Input('login-button', 'n_clicks')],
     [Input('ms-button', 'n_clicks')],
@@ -65,7 +65,8 @@ def handle_login(n_clicks_login, n_clicks_ms, email, senha):
             return f'Login realizado com email: {email}'
         else:
             return 'Por favor, preencha os campos de email e senha'
-    elif button_id == 'ms-button':
-        webbrowser.open("http://localhost:5000/login")
-        return 'Redirecionado para login com Microsoft'
+        # Login com microsoft 
+    elif button_id == 'ms-button': 
+        auth_url = initiate_microsoft_login()  
+        return auth_url,'Redirecionado para login com Microsoft'
     return ''

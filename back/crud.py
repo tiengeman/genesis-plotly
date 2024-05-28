@@ -16,7 +16,7 @@ def create_user_api():
     email = data["email"]
     username = data["username"]
     password = data["password"]
-    sector = data.get("sector", "")
+    sector = data.get("setor", "")
     create_user(email, username, password, sector)
     return {"message": "User created successfully"}
 
@@ -27,7 +27,7 @@ def update_user(user_id):
     user = session.query(User).get(user_id)
     if user:
         user.username = data["username"]
-        user.sector = data["sector"]
+        user.sector = data["setor"]
         session.commit()
         session.close()
         return {"message": "Usuário atualizado com sucesso!"}

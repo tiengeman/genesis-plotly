@@ -18,9 +18,9 @@ SCOPE = ['User.Read']
 
 @app.route('/')
 def index():
-    return 'Flask MSAL Example'
+    return 'Flask MSAL'
 
-@app.route('/login')
+@app.route('/loginms')
 def login():
     session["state"] = str(uuid.uuid4())
     auth_url = _build_auth_url(scopes=SCOPE, state=session["state"])
@@ -85,6 +85,13 @@ def _load_cache():
 def _save_cache(cache):
     if cache.has_state_changed:
         session['token_cache'] = cache.serialize()
+
+#função para obter url de autenticação na página de login, o msal não roda sozinho
+def initiate_microsoft_login():
+    with app.test_request_context():
+        session["state"] = str(uuid.uuid4())
+        auth_url = _build_auth_url(scopes=SCOPE, state=session["state"])
+        return auth_url
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
