@@ -55,3 +55,16 @@ def inserir_contrato(lista,db=back.db):
         'icms-contrato'             :lista[24],
         'investimento-contrato'     :lista[25]
     })
+
+def inserir_imposto(lista,db=back.db):
+    colecao = db.get_collection('Cadastro Impostos')
+
+    colecao.insert_one({
+        'receitatotal-impostos'     :lista[0],
+        'pisretido-impostos'        :lista[1],
+        'pispago-impostos'          :lista[2],
+        'cofinsretido-impostos'     :lista[3],
+        'cofinspago-impostos'       :lista[4],
+        'datafechamento-impostos'   :lista[5],
+        'competencia-impostos'      :lista[6]
+    })
