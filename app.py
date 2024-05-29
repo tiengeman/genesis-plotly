@@ -8,6 +8,7 @@ import pages.diretoria as diretoria
 import pages.relacao as relacao
 import pages.cadastro_projetos as cadastro_projetos
 import pages.impostos as impostos
+import pages.encargos as encargos
 from constants import *
 from dash.exceptions import PreventUpdate
 from banco import *
@@ -28,6 +29,7 @@ sidebar = dbc.Nav(
         dbc.NavItem(dbc.NavLink('Relação', href='/relacao', className='nav-link')),
         dbc.NavItem(dbc.NavLink('Cadastro Projetos', href='/cadastro_projetos', className='nav-link')),
         dbc.NavItem(dbc.NavLink('Impostos', href='/impostos', className='nav-link')),
+        dbc.NavItem(dbc.NavLink('Encargos', href='/encargos', className='nav-link')),
     ],
     vertical=True,  # Make the nav items stack vertically
     pills=True,  # Make the nav items take up the full width of the sidebar
@@ -104,6 +106,8 @@ def update_content(pathname):
         return cadastro_projetos.layout
     elif pathname == '/impostos':
         return impostos.layout
+    elif pathname == '/encargos':
+        return encargos.layout
     else:
         return home.layout
 
@@ -232,7 +236,7 @@ def update_message_modal(submit_clicks, close_clicks, receitatotal, pisretido, p
 
     if triggered_id == "close-centered-impostos":
         if submit_clicks:
-            lista_input = [close_clicks, receitatotal, pisretido, pispago, cofinsretido, cofinspago, datafechamento, competencia]
+            lista_input = [receitatotal, pisretido, pispago, cofinsretido, cofinspago, datafechamento, competencia]
             message = enviar_contratos(lista_input)
             if "sucesso" in message.lower():
                 return True, "Sucesso!", message
