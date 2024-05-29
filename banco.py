@@ -231,7 +231,18 @@ def cad_impostos():
 
 def cad_encargos():
     lista_encargos = back.cad_encargos()
-    print(lista_encargos)
+    lista = []
+    nome_colunas = ['id', 'CODIGO', 'NOME', 'CNPJ', 'PERCENTUAL', 'CPRB', 'INICIO', 'FIM']
+    for a in lista_encargos:
+        dicionario_de_listas = {coluna: [] for coluna in nome_colunas}
+        for linha in a:
+            for i, valor in enumerate(linha):
+                dicionario_de_listas[nome_colunas[i]].append(valor)
+        del dicionario_de_listas['id']
+        df_encargos = pd.DataFrame.from_dict(data=dicionario_de_listas)
+        lista.append(df_encargos)
+    return lista
+    
 
 def enviar_contratos(lista):
     try:
@@ -240,4 +251,4 @@ def enviar_contratos(lista):
     except Exception as e:
         return str(e)
     
-cad_encargos()
+df = cad_encargos()

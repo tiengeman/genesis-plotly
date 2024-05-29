@@ -75,6 +75,8 @@ refresh_button = html.Div([
     dbc.Button("Atualizar Tabela", id="refresh-button-encargos", style={'backgroundColor': colors['gray']})
 ])
 
+lista_encargos = cad_encargos()
+
 # Define a layout with a centered container
 layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center'}, children=[
     html.H1(children='Cadastro de Encargos', style={'marginTop': '10px', 'color': colors['gray'], 'fontWeight': 'bold'}),
@@ -90,18 +92,18 @@ layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center
         direction="horizontal",
         ),
         html.Div(style={'marginTop': '20px'}),
-        dash_table.DataTable(
-            id='tabela-encargos',
-            data=cad_impostos().to_dict('records'),
-            filter_action="native",
+        # Criar uma tabela para cada lista dentro de lista_encargos
+        *[dash_table.DataTable(
+            id=f'tabela-encargos-{index}',
+            data=encargos.to_dict('records'),
             columns=[
-                {'name': 'RECEITATOTAL', 'id': 'RECEITATOTAL', 'type': 'numeric'},
-                {'name': 'PISRETIDO', 'id': 'PISRETIDO', 'type': 'numeric'},
-                {'name': 'PISPAGO', 'id': 'PISPAGO', 'type': 'numeric'},
-                {'name': 'COFINSRETIDO', 'id': 'COFINSRETIDO', 'type': 'numeric'},
-                {'name': 'COFINSPAGO', 'id': 'COFINSPAGO', 'type': 'numeric'},
-                {'name': 'DATA FECHAMENTO', 'id': 'DATAFECHAMENTO', 'type': 'datetime'},
-                {'name': 'COMPETENCIA', 'id': 'COMPETENCIA', 'type': 'any'},
+                {'name': 'CODIGO', 'id': 'CODIGO', 'type': 'numeric'},
+                {'name': 'NOME', 'id': 'NOME', 'type': 'text'},
+                {'name': 'CNPJ', 'id': 'CNPJ', 'type': 'text'},
+                {'name': 'PERCENTUAL', 'id': 'PERCENTUAL', 'type': 'numeric'},
+                {'name': 'CPRB', 'id': 'CPRB', 'type': 'numeric'},
+                {'name': 'INICIO', 'id': 'INICIO', 'type': 'datetime'},
+                {'name': 'FIM', 'id': 'FIM', 'type': 'datetime'},
             ],
             style_cell={'textAlign': 'center', 'padding': '5px', 'fontFamily': 'Arial, sans-serif', 'fontSize': '0.8em', 'backgroundColor': colors['white'], 'color': colors['text']},  # Ajustando o tamanho da fonte
             style_header={
@@ -117,7 +119,7 @@ layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center
             ],
             style_table={'overflowX': 'auto', 'width': '100%'},  # Definindo o tamanho da tabela
             editable=False  # Certifique-se de que a tabela é editável
-        ), 
+        ) for index, encargos in enumerate(lista_encargos)]
     ]),
     message_modal  # Adicione o message_modal aqui
 ])

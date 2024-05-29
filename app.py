@@ -1,7 +1,8 @@
 import dash
 import dash_bootstrap_components as dbc
-from dash import html, dcc
+from dash import html, dcc, callback_context
 from dash.dependencies import Input, Output, State
+from pages.encargos import lista_encargos
 import pages.gerencial as gerencial
 import pages.home as home
 import pages.diretoria as diretoria
@@ -268,6 +269,15 @@ def toggle_editability(value):
 def toggle_editability(value):
     columns = [{"name": i, "id": i, "editable": value} if i not in [] else {"name": i, "id": i} for i in cad_impostos().columns]
     return columns
+
+
+# Atualizar a propriedade editable das tabelas quando o switch é acionado
+@app.callback(
+    [Output(f'tabela-encargos-{index}', 'editable') for index in range(len(lista_encargos))],
+    [Input('edit-switch-encargos', 'value')]
+)
+def update_editable(edit_value):
+    return [edit_value] * len(lista_encargos)
 
 # ============================================== BOTÃO ATUALIZAR ===========================================================
 
