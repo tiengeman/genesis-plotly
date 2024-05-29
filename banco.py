@@ -226,7 +226,12 @@ def cad_impostos():
     del dicionario_de_listas['ID']
     df_impostos = pd.DataFrame.from_dict(data=dicionario_de_listas)
     format_numeric_columns(df_impostos, ["RECEITATOTAL", 'PISRETIDO', 'PISPAGO', 'COFINSRETIDO', 'COFINSPAGO'])
+
     return df_impostos
+
+def cad_encargos():
+    lista_encargos = back.cad_encargos()
+    print(lista_encargos)
 
 def enviar_contratos(lista):
     try:
@@ -234,3 +239,5 @@ def enviar_contratos(lista):
         return "Cadastro realizado com sucesso"
     except Exception as e:
         return str(e)
+    
+cad_encargos()
