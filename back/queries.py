@@ -223,15 +223,22 @@ def cad_impostos(db=back.db):
 # Função que irá retornar uma lista de listas de todos os elementos da tabela de Cadastro Encargos
 def cad_encargos(db=back.db):
     colecao = db.get_collection('Cadastro Encargos')
+    filiais = colecao.distinct('codigofilial-encargos')
+    
     lista = []
-    lista_cc = []
+    lista_filial = []
 
-    for i in colecao.find():
-        valores = list(i.values())
-        lista.append(valores)
-        lista.append(valores[2])
+    for filial in filiais:
+        for i in colecao.find({'codigofilial-encargos':filial}):
+            valores = list(i.values())
+            lista.append(valores)
 
-    return lista,lista_cc
+        
+        lista_filial.append(lista)
+        lista = []
+
+
+    return lista_filial
 
 # Função que irá retornar uma lista de listas de todos os elementos da tabela de Cadastro Contratos
 def cad_contratos(db=back.db):
