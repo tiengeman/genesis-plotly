@@ -15,9 +15,6 @@ from dash.exceptions import PreventUpdate
 from banco import *
 from back.inserts import *
 
-# Constants
-# logo = 'https://i0.wp.com/engeman.net/wp-content/uploads/2024/04/LOGO_ENGEMAN_HORIZONTAL-e1714498268589.png?w=851&ssl=1'
-
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP])
 server = app.server
 
@@ -63,11 +60,11 @@ header = dbc.Navbar(
         [
             dbc.Col(offcanvas),
             dbc.Col( #adicionar a imagem depois
-                # html.A(
-                #     html.Img(src=logo, height="60px"),
-                #     href="/home",
-                #     style={"textDecoration": "none"}  # Add this style to remove the default underline
-                # )
+                html.A(
+                    html.Img(src=logo, height="60px"),
+                    href="/home",
+                    style={"textDecoration": "none"}  # Add this style to remove the default underline
+                )
             ),
         ]
     ),
@@ -299,6 +296,20 @@ def refresh_table(n_clicks):
 @app.callback(
     Output('tabela-impostos', 'data'),
     [Input('refresh-button-impostos', 'n_clicks')]
+)
+def refresh_table(n_clicks):
+    if n_clicks is None:
+        raise PreventUpdate
+    else:
+        # Atualize o dataframe df chamando a função cad_contratos() novamente
+        df_impostos = cad_impostos()
+        # Retorne os dados atualizados da tabela
+        return df_impostos.to_dict('records')
+    
+# Crie a callback para atualizar a tabela de impostos quando o botão for clicado
+@app.callback(
+    [Output(f'tabela-encargos-{index}', 'data') for index in range(len(lista_encargos))],
+    [Input('refresh-button-encargos', 'n_clicks')]
 )
 def refresh_table(n_clicks):
     if n_clicks is None:
