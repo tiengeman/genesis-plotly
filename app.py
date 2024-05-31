@@ -10,6 +10,7 @@ import pages.relacao as relacao
 import pages.cadastro_projetos as cadastro_projetos
 import pages.impostos as impostos
 import pages.encargos as encargos
+import pages.detalhamento as detalhamento
 from constants import *
 from dash.exceptions import PreventUpdate
 from banco import *
@@ -28,6 +29,7 @@ sidebar = dbc.Nav(
         dbc.NavItem(dbc.NavLink('Cadastro Projetos', href='/cadastro_projetos', className='nav-link')),
         dbc.NavItem(dbc.NavLink('Impostos', href='/impostos', className='nav-link')),
         dbc.NavItem(dbc.NavLink('Encargos', href='/encargos', className='nav-link')),
+        dbc.NavItem(dbc.NavLink('Detalhamento', href='/detalhamento', className='nav-link')),
     ],
     vertical=True,  # Make the nav items stack vertically
     pills=True,  # Make the nav items take up the full width of the sidebar
@@ -106,8 +108,12 @@ def update_content(pathname):
         return impostos.layout
     elif pathname == '/encargos':
         return encargos.layout
+    elif pathname == '/detalhamento':
+        return detalhamento.layout
     else:
         return home.layout
+    
+# ================================================ UPDATE TABLE GERENCIAL ==========================================================
 
 def update_table(output_id, value):
     if output_id == 'tabela-container':
@@ -123,6 +129,26 @@ def update_table(output_id, value):
 )
 def update_tables(value):
     return update_table('tabela-container', value), update_table('tabela2-container', value)
+
+# ================================================= UPDATE TABLE DETALHAMENTO ==========================================================
+
+def update_table_detalhamento(output_id, value, contrato):
+    if output_id == 'tabela-detalhamento-container-medicao':
+        return detalhamento.atualizar_tabela_medicao(value, contrato)
+    elif output_id == 'tabela-detalhamento-container-despesa':
+        return detalhamento.atualizar_tabela_despesa(value, contrato)
+
+#callback para atualizar as tabelas gerenciais de acordo com a competencia
+@app.callback(
+    Output('tabela-detalhamento-container-medicao', 'children'),
+    Output('tabela-detalhamento-container-despesa', 'children'),
+    [Input('minha-lista-suspensa-1-detalhamento', 'value'), Input('minha-lista-suspensa-2', 'value')]
+)
+def update_tables(value, contrato):
+    print(f'{value} - {contrato}')
+    return update_table_detalhamento('tabela-detalhamento-container-medicao', value, contrato), update_table_detalhamento('tabela-detalhamento-container-despesa', value, contrato)
+
+
     
 #callback para abrir o menu
 @app.callback(
@@ -319,6 +345,58 @@ def refresh_table(n_clicks):
         df_impostos = cad_impostos()
         # Retorne os dados atualizados da tabela
         return df_impostos.to_dict('records')
+    
+# @app.callback(
+#     Output('row-info-container', 'children'),
+#     Input('tabela', 'active_cell'),
+#     Input('tabela2', 'active_cell'),
+#     State('tabela', 'data'),
+#     State('tabela', 'columns'),
+#     State('tabela2', 'data'),
+#     State('tabela2', 'columns')
+# )
+# def show_row_info(active_cell1, active_cell2, data1, columns1, data2, columns2):
+#     ctx = dash.callback_context
+
+#     if not ctx.triggered:
+#         raise PreventUpdate
+
+#     if ctx.triggered[0]['prop_id'].split('.')[0] == 'tabela':
+#         active_cell = active_cell1
+#         data = data1
+#         columns = columns1
+#     else:
+#         active_cell = active_cell2
+#         data = data2
+#         columns = columns2
+
+#     if active_cell is None:
+#         raise PreventUpdate
+
+#     column_id = columns[active_cell['column']]['id']
+#     if column_id!= 'MEDIÇÃO':
+#         raise PreventUpdate
+
+#     row_index = active_cell['row']
+#     row_data = data[row_index]
+#     # Create a new table or a div to show the row information
+#     info_table = html.Div([
+#         html.H5(f"Row {row_index} Information:"),
+#         html.Table([
+#             html.Tr([html.Th(key), html.Td(value)]) for key, value in row_data.items()
+#         ])
+#     ])
+#     return info_table
+
+# @app.callback(
+#     Output('detalhamento-container', 'children'),
+#     Input('detalhamento-button', 'n_clicks')
+# )
+# def update_detalhamento_container(n_clicks):
+#     if n_clicks is not None and n_clicks > 0:
+#         return detalhamento.layout
+#     else:
+#         return html.P("Nenhum detalhamento disponível.")
 
 if __name__ == '__main__':
     app.run_server(debug=True)

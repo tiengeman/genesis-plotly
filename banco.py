@@ -41,9 +41,9 @@ def tabela(mes): #função que gera a tabela principal da aba gerencial
                                       'C.CUSTOS':lista_cc, 
                                       'INATIVO':list_inativo,
                                       'FILIAL':list_filial, 
-                                      '(R) MEDIÇÃO':lista_soma_comp, 
-                                      '(D) DESPESAS':list_despesas, 
-                                      '(R-D) LUCRO':list_lucro, 
+                                      'MEDIÇÃO':lista_soma_comp, 
+                                      'DESPESAS':list_despesas, 
+                                      'LUCRO':list_lucro, 
                                       '%':list_perc,
                                       'MEDIÇÃO TOTAL': list_medicao_total,
                                       'DESPESAS TOTAIS': list_desp_totais,
@@ -85,9 +85,9 @@ def tabela_2(mes):
                                       'C.CUSTOS':lista_cc, 
                                       'INATIVO':list_inativo,
                                       'FILIAL':list_filial, 
-                                      '(R) MEDIÇÃO':lista_soma_comp, 
-                                      '(D) DESPESAS':list_despesas, 
-                                      '(R-D) LUCRO':list_lucro, 
+                                      'MEDIÇÃO':lista_soma_comp, 
+                                      'DESPESAS':list_despesas, 
+                                      'LUCRO':list_lucro, 
                                       '%':list_perc,
                                       'MEDIÇÃO TOTAL': list_medicao_total,
                                       'DESPESAS TOTAIS': list_desp_totais,
@@ -251,4 +251,7 @@ def enviar_contratos(lista):
     except Exception as e:
         return str(e)
     
-df = cad_encargos()
+def lista_contratos():
+    lista_contrato, lista_soma_comp, lista_cc = back.medicao_total()
+    
+    return lista_contrato
