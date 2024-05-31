@@ -240,6 +240,34 @@ def cad_encargos(db=back.db):
 
     return lista_filial
 
+def detalha_despesas(competencia,contrato,db=back.db):
+    
+    colecao_notas = db.get_collection('Despesa Relatório')
+    colecao_fin = db.get_collection('Despesa Relatório')
+    colecao_folha = db.get_collection('Despesa Relatório')
+
+    retorno_notas = colecao_notas.find({'descricao-projeto':contrato,'competencia-despesa':competencia})
+    retorno_fin = colecao_fin.find({'descricao-projeto':contrato,'competencia-despesa':competencia})
+    retorno_folha = colecao_folha.find({'descricao-projeto':contrato,'competencia-despesa':competencia})
+
+    lista_notas = []
+    lista_fin = []
+    lista_folha = []
+    
+    for i in retorno_notas:
+        valores = i.values()
+        lista_notas.append(list(valores))
+
+    for j in retorno_fin:
+        valores = j.values()
+        lista_fin.append(list(valores))
+    
+    for k in retorno_folha:
+        valores = k.values()
+        lista_folha.append(list(valores))
+
+    return lista_notas,lista_folha,lista_fin
+
 # Função que irá retornar uma lista de listas de todos os elementos da tabela de Cadastro Contratos
 def cad_contratos(db=back.db):
     colecao = db.get_collection('Cadastro Contratos')
