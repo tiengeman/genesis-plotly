@@ -2,7 +2,23 @@ from sqlalchemy import Column, Integer, String, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from werkzeug.security import generate_password_hash, check_password_hash
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
 import pathlib
+
+# importando o mongo, desisti do sqlite
+username = 'ianfelipe'
+password = 'MateMatica16'
+valor_despesa = 0
+
+uri = f"mongodb+srv://{username}:{password}@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority"
+client = MongoClient(uri, server_api=ServerApi('1'))
+
+db = client['Project']
+
+colecao = db.get_collection('Usuários')
+
+##
 
 Base = declarative_base()
 DB_PATH = pathlib.Path("app.db")
