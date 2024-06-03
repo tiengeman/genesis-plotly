@@ -297,7 +297,7 @@ def ordenar_datas(lista):
         'dezembro': 12
     }
     # Converte cada elemento da lista para um formato que possa ser ordenado facilmente
-    lista_formatada = [(int(ano), meses[mes], 1) for mes, ano in [data.split('/') for data in lista]]
+    lista_formatada = [(int(ano), meses[mes], 1) for mes, ano in [data.split('/') for data in lista if data != None]]
     # Ordena as datas formatadas
     lista_ordenada = sorted(lista_formatada)
     # Converte as datas ordenadas de volta para o formato original

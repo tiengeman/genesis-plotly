@@ -255,3 +255,6 @@ def lista_contratos():
     lista_contrato, lista_soma_comp, lista_cc = back.medicao_total()
     
     return lista_contrato
+
+teste = back.detalha_despesas('abril/2024', 'RNCE - OPERAÇÃO E MANUTENÇÃO')
+print(teste)
