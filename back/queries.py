@@ -313,6 +313,7 @@ def detalha_despesas(competencia,contrato,db=back.db):
     lista_notas = []
     lista_fin = []
     lista_folha = []
+    lista_geral = []
     
     for i in retorno_notas:
         valores = i.values()
@@ -326,7 +327,11 @@ def detalha_despesas(competencia,contrato,db=back.db):
         valores = k.values()
         lista_folha.append(list(valores))
 
-    return lista_notas,lista_folha,lista_fin
+    lista_geral.append(lista_notas)
+    lista_geral.append(lista_folha)
+    lista_geral.append(lista_fin)
+
+    return lista_geral
 
 # Função que irá retornar uma lista de listas de todos os elementos da tabela de Cadastro Contratos
 def cad_contratos(db=back.db):
