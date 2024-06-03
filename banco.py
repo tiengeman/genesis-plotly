@@ -256,5 +256,19 @@ def lista_contratos():
     
     return lista_contrato
 
+def detalha_despesas(competencia, contrato):
+    lista_desp = back.detalha_despesas(competencia, contrato)
+    nome_colunas = ['ID', 'PROJETO-UNI', 'DESCRIÇÃO', 'PROJETO-ORI', 'DOCUMENTO', 'AGENTE', 'DESC. AGENTE', 'VALOR ORI', 'VALOR INVEST.', 'VALOR DESP', 'COD. CLASSE', 'DESC. CLASSE', 'DATA', 'COMPETENCIA', 'CATEGORIA',
+                    'OBSERVAÇÕES', 'TIPO']
+    dicionario_de_listas = {coluna: [] for coluna in nome_colunas}
+    for linha in lista_desp:
+        for i, valor in enumerate(linha):
+            dicionario_de_listas[nome_colunas[i]].append(valor)
+    del dicionario_de_listas['ID']
+    df_impostos = pd.DataFrame.from_dict(data=dicionario_de_listas)
+    
+    return df_impostos
+
+lista = cad_impostos()
 teste = back.detalha_despesas('abril/2024', 'RNCE - OPERAÇÃO E MANUTENÇÃO')
-print(teste)
+print(teste[3])
