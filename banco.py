@@ -268,7 +268,3 @@ def detalha_despesas(competencia, contrato):
     df_impostos = pd.DataFrame.from_dict(data=dicionario_de_listas)
     
     return df_impostos
-
-lista = cad_impostos()
-teste = back.detalha_despesas('abril/2024', 'RNCE - OPERAÇÃO E MANUTENÇÃO')
-print(teste)
