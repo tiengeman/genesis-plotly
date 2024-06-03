@@ -310,26 +310,26 @@ def detalha_despesas(competencia,contrato,db=back.db):
     retorno_fin = colecao_fin.find({'descricao-projeto':contrato,'competencia-despesa':competencia})
     retorno_folha = colecao_folha.find({'descricao-projeto':contrato,'competencia-despesa':competencia})
 
-    lista_notas = []
-    lista_fin = []
-    lista_folha = []
+    # lista_notas = []
+    # lista_fin = []
+    # lista_folha = []
     lista_geral = []
     
     for i in retorno_notas:
         valores = i.values()
-        lista_notas.append(list(valores))
+        lista_geral.append(list(valores))
 
     for j in retorno_fin:
         valores = j.values()
-        lista_fin.append(list(valores))
+        lista_geral.append(list(valores))
     
     for k in retorno_folha:
         valores = k.values()
-        lista_folha.append(list(valores))
+        lista_geral.append(list(valores))
 
-    lista_geral.append(lista_notas)
-    lista_geral.append(lista_folha)
-    lista_geral.append(lista_fin)
+    # lista_geral.append(lista_notas)
+    # lista_geral.append(lista_folha)
+    # lista_geral.append(lista_fin)
 
     return lista_geral
 
