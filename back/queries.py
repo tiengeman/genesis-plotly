@@ -302,9 +302,9 @@ def cad_encargos(db=back.db):
 
 def detalha_despesas(competencia,contrato,db=back.db):
     
-    colecao_notas = db.get_collection('Despesa Relatório')
-    colecao_fin = db.get_collection('Despesa Relatório')
-    colecao_folha = db.get_collection('Despesa Relatório')
+    colecao_notas = db.get_collection('Despesas Relatório')
+    colecao_fin = db.get_collection('Despesas Folha')
+    colecao_folha = db.get_collection('Despesas Financeiro')
 
     retorno_notas = colecao_notas.find({'descricao-projeto':contrato,'competencia-despesa':competencia})
     retorno_fin = colecao_fin.find({'descricao-projeto':contrato,'competencia-despesa':competencia})
