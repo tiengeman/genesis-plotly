@@ -271,4 +271,4 @@ def detalha_despesas(competencia, contrato):
 
 lista = cad_impostos()
 teste = back.detalha_despesas('abril/2024', 'RNCE - OPERAÇÃO E MANUTENÇÃO')
-print(teste[3])
+print(teste)
