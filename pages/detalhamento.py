@@ -18,7 +18,6 @@ layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center
             dcc.Dropdown(
                 id='minha-lista-suspensa-1-detalhamento',
                 options=back.competencias(),
-                value=back.competencias()[-1],
                 style={'fontFamily': 'Arial, sans-serif'}  # Definindo a fonte da lista suspensa
             ),
             width=6
@@ -45,7 +44,7 @@ layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center
 
 #função para atualizar a tabela, é chamada no callback quando uma competencia é selecionada
 def atualizar_tabela_despesa(selecao, contrato):
-    if selecao:
+    if contrato:
         df_tabela = detalha_despesas(selecao, contrato)
         return create_datatable_despesas(df_tabela, colors, "tabela-detalhamento-despesa")
     else:
@@ -84,21 +83,6 @@ def create_datatable_despesas(df, colors, id):
             {'name': 'TIPO', 'id': 'TIPO', 'type': 'text'},
         ],
         style_cell={'textAlign': 'center', 'padding': '5px', 'fontFamily': 'Arial, sans-serif', 'fontSize': '0.8em', 'backgroundColor': colors['white'], 'color': colors['text']},  # Ajustando o tamanho da fonte
-        # style_cell_conditional = [
-        #     {'if': {'column_id': 'LOCAL'}, 'width': '4%'},
-        #     {'if': {'column_id': 'CONTRATO'}, 'width': '35%'},
-        #     {'if': {'column_id': 'C.CUSTOS'}, 'width': '4%'},
-        #     {'if': {'column_id': 'INATIVO'}, 'width': '4%'},
-        #     {'if': {'column_id': 'FILIAL'}, 'width': '4%'},
-        #     {'if': {'column_id': 'MEDIÇÃO'}, 'width': '6%', 'textAlign': 'right'},
-        #     {'if': {'column_id': 'DESPESAS'}, 'width': '7%', 'textAlign': 'right'},
-        #     {'if': {'column_id': 'LUCRO'}, 'width': '7%', 'textAlign': 'right'},
-        #     {'if': {'column_id': '%'}, 'width': '4%', 'textAlign': 'right'},
-        #     {'if': {'column_id': 'MEDIÇÃO TOTAL'}, 'width': '7%', 'textAlign': 'right'},
-        #     {'if': {'column_id': 'DESPESAS TOTAIS'}, 'width': '7%', 'textAlign': 'right'},
-        #     {'if': {'column_id': 'LUCRO TOTAL'}, 'width': '7%', 'textAlign': 'right'},
-        #     {'if': {'column_id': '% TOTAL'}, 'width': '4%', 'textAlign': 'right'},
-        # ],
         # estilo do cabeçalho tabela
         style_header={
             'fontWeight': 'bold',
@@ -112,7 +96,8 @@ def create_datatable_despesas(df, colors, id):
                 'backgroundColor': colors['background'],
             },
 
-        ], 
+        ],
+        style_table={'overflowX': 'auto', 'width': '100%'},  # Definindo o tamanho da tabela 
     )
 
 # função de criação de tabela
@@ -137,21 +122,6 @@ def create_datatable(df, colors, id):
             {'name': '%', 'id': '% TOTAL', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
         ],
         style_cell={'textAlign': 'center', 'padding': '5px', 'fontFamily': 'Arial, sans-serif', 'fontSize': '0.8em', 'backgroundColor': colors['white'], 'color': colors['text']},  # Ajustando o tamanho da fonte
-        # style_cell_conditional = [
-        #     {'if': {'column_id': 'LOCAL'}, 'width': '4%'},
-        #     {'if': {'column_id': 'CONTRATO'}, 'width': '35%'},
-        #     {'if': {'column_id': 'C.CUSTOS'}, 'width': '4%'},
-        #     {'if': {'column_id': 'INATIVO'}, 'width': '4%'},
-        #     {'if': {'column_id': 'FILIAL'}, 'width': '4%'},
-        #     {'if': {'column_id': 'MEDIÇÃO'}, 'width': '6%', 'textAlign': 'right'},
-        #     {'if': {'column_id': 'DESPESAS'}, 'width': '7%', 'textAlign': 'right'},
-        #     {'if': {'column_id': 'LUCRO'}, 'width': '7%', 'textAlign': 'right'},
-        #     {'if': {'column_id': '%'}, 'width': '4%', 'textAlign': 'right'},
-        #     {'if': {'column_id': 'MEDIÇÃO TOTAL'}, 'width': '7%', 'textAlign': 'right'},
-        #     {'if': {'column_id': 'DESPESAS TOTAIS'}, 'width': '7%', 'textAlign': 'right'},
-        #     {'if': {'column_id': 'LUCRO TOTAL'}, 'width': '7%', 'textAlign': 'right'},
-        #     {'if': {'column_id': '% TOTAL'}, 'width': '4%', 'textAlign': 'right'},
-        # ],
         # estilo do cabeçalho tabela
         style_header={
             'fontWeight': 'bold',
