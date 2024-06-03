@@ -279,6 +279,6 @@ def detalha_receita(competencia, contrato):
             dicionario_de_listas[nome_colunas[i]].append(valor)
     del dicionario_de_listas['ID']
     df_receita = pd.DataFrame.from_dict(data=dicionario_de_listas)
-    format_numeric_columns(df_receita, ["VALOR", 'VALOR-RETENCAO', 'VALOR-ADM'])
+    format_numeric_columns(df_receita, ["VALOR"])
     
     return df_receita

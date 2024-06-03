@@ -148,7 +148,6 @@ def update_tables(value, contrato):
     print(f'{value} - {contrato}')
     return update_table_detalhamento('tabela-detalhamento-container-medicao', value, contrato), update_table_detalhamento('tabela-detalhamento-container-despesa', value, contrato)
 
-
     
 #callback para abrir o menu
 @app.callback(
