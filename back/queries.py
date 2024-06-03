@@ -306,10 +306,21 @@ def detalha_despesas(competencia,contrato,db=back.db):
     colecao_fin = db.get_collection('Despesas Folha')
     colecao_folha = db.get_collection('Despesas Financeiro')
 
-    if competencia == None:
+    if competencia == None and contrato == None:
+        retorno_notas = colecao_notas.find()
+        retorno_fin = colecao_fin.find()
+        retorno_folha = colecao_folha.find()
+    
+    elif competencia == None:
         retorno_notas = colecao_notas.find({'descricao-projeto':contrato})
         retorno_fin = colecao_fin.find({'descricao-projeto':contrato})
         retorno_folha = colecao_folha.find({'descricao-projeto':contrato})
+
+    elif contrato == None:
+        retorno_notas = colecao_notas.find({'competencia-despesa':competencia})
+        retorno_fin = colecao_fin.find({'competencia-despesa':competencia})
+        retorno_folha = colecao_folha.find({'competencia-despesa':competencia})
+    
     else:
         retorno_notas = colecao_notas.find({'descricao-projeto':contrato,'competencia-despesa':competencia})
         retorno_fin = colecao_fin.find({'descricao-projeto':contrato,'competencia-despesa':competencia})
@@ -342,11 +353,18 @@ def detalha_receita(competencia,contrato,db=back.db):
     
     colecao_receitas = db.get_collection('Receitas')
 
-    if competencia == None:
+    if competencia == None and contrato == None:
+        retorno_receita = colecao_receitas.find()
+    
+    elif competencia == None:
         retorno_receita = colecao_receitas.find({'descricao-projeto':contrato})
-        
+
+    elif contrato == None:
+        retorno_receita = colecao_receitas.find({'competencia-despesa':competencia})
+    
     else:
         retorno_receita = colecao_receitas.find({'descricao-projeto':contrato,'competencia-despesa':competencia})
+
 
     lista_geral = []
     
