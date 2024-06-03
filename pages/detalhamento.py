@@ -44,20 +44,13 @@ layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center
 
 #função para atualizar a tabela, é chamada no callback quando uma competencia é selecionada
 def atualizar_tabela_despesa(selecao, contrato):
-    if contrato:
-        df_tabela = detalha_despesas(selecao, contrato)
-        return create_datatable_despesas(df_tabela, colors, "tabela-detalhamento-despesa")
-    else:
-        return html.P("Nenhuma tabela disponível para esta seleção.")
+    df_tabela = detalha_despesas(selecao, contrato)
+    return create_datatable_despesas(df_tabela, colors, "tabela-detalhamento-despesa")
     
 #função para atualizar a tabela, é chamada no callback quando uma competencia é selecionada
 def atualizar_tabela_medicao(selecao, contrato):
-    if selecao:
-        df_tabela = tabela(selecao)
-        format_numeric_columns(df_tabela, ['MEDIÇÃO', 'DESPESAS', 'LUCRO', 'MEDIÇÃO TOTAL', 'DESPESAS TOTAIS', 'LUCRO TOTAL'])
-        return create_datatable(df_tabela, colors, "tabela-detalhamento-medicao")
-    else:
-        return html.P("Nenhuma tabela disponível para esta seleção.")
+    df_tabela = detalha_receita(selecao, contrato)
+    return create_datatable_medicao(df_tabela, colors, "tabela-detalhamento-medicao")
     
 # função de criação de tabela
 def create_datatable_despesas(df, colors, id):
@@ -101,25 +94,23 @@ def create_datatable_despesas(df, colors, id):
     )
 
 # função de criação de tabela
-def create_datatable(df, colors, id):
+def create_datatable_medicao(df, colors, id):
     return dash_table.DataTable(
         id=id,
         data=df.to_dict('records'),
         filter_action="native",
         columns=[
-            {'name': 'LOCAL', 'id': 'LOCAL', 'type': 'text'},
-            {'name': 'CONTRATO', 'id': 'CONTRATO', 'type': 'text'},
-            {'name': 'CC', 'id': 'C.CUSTOS', 'type': 'text'},
-            {'name': 'INATIVO', 'id': 'INATIVO', 'type': 'text'},
+            {'name': 'PROJETO-UNI', 'id': 'PROJETO-UNI', 'type': 'text'},
+            {'name': 'DESCRIÇÃO', 'id': 'DESCRIÇÃO', 'type': 'text'},
+            {'name': 'PROJETO-ORI', 'id': 'PROJETO-ORI', 'type': 'text'},
+            {'name': 'DOCUMENTO', 'id': 'DOCUMENTO', 'type': 'text'},
+            {'name': 'CLIENTE', 'id': 'CLIENTE', 'type': 'text'},
+            {'name': 'DATA', 'id': 'DATA', 'type': 'datetime'},
+            {'name': 'VALOR', 'id': 'VALOR', 'type': 'numeric'},
+            {'name': 'VALOR-RETENCAO', 'id': 'VALOR-RETENCAO', 'type': 'numeric'},
+            {'name': 'VALOR-ADM', 'id': 'VALOR-ADM', 'type': 'numeric'},
+            {'name': 'COMPETENCIA', 'id': 'COMPETENCIA', 'type': 'text'},
             {'name': 'FILIAL', 'id': 'FILIAL', 'type': 'text'},
-            {'name': 'MEDIÇÃO', 'id': 'MEDIÇÃO', 'type': 'numeric'},
-            {'name': 'DESPESAS', 'id': 'DESPESAS', 'type': 'numeric'},
-            {'name': 'LUCRO', 'id': 'LUCRO', 'type': 'numeric'},
-            {'name': '%', 'id': '%', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
-            {'name': 'MEDIÇÃO TOTAL', 'id': 'MEDIÇÃO TOTAL', 'type': 'numeric'},
-            {'name': 'DESP. TOTAIS', 'id': 'DESPESAS TOTAIS', 'type': 'numeric'},
-            {'name': 'LUCRO TOTAL', 'id': 'LUCRO TOTAL', 'type': 'numeric'},
-            {'name': '%', 'id': '% TOTAL', 'type': 'numeric', 'format': FormatTemplate.percentage(1)},
         ],
         style_cell={'textAlign': 'center', 'padding': '5px', 'fontFamily': 'Arial, sans-serif', 'fontSize': '0.8em', 'backgroundColor': colors['white'], 'color': colors['text']},  # Ajustando o tamanho da fonte
         # estilo do cabeçalho tabela
@@ -136,4 +127,5 @@ def create_datatable(df, colors, id):
             },
 
         ], 
+        style_table={'overflowX': 'auto', 'width': '100%'},  # Definindo o tamanho da tabela 
     )

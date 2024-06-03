@@ -360,10 +360,10 @@ def detalha_receita(competencia,contrato,db=back.db):
         retorno_receita = colecao_receitas.find({'descricao-projeto':contrato})
 
     elif contrato == None:
-        retorno_receita = colecao_receitas.find({'competencia-despesa':competencia})
+        retorno_receita = colecao_receitas.find({'competencia-medicao':competencia})
     
     else:
-        retorno_receita = colecao_receitas.find({'descricao-projeto':contrato,'competencia-despesa':competencia})
+        retorno_receita = colecao_receitas.find({'descricao-projeto':contrato,'competencia-medicao':competencia})
 
 
     lista_geral = []
@@ -426,3 +426,5 @@ def ordenar_datas(lista):
     lista_ordenada = [data.replace(datetime.strptime(data.split('/')[0], '%B').strftime('%B').lower(), meses_pt[datetime.strptime(data.split('/')[0], '%B').strftime('%B').lower()]) for data in lista_ordenada]
 
     return lista_ordenada
+
+

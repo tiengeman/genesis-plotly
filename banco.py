@@ -266,5 +266,19 @@ def detalha_despesas(competencia, contrato):
             dicionario_de_listas[nome_colunas[i]].append(valor)
     del dicionario_de_listas['ID']
     df_impostos = pd.DataFrame.from_dict(data=dicionario_de_listas)
-    
+    format_numeric_columns(df_impostos, ["VALOR ORI", 'VALOR INVEST.', 'VALOR DESP'])
+
     return df_impostos
+
+def detalha_receita(competencia, contrato):
+    lista_receita = back.detalha_receita(competencia, contrato)
+    nome_colunas = ['ID', 'PROJETO-UNI', 'DESCRIÇÃO', 'PROJETO-ORI', 'DOCUMENTO', 'CLIENTE', 'DATA', 'VALOR', 'VALOR-RETENCAO', 'VALOR-ADM', 'COMPETENCIA', 'FILIAL']
+    dicionario_de_listas = {coluna: [] for coluna in nome_colunas}
+    for linha in lista_receita:
+        for i, valor in enumerate(linha):
+            dicionario_de_listas[nome_colunas[i]].append(valor)
+    del dicionario_de_listas['ID']
+    df_receita = pd.DataFrame.from_dict(data=dicionario_de_listas)
+    format_numeric_columns(df_receita, ["VALOR", 'VALOR-RETENCAO', 'VALOR-ADM'])
+    
+    return df_receita

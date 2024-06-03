@@ -52,7 +52,7 @@ def create_datatable(df, colors, id):
         columns=[
             {'name': 'LOCAL', 'id': 'LOCAL', 'type': 'text', "hideable": True},
             {'name': 'CONTRATO', 'id': 'CONTRATO', 'type': 'text'},
-            {'name': 'CC', 'id': 'C.CUSTOS', 'type': 'text', "hideable": True},
+            {'name': 'CC', 'id': 'C.CUSTOS', 'type': 'numeric', "hideable": True},
             {'name': 'INATIVO', 'id': 'INATIVO', 'type': 'text', "hideable": True},
             {'name': 'FILIAL', 'id': 'FILIAL', 'type': 'text', "hideable": True},
             {'name': 'MEDIÇÃO', 'id': 'MEDIÇÃO', 'type': 'numeric', "hideable": True},
