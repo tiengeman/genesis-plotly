@@ -442,7 +442,7 @@ def register_user(n_clicks, nome, email, senha, confirmar_senha, setor):
             return 'Cadastro realizado com sucesso!'
         except Exception as e:
             return f'Erro ao realizar o cadastro: {e}'
-    return '', dash.no_update
+#    return '', dash.no_update
 
 
 if __name__ == '__main__':
