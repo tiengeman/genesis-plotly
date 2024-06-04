@@ -11,10 +11,13 @@ import pages.cadastro_projetos as cadastro_projetos
 import pages.impostos as impostos
 import pages.encargos as encargos
 import pages.detalhamento as detalhamento
+import pages.cadastro as cadastro
 from constants import *
 from dash.exceptions import PreventUpdate
 from banco import *
 from back.inserts import *
+from pymongo import MongoClient
+from passlib.hash import sha256_crypt
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP])
 server = app.server
@@ -30,6 +33,7 @@ sidebar = dbc.Nav(
         dbc.NavItem(dbc.NavLink('Impostos', href='/impostos', className='nav-link')),
         dbc.NavItem(dbc.NavLink('Encargos', href='/encargos', className='nav-link')),
         dbc.NavItem(dbc.NavLink('Detalhamento', href='/detalhamento', className='nav-link')),
+        dbc.NavItem(dbc.NavLink('Cadastro', href='/cadastro', className='nav-link')),
     ],
     vertical=True,  # Make the nav items stack vertically
     pills=True,  # Make the nav items take up the full width of the sidebar
@@ -110,6 +114,8 @@ def update_content(pathname):
         return encargos.layout
     elif pathname == '/detalhamento':
         return detalhamento.layout
+    elif pathname == '/cadastro':
+        return cadastro.layout
     else:
         return home.layout
     
@@ -446,6 +452,48 @@ def refresh_table(n_clicks):
 #         return detalhamento.layout
 #     else:
 #         return html.P("Nenhum detalhamento disponível.")
+
+
+# CALBACKS DA TELA CADASTRO ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° NÃO MEXA
+@app.callback(
+    Output('output-message', 'children'),
+    [Input('register-button', 'n_clicks')],
+    [State('nome', 'value'), State('email', 'value'), State('senha', 'value'), State('confirmar-senha', 'value'), State('setor', 'value')]
+
+)
+def register_user(n_clicks, nome, email, senha, confirmar_senha, setor):
+    if n_clicks > 0:
+        if not nome or not email or not senha or not confirmar_senha or not setor:
+            return 'Por favor, preencha todos os campos.'
+
+        if senha != confirmar_senha:
+            return 'As senhas não coincidem. Por favor, tente novamente.'
+
+        try:
+            client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
+            db = client['Project']
+            users_collection = db['Usuários']
+            
+            # Verificar se o email já está registrado
+            if users_collection.find_one({"email": email}):
+                return 'Email já registrado. Por favor, faça o login.'
+
+            # Gerar hash da senha
+            hashed_senha = sha256_crypt.hash(senha) #Dê certo, pfv eu preciso largar
+
+            user_document = {
+                'nome': nome,
+                'email': email, 
+                'senha': hashed_senha, #hash.senha
+                'setor': setor
+            }
+            result = users_collection.insert_one(user_document)
+            print("Documento inserido:", result)
+            return 'Cadastro realizado com sucesso!'
+        except Exception as e:
+            return f'Erro ao realizar o cadastro: {e}'
+#    return '', dash.no_update
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
