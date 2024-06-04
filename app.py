@@ -22,7 +22,7 @@ from back.inserts import *
 from back.msal_login import *
 from back.models import *
 from pymongo import MongoClient
-from werkzeug.security import generate_password_hash, check_password_hash
+from passlib.hash import sha256_crypt
 
 # Constants
 # logo = 'https://i0.wp.com/engeman.net/wp-content/uploads/2024/04/LOGO_ENGEMAN_HORIZONTAL-e1714498268589.png?w=851&ssl=1'
@@ -39,7 +39,7 @@ sidebar = dbc.Nav(
         dbc.NavItem(dbc.NavLink('Relação', href='/relacao', className='nav-link')),
         dbc.NavItem(dbc.NavLink('Cadastro Projetos', href='/cadastro_projetos', className='nav-link')),
         dbc.NavItem(dbc.NavLink('Impostos', href='/impostos', className='nav-link')),
-        dbc.NavItem(dbc.NavLink('Registro', href='/registro', className='nav-link')),
+        dbc.NavItem(dbc.NavLink('Registro', href='/registro', className='nav-link'))
     ],
     vertical=True,
     pills=True,
@@ -281,72 +281,71 @@ def go_to_login(n_clicks):
 
 
 # CALBACKS DA TELA REGISTRO ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° °
-@app.callback(
-    Output('output-message', 'children'),
-    [Input('register-button', 'n_clicks')],
-    [State('nome', 'value'), State('email', 'value'), State('senha', 'value'), State('confirmar-senha', 'value'), State('setor', 'value')]
-
-)
-def register_user(n_clicks, nome, email, senha, confirmar_senha, setor):
-    print("Callback deu certo")
-    if n_clicks > 0:
-        if not nome or not email or not senha or not confirmar_senha or not setor:
-            return 'Por favor, preencha todos os campos.'
-
-        if senha != confirmar_senha:
-            return 'As senhas não coincidem. Por favor, tente novamente.'
-
-        try:
-            client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
-            db = client['Project']
-            collection = db['Usuários']
-            
-            # Verificar se o email já está registrado
-            if collection.find_one({"email": email}):
-                return 'Email já registrado. Por favor, faça o login.'
-
-            # Gerar hash da senha
-#            hashed_senha = generate_password_hash(senha, method='sha256') #Dê certo, pfv eu preciso largar
-
-            user_document = {
-                'nome': nome,
-                'email': email, 
-                'senha': senha, #hash.senha
-                'setor': setor
-            }
-            result = collection.insert_one(user_document)
-            print("Documento inserido:", result)
-            return 'Cadastro realizado com sucesso!'
-        except Exception as e:
-            return f'Erro ao realizar o cadastro: {e}'
-    return '', dash.no_update
-
-
-# CALBACKS DA TELA LOGIN ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° °
 # @app.callback(
 #     Output('output-message', 'children'),
-#     [Input('login-button', 'n_clicks')],
-#     [Input('ms-button', 'n_clicks')],
-#     [State('email', 'value'), State('senha', 'value')]
+#     [Input('register-button', 'n_clicks')],
+#     [State('nome', 'value'), State('email', 'value'), State('senha', 'value'), State('confirmar-senha', 'value'), State('setor', 'value')]
+
 # )
-# def handle_login(n_clicks_login, n_clicks_ms, email, senha):
-#     ctx = dash.callback_context
+# def register_user(n_clicks, nome, email, senha, confirmar_senha, setor):
+#     if n_clicks > 0:
+#         if not nome or not email or not senha or not confirmar_senha or not setor:
+#             return 'Por favor, preencha todos os campos.'
 
-#     if not ctx.triggered:
-#         return '', dash.no_update
-    
-#     button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+#         if senha != confirmar_senha:
+#             return 'As senhas não coincidem. Por favor, tente novamente.'
 
-#     if button_id == 'login-button':
-#         # Simulação de processamento de login
-#         if email and senha:
-#             return f'Login realizado com email: {email}'
-#         else:
-#             return 'Por favor, preencha os campos de email e senha'
-#     elif button_id == 'ms-button':
-#         # auth_url = initiate_microsoft_login()
-#         return 'http://localhost:5000/login', 'Redirecionado para login com Microsoft'
+#         try:
+#             client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
+#             db = client['Project']
+#             collection = db['Usuários']
+            
+#             # Verificar se o email já está registrado
+#             if collection.find_one({"email": email}):
+#                 return 'Email já registrado. Por favor, faça o login.'
+
+#             # Gerar hash da senha
+#             hashed_senha = sha256_crypt.hash(senha) #Dê certo, pfv eu preciso largar
+
+#             user_document = {
+#                 'nome': nome,
+#                 'email': email, 
+#                 'senha': hashed_senha, #hash.senha
+#                 'setor': setor
+#             }
+#             result = collection.insert_one(user_document)
+#             print("Documento inserido:", result)
+#             return 'Cadastro realizado com sucesso!'
+#         except Exception as e:
+#             return f'Erro ao realizar o cadastro: {e}'
 #     return '', dash.no_update
+
+
+#CALBACKS DA TELA LOGIN ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° °
+@app.callback(
+    Output('output-message', 'children'),
+    [Input('login-button', 'n_clicks')],
+    [Input('ms-button', 'n_clicks')],
+    [State('email', 'value'), State('senha', 'value')]
+)
+def handle_login(n_clicks_login, n_clicks_ms, email, senha):
+    ctx = dash.callback_context
+
+    if not ctx.triggered:
+        return '', dash.no_update
+    
+    button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+
+    if button_id == 'login-button':
+        # Simulação de processamento de login
+        if email and senha:
+            return f'Login realizado com email: {email}'
+        else:
+            return 'Por favor, preencha os campos de email e senha'
+    elif button_id == 'ms-button':
+        # auth_url = initiate_microsoft_login()
+        return 'http://localhost:5000/login', 'Redirecionado para login com Microsoft'
+    return '', dash.no_update
 
 
 

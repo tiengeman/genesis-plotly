@@ -1,4 +1,3 @@
-import dash
 import dash_bootstrap_components as dbc
 from dash import html, dcc
 
@@ -46,8 +45,6 @@ layout = dbc.Container(
                 ])
             )
         )
-    ],
-    fluid=True,
-    className='p-5'
+    ]
 )
 
