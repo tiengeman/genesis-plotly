@@ -222,7 +222,7 @@ def update_message_modal(submit_clicks, close_clicks, os, tipo, enq, cliente, de
     else:
         raise dash.exceptions.PreventUpdate
     
-#callback para abrir o modal de cadastro de projetos
+#callback para abrir o modal de cadastro de impostos
 @app.callback(
     Output("modal-centered-impostos", "is_open"),
     [Input("open-centered-impostos", "n_clicks"), Input("close-centered-impostos", "n_clicks")],
@@ -233,7 +233,7 @@ def toggle_modal(n1, n2, is_open):
         return not is_open
     return is_open
 
-#callback para salvar itens do cadastro
+#callback para salvar itens do cadastro de impostos
 @app.callback(
     [
         Output("message-modal-impostos", "is_open"),
@@ -271,6 +271,56 @@ def update_message_modal(submit_clicks, close_clicks, receitatotal, pisretido, p
         return False, "", ""
     else:
         raise dash.exceptions.PreventUpdate
+    
+#callback para abrir o modal de cadastro de encargos
+@app.callback(
+    Output("modal-centered-encargos", "is_open"),
+    [Input("open-centered-encargos", "n_clicks"), Input("close-centered-encargos", "n_clicks")],
+    [State("modal-centered-encargos", "is_open")],
+)
+def toggle_modal(n1, n2, is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
+
+#callback para salvar itens do cadastro de encargos
+@app.callback(
+    [
+        Output("message-modal-encargos", "is_open"),
+        Output("message-modal-header-encargos", "children"),
+        Output("message-modal-body-encargos", "children"),
+    ],
+    [
+        Input("close-centered-encargos", "n_clicks"),
+        Input("close-message-modal-encargos", "n_clicks"),
+    ],
+    [
+        State("CODIGO", "value"), State("NOME", "value"), State("CNPJ", "value"),
+        State("PERCENTUAL", "value"), State("CPRB", "value"), State("INICIO", "value"),
+        State("FIM", "value"),
+    ],
+)
+def update_message_modal(submit_clicks, close_clicks, codigo, nome, cnpj, percentual, cprb, inicio, fim):
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        raise dash.exceptions.PreventUpdate
+
+    triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+    if triggered_id == "close-centered-encargos":
+        if submit_clicks:
+            lista_input = [close_clicks, codigo, nome, cnpj, percentual, cprb, inicio, fim]
+            message = enviar_contratos(lista_input)
+            if "sucesso" in message.lower():
+                return True, "Sucesso!", message
+            else:
+                return True, "Erro!", message
+        else:
+            raise dash.exceptions.PreventUpdate
+    elif triggered_id == "close-message-modal-encargos":
+        return False, "", ""
+    else:
+        raise dash.exceptions.PreventUpdate
 
 #========================================= SWITCH TABELA EDITÁVEL ====================================================
 
@@ -303,7 +353,7 @@ def update_editable(edit_value):
 
 # ============================================== BOTÃO ATUALIZAR ===========================================================
 
-# Crie a callback para atualizar a tabela quando o botão for clicado
+# Crie a callback para atualizar a tabela de projetos quando o botão for clicado
 @app.callback(
     Output('tabela-projetos', 'data'),
     [Input('refresh-button-contratos', 'n_clicks')]
@@ -331,7 +381,7 @@ def refresh_table(n_clicks):
         # Retorne os dados atualizados da tabela
         return df_impostos.to_dict('records')
     
-# Crie a callback para atualizar a tabela de impostos quando o botão for clicado
+# Crie a callback para atualizar a tabela de encargos quando o botão for clicado
 @app.callback(
     [Output(f'tabela-encargos-{index}', 'data') for index in range(len(lista_encargos))],
     [Input('refresh-button-encargos', 'n_clicks')]

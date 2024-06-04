@@ -10,13 +10,13 @@ import dash.dash_table.FormatTemplate as FormatTemplate
 # modelo do formulário de cadastro de projeto
 form = dbc.Form(
     [
-        dbc.Row([dbc.Label("Receite Total", width=2),dbc.Col(dbc.Input(type="number", id="RECEITATOTAL", placeholder="Insira a receita total"))],className="mb-3"),
-        dbc.Row([dbc.Label("PIS Retido", width=2),dbc.Col(dbc.Input(type="number", id="PISRETIDO", placeholder="Insira o PIS retido"))],className="mb-3"),
-        dbc.Row([dbc.Label("PIS Pago", width=2),dbc.Col(dbc.Input(type="number", id="PISPAGO", placeholder="Insira o PIS pago"))],className="mb-3"),
-        dbc.Row([dbc.Label("COFINS Retido", width=2),dbc.Col(dbc.Input(type="number", id="COFINSRETIDO", placeholder="Insira o COFINS retido"))],className="mb-3"),
-        dbc.Row([dbc.Label("COFINS Pago", width=2),dbc.Col(dbc.Input(type="number", id="COFINSPAGO", placeholder="Insira o COFINS pago"))],className="mb-3"),
-        dbc.Row([dbc.Label("Data Fechamento", width=2),dbc.Col(dbc.Input(type="date", id="DATAFECHAMENTO", placeholder="Insira a data de fechamento"))],className="mb-3"),
-        dbc.Row([dbc.Label("Competência", width=2),dbc.Col(dbc.Input(type="text", id="COMPETENCIA", placeholder="Insira a competência"))],className="mb-3"),
+        dbc.Row([dbc.Label("Código", width=2),dbc.Col(dbc.Input(type="number", id="CODIGO", placeholder="Insira a receita total"))],className="mb-3"),
+        dbc.Row([dbc.Label("Nome", width=2),dbc.Col(dbc.Input(type="text", id="NOME", placeholder="Insira o PIS retido"))],className="mb-3"),
+        dbc.Row([dbc.Label("CNPJ", width=2),dbc.Col(dbc.Input(type="text", id="CNPJ", placeholder="Insira o PIS pago"))],className="mb-3"),
+        dbc.Row([dbc.Label("Percentual", width=2),dbc.Col(dbc.Input(type="number", id="PERCENTUAL", placeholder="Insira o COFINS retido"))],className="mb-3"),
+        dbc.Row([dbc.Label("CPRB", width=2),dbc.Col(dbc.Input(type="number", id="CPRB", placeholder="Insira o COFINS pago"))],className="mb-3"),
+        dbc.Row([dbc.Label("Início", width=2),dbc.Col(dbc.Input(type="date", id="INICIO", placeholder="Insira a data de fechamento"))],className="mb-3"),
+        dbc.Row([dbc.Label("Fim", width=2),dbc.Col(dbc.Input(type="date", id="FIM", placeholder="Insira a competência"))],className="mb-3"),
     ]
 )
 
@@ -26,7 +26,7 @@ modal = html.Div(
         dbc.Button("Cadastrar", id="open-centered-encargos", style={'backgroundColor': colors['orange']}),
         dbc.Modal(
             [
-                dbc.ModalHeader(dbc.ModalTitle("Cadastro de Impostos"), close_button=True),
+                dbc.ModalHeader(dbc.ModalTitle("Cadastro de Encargos"), close_button=True),
                 dbc.ModalBody(form),
                 dbc.ModalFooter(
                     dbc.Button(
