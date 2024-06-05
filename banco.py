@@ -4,7 +4,8 @@ import back.banco_teste
 from back.inserts import inserir_contrato
 
 def tabela(mes): #função que gera a tabela principal da aba gerencial
-    lista_contrato, lista_soma_comp, lista_cc = back.medicao(mes)
+    lista_contrato, lista_soma_comp, lista_cc, lista_locais = back.medicao(mes)
+    lista_locais.append("")
     lista_contrato.append('TOTAL OPERAÇÃO')
     lista_contrato_final, lista_soma_comp, lista_cc = remove_capex(lista_contrato, lista_soma_comp, lista_cc)
     lista_cc.append('')
@@ -36,7 +37,9 @@ def tabela(mes): #função que gera a tabela principal da aba gerencial
     del list_lucro_total[-1]
     list_lucro_total.append(sum(list_lucro_total))
     list_perc_total = perc(list_medicao_total, list_lucro_total)
-    df = pd.DataFrame.from_dict(data={'LOCAL':list_local, 
+    print(len(lista_locais))
+    print(len(lista_contrato_final))
+    df = pd.DataFrame.from_dict(data={'LOCAL':lista_locais, 
                                       'CONTRATO':lista_contrato_final, 
                                       'C.CUSTOS':lista_cc, 
                                       'INATIVO':list_inativo,
@@ -79,7 +82,6 @@ def tabela_2(mes):
     list_desp_totais.append(sum(list_desp_totais))
     list_lucro_total = subtrair_listas(list_medicao_total, list_desp_totais)
     list_perc_total = perc(list_medicao_total, list_lucro_total)
-
     df = pd.DataFrame.from_dict(data={'LOCAL':list_local, 
                                       'CONTRATO':lista_contrato, 
                                       'C.CUSTOS':lista_cc, 
@@ -151,7 +153,7 @@ def merge_lists_into_tuples(list1, list2): #função para juntar duas listas e f
 def medicao_capex(mes): # gera a coluna de medição para o capex
     lista_capex = ['INVESTIMENTOS (CONTRATO)', 'EXPANSÃO - FILIAL MACAÉ', 'EXPANSÃO - MATRIZ RECIFE', 'DEPÓSITOS JUDICIAIS', 'ENGEMAN TECNOLOGIAS']
     medicao = []
-    lista_contrato, lista_soma_comp, lista_cc = back.medicao(mes)
+    lista_contrato, lista_soma_comp, lista_cc, lista_locais = back.medicao(mes)
     for i in lista_capex:
         flag = False
         for a in range(len(lista_contrato)):
