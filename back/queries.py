@@ -40,24 +40,21 @@ def total_despesa(db=back.db):
     colecao_despesa_impostos = db.get_collection('Despesas Impostos')
     colecao_despesa_deducoes = db.get_collection('Despesas Deduções')
 
-    colecao_filial = db.get_collection('Filiais')
-    colecao_contrato = db.get_collection('Cadastro Contratos')
-
     # filtros que agrupam os campos descricao-projeto e somam os valores de valor-original-despesa de cada contrato
     pipeline_financeiro =  [ 
-        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto','codigo-projeto-original':'$codigo-projeto-original'},'despesa_financeiro':{'$sum':'$valor-despesa'}}}
+        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa_financeiro':{'$sum':'$valor-despesa'}}}
     ]
     pipeline_folha  = [
-        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto','codigo-projeto-original':'$codigo-projeto-original'},'despesa_folha':{'$sum':'$valor-despesa'}}}
+        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa_folha':{'$sum':'$valor-despesa'}}}
     ]
     pipeline_relatorio = [
-        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto','codigo-projeto-original':'$codigo-projeto-original'},'despesa_relatorio':{'$sum':'$valor-despesa'}}}
+        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa_relatorio':{'$sum':'$valor-despesa'}}}
     ]
     pipeline_impostos = [
-        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto','codigo-projeto-original':'$codigo-projeto-original'},'despesa_impostos':{'$sum':'$valor-despesa'}}}
+        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa_impostos':{'$sum':'$valor-despesa'}}}
     ]
     pipeline_deducoes = [
-        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto','codigo-projeto-original':'$codigo-projeto-original'},'despesa_deducoes':{'$sum':'$valor-despesa'}}}
+        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa_deducoes':{'$sum':'$valor-despesa'}}}
     ]
 
     # Consultas que utilizam os filtros a cima. O retorno dessas consultas são dicionarios. Ex:. {'_id': {'descricao-projeto': 'ADM LOCAL (MACAÉ)'}, 'despesa_financeiro': 450681.34}
@@ -74,29 +71,22 @@ def total_despesa(db=back.db):
     dicio_deducoes = {}
 
     lista_final = []
-    lista_locais = []
-    dicio_locais = {}
     
     # Loops para adicionar nos respectivos dicionários os valores totais dos contratos(são as chaves dos dicios) e a despesa total(que são os valores dos dicios)
     for i in total_financeiro:
         dicio_financeiro[i['_id']['descricao-projeto']] = i['despesa_financeiro']
-        dicio_locais[i['_id']['descricao-projeto']] = i['_id']['codigo-projeto-original']
 
     for j in total_folha:
         dicio_folha[j['_id']['descricao-projeto']] = j['despesa_folha']
-        dicio_locais[j['_id']['descricao-projeto']] = j['_id']['codigo-projeto-original']
     
     for k in total_relatorio:
         dicio_relatorio[k['_id']['descricao-projeto']] = k['despesa_relatorio']
-        dicio_locais[k['_id']['descricao-projeto']] = k['_id']['codigo-projeto-original']
     
     for x in total_impostos:
         dicio_impostos[x['_id']['descricao-projeto']] = x['despesa_impostos']
-        dicio_locais[x['_id']['descricao-projeto']] = x['_id']['codigo-projeto-original']
     
     for y in total_deducoes:
         dicio_deducoes[y['_id']['descricao-projeto']] = y['despesa_deducoes']
-        dicio_locais[y['_id']['descricao-projeto']] = y['_id']['codigo-projeto-original']
 
     for contrato in dicio_relatorio:
         # aqui o código ira tentar somar o valor da despesa caso a chave contrato exista no dicionario
@@ -121,18 +111,10 @@ def total_despesa(db=back.db):
         except:
             pass
 
-        
         lista_final.append((contrato,soma_total))
         soma_total = 0
     
-    for conjunto in lista_final:
-        retorno = colecao_contrato.find_one({'projetosapiens-contratos':conjunto[0]})
-        print(f'retorno:{retorno}')
-        local = colecao_filial.find_one({'codigo-filial':retorno['filial-contratos']})
-        print(f'local:{local}')
-        lista_locais.append(local['municipio-filial'])
-
-    return lista_final,lista_locais
+    return lista_final
 
 def total_despesa_competencia(competencia, db=back.db):
 
@@ -143,28 +125,26 @@ def total_despesa_competencia(competencia, db=back.db):
     colecao_despesa_impostos = db.get_collection('Despesas Impostos')
     colecao_despesa_deducoes = db.get_collection('Despesas Deduções')
 
-    colecao_filial = db.get_collection('Filiais')
-    colecao_contrato = db.get_collection('Cadastro Contratos')
     # filtros que agrupam os campos especificados e somam os valores de despesas de cada contrato
     pipeline_financeiro =  [ 
         {"$match": {"competencia-despesa": competencia}},
-        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto','codigo-projeto-original':'$codigo-projeto-original'},'despesa_financeiro':{'$sum':'$valor-despesa'}}}
+        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa_financeiro':{'$sum':'$valor-despesa'}}}
     ]
     pipeline_folha  = [
         {"$match": {"competencia-despesa": competencia}},
-        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto','codigo-projeto-original':'$codigo-projeto-original'},'despesa_folha':{'$sum':'$valor-despesa'}}}
+        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa_folha':{'$sum':'$valor-despesa'}}}
     ]
     pipeline_relatorio = [
         {"$match": {"competencia-despesa": competencia}},
-        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto','codigo-projeto-original':'$codigo-projeto-original'},'despesa_relatorio':{'$sum':'$valor-despesa'}}}
+        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa_relatorio':{'$sum':'$valor-despesa'}}}
     ]
     pipeline_impostos = [
         {"$match": {"competencia-despesa": competencia}},
-        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto','codigo-projeto-original':'$codigo-projeto-original'},'despesa_impostos':{'$sum':'$valor-despesa'}}}
+        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa_impostos':{'$sum':'$valor-despesa'}}}
     ]
     pipeline_deducoes = [
         {"$match": {"competencia-despesa": competencia}},
-        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto','codigo-projeto-original':'$codigo-projeto-original'},'despesa_deducoes':{'$sum':'$valor-despesa'}}}
+        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa_deducoes':{'$sum':'$valor-despesa'}}}
     ]
 
     # Consultas que utilizam os filtros a cima. O retorno dessas consultas são dicionarios. Ex:. {'_id': {'descricao-projeto': 'ADM LOCAL (MACAÉ)'}, 'despesa_financeiro': 450681.34}
@@ -181,31 +161,22 @@ def total_despesa_competencia(competencia, db=back.db):
     dicio_deducoes = {}
 
     lista_final = []
-    lista_locais = []
-    dicio_locais = {}
-    
-
 
     # Loops para adicionar nos respectivos dicionários os valores totais dos contratos(são as chaves dos dicios) e a despesa total(que são os valores dos dicios)
     for i in total_financeiro:
         dicio_financeiro[i['_id']['descricao-projeto']] = i['despesa_financeiro']
-        dicio_locais[i['_id']['descricao-projeto']] = i['_id']['codigo-projeto-original']
 
     for j in total_folha:
         dicio_folha[j['_id']['descricao-projeto']] = j['despesa_folha']
-        dicio_locais[j['_id']['descricao-projeto']] = j['_id']['codigo-projeto-original']
     
     for k in total_relatorio:
         dicio_relatorio[k['_id']['descricao-projeto']] = k['despesa_relatorio']
-        dicio_locais[k['_id']['descricao-projeto']] = k['_id']['codigo-projeto-original']
     
     for x in total_impostos:
         dicio_impostos[x['_id']['descricao-projeto']] = x['despesa_impostos']
-        dicio_locais[x['_id']['descricao-projeto']] = x['_id']['codigo-projeto-original']
     
     for y in total_deducoes:
         dicio_deducoes[y['_id']['descricao-projeto']] = y['despesa_deducoes']
-        dicio_locais[y['_id']['descricao-projeto']] = y['_id']['codigo-projeto-original']
 
     for contrato in dicio_relatorio:
         try:
@@ -236,20 +207,15 @@ def total_despesa_competencia(competencia, db=back.db):
         
         lista_final.append((contrato,soma_total))
         soma_total = 0
-
-        for conjunto in lista_final:
-            retorno = colecao_contrato.find_one({'projetosapiens-contratos':conjunto[0]})
-            print(f'retorno:{retorno}')
-            local = colecao_filial.find_one({'codigo-filial':retorno['filial-contratos']})
-            print(f'local:{local}')
-            lista_locais.append(local['municipio-filial'])
     
-    return lista_final,lista_locais
+    return lista_final
 
 
 def medicao(competencia, db=back.db):
 
     colecao_medicao = db.get_collection('Receitas')
+    colecao_contratos = db.get_collection('Cadastro Contratos')
+    colecao_filial = db.get_collection('Filiais')
 
     # consulta que agrupa as receitas por descrição do projeto e soma o campo de valor de medição
     pipeline = [
@@ -262,14 +228,20 @@ def medicao(competencia, db=back.db):
     lista_descricao_projeto = []
     lista_centro_de_custo = []
     lista_total_medicao = []
+    lista_locais = []
 
     for i in medicao:
         lista_descricao_projeto.append(i["_id"]["descricao-projeto"])
         lista_centro_de_custo.append(i['_id']['codigo-projeto-unificado'])
         lista_total_medicao.append(i["total-medicao"])
+
+        retorno = colecao_contratos.find_one({'projetosapiens-contratos':i['_id']['codigo-projeto-original']})
+        filial = colecao_filial.find_one({'codigo-filial':retorno['filial-contratos']})
+        local = filial['municipio-filial']
+        lista_locais.append(local)
         
 
-    return lista_descricao_projeto,lista_total_medicao,lista_centro_de_custo
+    return lista_descricao_projeto,lista_total_medicao,lista_centro_de_custo,lista_locais
 
 def medicao_total(db=back.db):
 
@@ -291,7 +263,7 @@ def medicao_total(db=back.db):
         lista_centro_de_custo.append(i['_id']['codigo-projeto-unificado'])
         lista_total_medicao.append(i["total-medicao"])
 
-    return lista_descricao_projeto,lista_total_medicao,lista_centro_de_custo 
+    return lista_descricao_projeto,lista_total_medicao,lista_centro_de_custo
 
 # função para retornar uma lista com todas as medições(pelos menos todas as presentes na aba de cad-receitas)
 def competencias(db=back.db):
