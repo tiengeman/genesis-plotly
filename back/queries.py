@@ -236,8 +236,13 @@ def medicao(competencia, db=back.db):
         lista_total_medicao.append(i["total-medicao"])
 
         retorno = colecao_contratos.find_one({'projetosapiens-contratos':i['_id']['codigo-projeto-original']})
+        if retorno == None:
+            retorno = colecao_contratos.find_one({'projetosapiens-contratos':i['_id']['codigo-projeto-unificado']})
+        # print(f'retorno:{retorno}')
         filial = colecao_filial.find_one({'codigo-filial':retorno['filial-contratos']})
+        # print(f'filial{filial}')
         local = filial['municipio-filial']
+        # print(f'local:{local}')
         lista_locais.append(local)
         
 
@@ -434,3 +439,7 @@ def ordenar_datas(lista):
     lista_ordenada = [data.replace(datetime.strptime(data.split('/')[0], '%B').strftime('%B').lower(), meses_pt[datetime.strptime(data.split('/')[0], '%B').strftime('%B').lower()]) for data in lista_ordenada]
 
     return lista_ordenada
+
+
+retorno = medicao('abril/2024')
+print(retorno)
