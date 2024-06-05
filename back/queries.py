@@ -220,7 +220,7 @@ def medicao(competencia, db=back.db):
     # consulta que agrupa as receitas por descrição do projeto e soma o campo de valor de medição
     pipeline = [
         {"$match": {"competencia-medicao": competencia}},  # Filtrar por data
-        {"$group": {"_id": {"descricao-projeto": "$descricao-projeto",'codigo-projeto-unificado':'$codigo-projeto-unificado'}, "total-medicao": {"$sum": "$valor-medicao"}}}  # Calcular a soma da receita
+        {"$group": {"_id": {"descricao-projeto": "$descricao-projeto",'codigo-projeto-unificado':'$codigo-projeto-unificado','codigo-projeto-original':'$codigo-projeto-original'}, "total-medicao": {"$sum": "$valor-medicao"}}}  # Calcular a soma da receita
     ]
 
     medicao = colecao_medicao.aggregate(pipeline)
