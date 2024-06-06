@@ -16,9 +16,6 @@ def tabela(mes): #função que gera a tabela principal da aba gerencial
     tupla_despesa_total = back.total_despesa()
     tupla_despesas = back.total_despesa_competencia(mes) #gera uma lista de tuplas com as info
 
-    list_inativo = inativo(lista_soma_comp) #gera a lista se é inativo ou não
-    del list_inativo[-1]
-    list_inativo.append('NÃO')
     list_filial = [None]*len(lista_contrato_final)
     list_despesas = ordena_lista(lista_contrato_final, tupla_despesas) #aqui ele ordena os valores de acordo com a lista de contrato
     del list_despesas[-1]
@@ -37,6 +34,9 @@ def tabela(mes): #função que gera a tabela principal da aba gerencial
     del list_lucro_total[-1]
     list_lucro_total.append(list_medicao_total[-1]-list_desp_totais[-1])
     list_perc_total = perc(list_medicao_total, list_lucro_total)
+    list_inativo = inativo(list_lucro) #gera a lista se é inativo ou não
+    del list_inativo[-1]
+    list_inativo.append('NÃO')
     df = pd.DataFrame.from_dict(data={'LOCAL':lista_locais, 
                                       'CONTRATO':lista_contrato_final, 
                                       'C.CUSTOS':lista_cc, 
