@@ -5,6 +5,7 @@ from back.inserts import inserir_contrato
 
 def tabela(mes): #função que gera a tabela principal da aba gerencial
     lista_contrato, lista_soma_comp, lista_cc, lista_locais = back.medicao(mes)
+    lista_contrato, lista_soma_comp, lista_cc, lista_locais = ordenar_listas_locais(lista_contrato, lista_soma_comp, lista_cc, lista_locais)
     lista_locais.append("")
     lista_contrato.append('TOTAL OPERAÇÃO')
     lista_contrato_final, lista_soma_comp, lista_cc = remove_capex(lista_contrato, lista_soma_comp, lista_cc)
@@ -15,7 +16,6 @@ def tabela(mes): #função que gera a tabela principal da aba gerencial
     tupla_despesa_total = back.total_despesa()
     tupla_despesas = back.total_despesa_competencia(mes) #gera uma lista de tuplas com as info
 
-    list_local = [None]*len(lista_contrato_final)
     list_inativo = inativo(lista_soma_comp) #gera a lista se é inativo ou não
     del list_inativo[-1]
     list_inativo.append('NÃO')
@@ -37,8 +37,6 @@ def tabela(mes): #função que gera a tabela principal da aba gerencial
     del list_lucro_total[-1]
     list_lucro_total.append(sum(list_lucro_total))
     list_perc_total = perc(list_medicao_total, list_lucro_total)
-    print(len(lista_locais))
-    print(len(lista_contrato_final))
     df = pd.DataFrame.from_dict(data={'LOCAL':lista_locais, 
                                       'CONTRATO':lista_contrato_final, 
                                       'C.CUSTOS':lista_cc, 
@@ -97,6 +95,26 @@ def tabela_2(mes):
                                       '% TOTAL': list_perc_total})
     
     return df
+
+def ordenar_listas_locais(lista_contrato, lista_soma_comp, lista_cc, lista_locais): #ordena essas 4 listas de acordo com os locais e depois de acordo com os contratos
+    # Garantir que todas as listas têm o mesmo comprimento
+    if not (len(lista_contrato) == len(lista_soma_comp) == len(lista_cc) == len(lista_locais)):
+        raise ValueError("Todas as listas devem ter o mesmo comprimento")
+    
+    # Convertendo todos os elementos de lista_locais e lista_contrato para strings
+    lista_locais_str = list(map(str, lista_locais))
+    lista_cc_str = list(map(str, lista_cc))
+    
+    # Cria uma lista de tuplas que combina todas as listas
+    combined_list = list(zip(lista_locais_str, lista_cc, lista_soma_comp, lista_contrato))
+    
+    # Ordena primeiro pelos locais e depois pelos contratos
+    combined_list_sorted = sorted(combined_list, key=lambda x: (x[0], x[1]), reverse=True)
+    
+    # Separa as listas ordenadas
+    lista_locais_ordenada, lista_cc_ordenada, lista_soma_comp_ordenada, lista_contrato_ordenada = zip(*combined_list_sorted)
+    
+    return list(lista_contrato_ordenada), list(lista_soma_comp_ordenada), list(lista_cc_ordenada), list(lista_locais_ordenada)
 
 def inativo(lista_valores): #função para criar a lista se o contrato está inativo ou não
     lista_inativo = []

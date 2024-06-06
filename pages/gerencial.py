@@ -67,7 +67,7 @@ def create_datatable(df, colors, id):
         style_cell={'textAlign': 'center', 'padding': '5px', 'fontFamily': 'Arial, sans-serif', 'fontSize': '0.8em', 'backgroundColor': colors['white'], 'color': colors['text']},  # Ajustando o tamanho da fonte
         style_cell_conditional = [
             {'if': {'column_id': 'LOCAL'}, 'width': '4%'},
-            {'if': {'column_id': 'CONTRATO'}, 'width': '35%'},
+            {'if': {'column_id': 'CONTRATO'}, 'width': '25%'},
             {'if': {'column_id': 'C.CUSTOS'}, 'width': '4%'},
             {'if': {'column_id': 'INATIVO'}, 'width': '4%'},
             {'if': {'column_id': 'FILIAL'}, 'width': '4%'},
@@ -170,5 +170,9 @@ def create_datatable(df, colors, id):
                 'backgroundColor': '#DAA520',
                 'color': 'white',
             }
-        ], 
+        ],
+        style_data={
+            'whiteSpace': 'normal',
+            'height': 'auto',
+        },
     )

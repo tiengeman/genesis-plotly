@@ -151,7 +151,6 @@ def update_table_detalhamento(output_id, value, contrato):
     [Input('minha-lista-suspensa-1-detalhamento', 'value'), Input('minha-lista-suspensa-2', 'value')]
 )
 def update_tables(value, contrato):
-    print(f'{value} - {contrato}')
     return update_table_detalhamento('tabela-detalhamento-container-medicao', value, contrato), update_table_detalhamento('tabela-detalhamento-container-despesa', value, contrato)
 
     
