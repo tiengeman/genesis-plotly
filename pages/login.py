@@ -45,6 +45,6 @@ layout = dbc.Container(
                 ])
             )
         )
-    ]
+    ],
 )
 

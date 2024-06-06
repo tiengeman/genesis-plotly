@@ -1,3 +1,4 @@
+import base64
 from flask import Flask, render_template, redirect, url_for, session, request
 from msal import ConfidentialClientApplication
 import uuid
@@ -13,6 +14,7 @@ import pages.cadastro_projetos as cadastro_projetos
 import pages.impostos as impostos
 import pages.login as login
 import pages.registro as registro
+import pages.user as user
 from constants import *
 from dash.exceptions import PreventUpdate
 import dash
@@ -23,12 +25,17 @@ from back.msal_login import *
 from back.models import *
 from pymongo import MongoClient
 from passlib.hash import sha256_crypt
+from flask import send_from_directory
 
 # Constants
 # logo = 'https://i0.wp.com/engeman.net/wp-content/uploads/2024/04/LOGO_ENGEMAN_HORIZONTAL-e1714498268589.png?w=851&ssl=1'
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP])
 server = app.server
+
+UPLOAD_DIRECTORY = "uploaded_images"
+if not os.path.exists(UPLOAD_DIRECTORY):
+    os.makedirs(UPLOAD_DIRECTORY)
 
 # Conteúdo dentro do menu
 sidebar = dbc.Nav(
@@ -39,7 +46,8 @@ sidebar = dbc.Nav(
         dbc.NavItem(dbc.NavLink('Relação', href='/relacao', className='nav-link')),
         dbc.NavItem(dbc.NavLink('Cadastro Projetos', href='/cadastro_projetos', className='nav-link')),
         dbc.NavItem(dbc.NavLink('Impostos', href='/impostos', className='nav-link')),
-        dbc.NavItem(dbc.NavLink('Registro', href='/registro', className='nav-link'))
+        dbc.NavItem(dbc.NavLink('Registro', href='/registro', className='nav-link')),
+        dbc.NavItem(dbc.NavLink('Usuário', href='/user', className='nav-link')),
     ],
     vertical=True,
     pills=True,
@@ -143,6 +151,8 @@ def update_content(pathname):
         return login.layout
     elif pathname == '/registro':
         return registro.layout
+    elif pathname == '/user':
+        return user.layout
     else:
         return home.layout
 
@@ -151,6 +161,16 @@ def update_table(output_id, value):
         return gerencial.atualizar_tabela(value)
     elif output_id == 'tabela2-container':
         return gerencial.atualizar_tabela2(value)
+    
+# Callback para redirecionar para a página de login quando o botão for clicado
+@app.callback(
+    Output('url', 'pathname'),
+    Input('user-button', 'n_clicks')
+)
+def go_to_login(n_clicks):
+    if n_clicks:
+        return '/login'
+    return dash.no_update
 
 # Callback para atualizar as tabelas gerenciais de acordo com a competência
 @app.callback(
@@ -269,83 +289,132 @@ def update_table(n_clicks):
         # Retorne os dados atualizados da tabela
         return df_impostos.to_dict('records')
 
-# Callback para redirecionar para a página de login quando o botão for clicado
-@app.callback(
-    Output('url', 'pathname'),
-    Input('user-button', 'n_clicks')
-)
-def go_to_login(n_clicks):
-    if n_clicks:
-        return '/login'
-    return dash.no_update
 
-
-# CALBACKS DA TELA REGISTRO ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° °
-# @app.callback(
-#     Output('output-message', 'children'),
-#     [Input('register-button', 'n_clicks')],
-#     [State('nome', 'value'), State('email', 'value'), State('senha', 'value'), State('confirmar-senha', 'value'), State('setor', 'value')]
-
-# )
-# def register_user(n_clicks, nome, email, senha, confirmar_senha, setor):
-#     if n_clicks > 0:
-#         if not nome or not email or not senha or not confirmar_senha or not setor:
-#             return 'Por favor, preencha todos os campos.'
-
-#         if senha != confirmar_senha:
-#             return 'As senhas não coincidem. Por favor, tente novamente.'
-
-#         try:
-#             client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
-#             db = client['Project']
-#             collection = db['Usuários']
-            
-#             # Verificar se o email já está registrado
-#             if collection.find_one({"email": email}):
-#                 return 'Email já registrado. Por favor, faça o login.'
-
-#             # Gerar hash da senha
-#             hashed_senha = sha256_crypt.hash(senha) #Dê certo, pfv eu preciso largar
-
-#             user_document = {
-#                 'nome': nome,
-#                 'email': email, 
-#                 'senha': hashed_senha, #hash.senha
-#                 'setor': setor
-#             }
-#             result = collection.insert_one(user_document)
-#             print("Documento inserido:", result)
-#             return 'Cadastro realizado com sucesso!'
-#         except Exception as e:
-#             return f'Erro ao realizar o cadastro: {e}'
-#     return '', dash.no_update
-
-
-#CALBACKS DA TELA LOGIN ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° °
+# CALBACKS DA TELA REGISTRO ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° finalmenrte deu certo aaaaaahhhhhh
 @app.callback(
     Output('output-message', 'children'),
-    [Input('login-button', 'n_clicks')],
-    [Input('ms-button', 'n_clicks')],
-    [State('email', 'value'), State('senha', 'value')]
+    [Input('register-button', 'n_clicks')],
+    [State('nome', 'value'), State('email', 'value'), State('senha', 'value'), State('confirmar-senha', 'value'), State('setor', 'value')]
+
 )
-def handle_login(n_clicks_login, n_clicks_ms, email, senha):
-    ctx = dash.callback_context
+def register_user(n_clicks, nome, email, senha, confirmar_senha, setor):
+    if n_clicks > 0:
+        if not nome or not email or not senha or not confirmar_senha or not setor:
+            return 'Por favor, preencha todos os campos.'
 
-    if not ctx.triggered:
-        return '', dash.no_update
+        if senha != confirmar_senha:
+            return 'As senhas não coincidem. Por favor, tente novamente.'
+
+        try:
+            client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
+            db = client['Project']
+            users_collection = db['Usuários']
+            
+            # Verificar se o email já está registrado
+            if users_collection.find_one({"email": email}):
+                return 'Email já registrado. Por favor, faça o login.'
+
+            # Gerar hash da senha
+            hashed_senha = sha256_crypt.hash(senha) #Dê certo, pfv eu preciso largar
+
+            user_document = {
+                'nome': nome,
+                'email': email, 
+                'senha': hashed_senha, #hash.senha
+                'setor': setor
+            }
+            result = users_collection.insert_one(user_document)
+            print("Documento inserido:", result)
+            return 'Cadastro realizado com sucesso!'
+        except Exception as e:
+            return f'Erro ao realizar o cadastro: {e}'
+
+# CALLBACK DA TELA DE PERFIL DO USUÁRIO ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° 
+@app.callback(
+    Output('user-data', 'children'),
+    [Input('url', 'pathname')]
+)
+
+def load_user_data(pathname):
+    if pathname == '/user' and 'user_email' in session:
+        client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
+        db = client['Project']
+        collection = db['Usuários']
+        user = collection.find_one({"email": session['user_email']})
+        
+        if user:
+            profile_pic = user.get('profile_pic', None)
+            profile_pic_div = html.Div()
+            if profile_pic:
+                profile_pic_div = html.Img(src=profile_pic, style={'border-radius': '50%', 'width': '150px', 'height': '150px'})
+
+            return html.Div([
+                profile_pic_div,
+                html.P(f"Nome: {user['nome']}"),
+                html.P(f"Email: {user['email']}"),
+                html.P(f"Setor: {user['setor']}")
+            ])
+
+# CALLBACK PARA UPLOAD DA IMAGEM 
+@app.callback(
+    Output('output-image-upload','children'),
+    [Input('upload-image', 'contents')],
+    [State('upload-image', 'filename'), State('profile_pic', 'children')]
+)
+
+def upload_output(content, filename, profile_pic):
+     if content is not None:
+        data = content.encode("utf8").split(b";base64,")[1]
+        file_path = os.path.join(UPLOAD_DIRECTORY, filename)
+
+        with open(file_path, "wb") as fh:
+            fh.write(base64.decodebytes(data))
+
+        client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
+        db = client['Project']
+        collection = db['Usuários']
+        profile_pic = f'/uploaded_images/{filename}'
+        collection.update_one({'email': session['user_email']}, {'$set': {'profile_pic': profile_pic}})
+        
+        # return html.Div([
+        #     html.Img(src=content, style={'border-radius': '50%', 'width': '150px', 'height': '150px'}),
+        # ])
+        if profile_pic:
+            return html.Div([
+            html.Img(src=profile_pic, style={'border-radius': '50%', 'width': '150px', 'height': '150px'})
+    ])
+     
+
+@server.route('/uploaded_images/<filename>')
+def uploaded_images(filename):
+    return send_from_directory(UPLOAD_DIRECTORY, filename)
+
+
+# CALBACKS DA TELA LOGIN ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° °
+# @app.callback(
+#     Output('output-message', 'children'),
+#     [Input('login-button', 'n_clicks')],
+#     [Input('ms-button', 'n_clicks')],
+#     [State('email', 'value'), State('senha', 'value')]
+# )
+# def handle_login(n_clicks_login, n_clicks_ms, email, senha):
+#     ctx = dash.callback_context
+
+#     if not ctx.triggered:
+#         return '', dash.no_update
     
-    button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+#     button_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
-    if button_id == 'login-button':
-        # Simulação de processamento de login
-        if email and senha:
-            return f'Login realizado com email: {email}'
-        else:
-            return 'Por favor, preencha os campos de email e senha'
-    elif button_id == 'ms-button':
-        # auth_url = initiate_microsoft_login()
-        return 'http://localhost:5000/login', 'Redirecionado para login com Microsoft'
-    return '', dash.no_update
+#     if button_id == 'login-button':
+#         # Simulação de processamento de login
+#         if email and senha:
+#             return f'Login realizado com email: {email}'
+#         else:
+#             return 'Por favor, preencha os campos de email e senha'
+#     elif button_id == 'ms-button':
+#         # auth_url = initiate_microsoft_login()
+#         return 'http://localhost:5000/login', 'Redirecionado para login com Microsoft'
+#     return '', dash.no_update
 
 
 
