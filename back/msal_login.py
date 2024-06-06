@@ -16,6 +16,7 @@ AUTHORITY = f'https://login.microsoftonline.com/{TENANT_ID}'
 REDIRECT_PATH = '/getAToken'
 SCOPE = ['User.Read']
 
+#talvez e
 @app.route('/')
 def index():
     return 'Flask MSAL'
@@ -75,7 +76,7 @@ def _build_auth_url(authority=None, scopes=None, state=None):
         state=state or str(uuid.uuid4()),
         redirect_uri=url_for('authorized', _external=True))
 
-
+# cache pra salvar login
 def _load_cache():
     cache = SerializableTokenCache()
     if session.get('token_cache'):

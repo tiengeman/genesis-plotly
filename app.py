@@ -1,6 +1,6 @@
 import base64
-from flask import Flask, render_template, redirect, url_for, session, request
-from msal import ConfidentialClientApplication
+from flask import Flask, render_template, redirect, url_for, session, request,send_from_directory
+from msal import ConfidentialClientApplication, SerializableTokenCache
 import uuid
 import dash
 import dash_bootstrap_components as dbc
@@ -33,9 +33,14 @@ from flask import send_from_directory
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP])
 server = app.server
 
-UPLOAD_DIRECTORY = "uploaded_images"
-if not os.path.exists(UPLOAD_DIRECTORY):
-    os.makedirs(UPLOAD_DIRECTORY)
+UPLOAD_DIRECTORY = os.environ.get('UPLOAD_DIRECTORY', 'uploaded_images')
+
+CLIENT_ID = '67e2167c-bb04-48d3-a10f-e9d9d618ad9d'
+CLIENT_SECRET = 's2a8Q~dCSTsX-oPuaZuQSUOcnGjtAIlwv9oyLbWb'
+TENANT_ID = '751b9ffa-fe40-4f7f-90a6-e3276de42583'
+AUTHORITY = f'https://login.microsoftonline.com/{TENANT_ID}'
+REDIRECT_PATH = '/getAToken'
+SCOPE = ['User.Read']
 
 # Conteúdo dentro do menu
 sidebar = dbc.Nav(
@@ -48,6 +53,7 @@ sidebar = dbc.Nav(
         dbc.NavItem(dbc.NavLink('Impostos', href='/impostos', className='nav-link')),
         dbc.NavItem(dbc.NavLink('Registro', href='/registro', className='nav-link')),
         dbc.NavItem(dbc.NavLink('Usuário', href='/user', className='nav-link')),
+        dbc.NavItem(dbc.NavLink('Login', href='/login', className='nav-link')),
     ],
     vertical=True,
     pills=True,
@@ -129,6 +135,80 @@ app.layout = html.Div([
     ]),
 ])
 
+# Rotas de autenticação Microsoft
+@server.route('/loginms')
+def login_ms():
+    session["state"] = str(uuid.uuid4())
+    auth_url = _build_auth_url(scopes=SCOPE, state=session["state"])
+    return redirect(auth_url)
+
+@server.route(REDIRECT_PATH)
+def authorized():
+    if request.args.get('state') != session.get("state"):
+        return redirect(url_for("index"))
+
+    if 'error' in request.args:
+        return "Login failure: " + request.args['error_description']
+
+    if request.args.get('code'):
+        cache = _load_cache()
+        result = _build_msal_app(cache=cache).acquire_token_by_authorization_code(
+            request.args['code'],
+            scopes=SCOPE,
+            redirect_uri=url_for('authorized', _external=True))
+        if "error" in result:
+            return "Token failure: " + result["error_description"]
+
+        email = result["id_token_claims"]["unique_name"]
+        username = email.split("@")[0]
+        user = get_user(email)
+        if user:
+            session["user"] = result.get("id_token_claims")
+            _save_cache(cache)
+        else:
+            create_user(email, username, "", "Microsoft")
+            session["user"] = result.get("id_token_claims")
+            _save_cache(cache)
+        
+    return redirect(url_for("index"))
+
+@server.route('/logout')
+def logout():
+    session.clear()
+    return redirect(
+        AUTHORITY + "/oauth2/v2.0/logout" +
+        "?post_logout_redirect_uri=" + url_for("index", _external=True))
+
+def _build_msal_app(cache=None, authority=None):
+    return ConfidentialClientApplication(
+        CLIENT_ID, authority=authority or AUTHORITY,
+        client_credential=CLIENT_SECRET, token_cache=cache)
+
+def _build_auth_url(authority=None, scopes=None, state=None):
+    return _build_msal_app(authority=authority).get_authorization_request_url(
+        scopes or [],
+        state=state or str(uuid.uuid4()),
+        redirect_uri=url_for('authorized', _external=True))
+
+def _load_cache():
+    cache = SerializableTokenCache()
+    if session.get('token_cache'):
+        cache.deserialize(session['token_cache'])
+    return cache
+
+def _save_cache(cache):
+    if cache.has_state_changed:
+        session['token_cache'] = cache.serialize()
+
+# Função para obter URL de autenticação na página de login
+def initiate_microsoft_login():
+    with server.test_request_context():
+        session["state"] = str(uuid.uuid4())
+        auth_url = _build_auth_url(scopes=SCOPE, state=session["state"])
+        return auth_url
+
+
+
 #====================================================================== Callbacks ================================================================================================
 
 # Callback para mudar de página de acordo com o menu
@@ -170,7 +250,7 @@ def update_table(output_id, value):
 def go_to_login(n_clicks):
     if n_clicks:
         return '/login'
-    return dash.no_update
+    return None
 
 # Callback para atualizar as tabelas gerenciais de acordo com a competência
 @app.callback(
@@ -291,50 +371,49 @@ def update_table(n_clicks):
 
 
 # CALBACKS DA TELA REGISTRO ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° finalmenrte deu certo aaaaaahhhhhh
-@app.callback(
-    Output('output-message', 'children'),
-    [Input('register-button', 'n_clicks')],
-    [State('nome', 'value'), State('email', 'value'), State('senha', 'value'), State('confirmar-senha', 'value'), State('setor', 'value')]
+# @app.callback(
+#     Output('output-message', 'children'),
+#     [Input('register-button', 'n_clicks')],
+#     [State('nome', 'value'), State('email', 'value'), State('senha', 'value'), State('confirmar-senha', 'value'), State('setor', 'value')]
 
-)
-def register_user(n_clicks, nome, email, senha, confirmar_senha, setor):
-    if n_clicks > 0:
-        if not nome or not email or not senha or not confirmar_senha or not setor:
-            return 'Por favor, preencha todos os campos.'
+# )
+# def register_user(n_clicks, nome, email, senha, confirmar_senha, setor):
+#     if n_clicks > 0:
+#         if not nome or not email or not senha or not confirmar_senha or not setor:
+#             return 'Por favor, preencha todos os campos.'
 
-        if senha != confirmar_senha:
-            return 'As senhas não coincidem. Por favor, tente novamente.'
+#         if senha != confirmar_senha:
+#             return 'As senhas não coincidem. Por favor, tente novamente.'
 
-        try:
-            client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
-            db = client['Project']
-            users_collection = db['Usuários']
+#         try:
+#             client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
+#             db = client['Project']
+#             users_collection = db['Usuários']
             
-            # Verificar se o email já está registrado
-            if users_collection.find_one({"email": email}):
-                return 'Email já registrado. Por favor, faça o login.'
+#             # Verificar se o email já está registrado
+#             if users_collection.find_one({"email": email}):
+#                 return 'Email já registrado. Por favor, faça o login.'
 
-            # Gerar hash da senha
-            hashed_senha = sha256_crypt.hash(senha) #Dê certo, pfv eu preciso largar
+#             # Gerar hash da senha
+#             hashed_senha = sha256_crypt.hash(senha) #Dê certo, pfv eu preciso largar
 
-            user_document = {
-                'nome': nome,
-                'email': email, 
-                'senha': hashed_senha, #hash.senha
-                'setor': setor
-            }
-            result = users_collection.insert_one(user_document)
-            print("Documento inserido:", result)
-            return 'Cadastro realizado com sucesso!'
-        except Exception as e:
-            return f'Erro ao realizar o cadastro: {e}'
+#             user_document = {
+#                 'nome': nome,
+#                 'email': email, 
+#                 'senha': hashed_senha, #hash.senha
+#                 'setor': setor
+#             }
+#             result = users_collection.insert_one(user_document)
+#             print("Documento inserido:", result)
+#             return 'Cadastro realizado com sucesso!'
+#         except Exception as e:
+#             return f'Erro ao realizar o cadastro: {e}'
 
 # CALLBACK DA TELA DE PERFIL DO USUÁRIO ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° 
 @app.callback(
     Output('user-data', 'children'),
     [Input('url', 'pathname')]
 )
-
 def load_user_data(pathname):
     if pathname == '/user' and 'user_email' in session:
         client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
@@ -354,16 +433,15 @@ def load_user_data(pathname):
                 html.P(f"Email: {user['email']}"),
                 html.P(f"Setor: {user['setor']}")
             ])
-
+        return None
 # CALLBACK PARA UPLOAD DA IMAGEM 
 @app.callback(
     Output('output-image-upload','children'),
     [Input('upload-image', 'contents')],
-    [State('upload-image', 'filename'), State('profile_pic', 'children')]
+    [State('upload-image', 'filename')]
 )
-
-def upload_output(content, filename, profile_pic):
-     if content is not None:
+def upload_output(content, filename):
+    if content is not None:
         data = content.encode("utf8").split(b";base64,")[1]
         file_path = os.path.join(UPLOAD_DIRECTORY, filename)
 
@@ -375,46 +453,88 @@ def upload_output(content, filename, profile_pic):
         collection = db['Usuários']
         profile_pic = f'/uploaded_images/{filename}'
         collection.update_one({'email': session['user_email']}, {'$set': {'profile_pic': profile_pic}})
-        
-        # return html.Div([
-        #     html.Img(src=content, style={'border-radius': '50%', 'width': '150px', 'height': '150px'}),
-        # ])
-        if profile_pic:
-            return html.Div([
+
+        return html.Div([
             html.Img(src=profile_pic, style={'border-radius': '50%', 'width': '150px', 'height': '150px'})
-    ])
-     
+        ])
+    return None
 
 @server.route('/uploaded_images/<filename>')
 def uploaded_images(filename):
     return send_from_directory(UPLOAD_DIRECTORY, filename)
 
 
-# CALBACKS DA TELA LOGIN ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° °
 # @app.callback(
-#     Output('output-message', 'children'),
-#     [Input('login-button', 'n_clicks')],
-#     [Input('ms-button', 'n_clicks')],
-#     [State('email', 'value'), State('senha', 'value')]
+#     Output('output-image-upload','children'),
+#     [Input('upload-image', 'contents')],
+#     [State('upload-image', 'filename'), State('profile_pic', 'children')]
 # )
-# def handle_login(n_clicks_login, n_clicks_ms, email, senha):
-#     ctx = dash.callback_context
 
-#     if not ctx.triggered:
-#         return '', dash.no_update
+# def upload_output(content, filename, profile_pic):
+#      if content is not None:
+#         data = content.encode("utf8").split(b";base64,")[1]
+#         file_path = os.path.join(UPLOAD_DIRECTORY, filename)
+
+#         with open(file_path, "wb") as fh:
+#             fh.write(base64.decodebytes(data))
+
+#         client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
+#         db = client['Project']
+#         collection = db['Usuários']
+#         profile_pic = f'/uploaded_images/{filename}'
+#         collection.update_one({'email': session['user_email']}, {'$set': {'profile_pic': profile_pic}})
+        
+#         # return html.Div([
+#         #     html.Img(src=content, style={'border-radius': '50%', 'width': '150px', 'height': '150px'}),
+#         # ])
+#         if profile_pic:
+#             return html.Div([
+#             html.Img(src=profile_pic, style={'border-radius': '50%', 'width': '150px', 'height': '150px'})
+#     ])
+     
+
+# @server.route('/uploaded_images/<filename>')
+# def uploaded_images(filename):
+#     return send_from_directory(UPLOAD_DIRECTORY, filename)
+
+
+# CALLBACKS DA TELA LOGIN ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° °
+@app.callback(
+    Output('output-message', 'children'),
+    [Input('login-button', 'n_clicks'), Input('ms-button', 'n_clicks')],
+    [State('email', 'value'), State('senha', 'value')]
+)
+def handle_login(n_clicks_login, n_clicks_ms, email, senha):
+    ctx = dash.callback_context
+
+    if not ctx.triggered:
+        return '', None #dash.no_update
     
-#     button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+    button_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
-#     if button_id == 'login-button':
-#         # Simulação de processamento de login
-#         if email and senha:
-#             return f'Login realizado com email: {email}'
-#         else:
-#             return 'Por favor, preencha os campos de email e senha'
-#     elif button_id == 'ms-button':
-#         # auth_url = initiate_microsoft_login()
-#         return 'http://localhost:5000/login', 'Redirecionado para login com Microsoft'
-#     return '', dash.no_update
+    if button_id == 'login-button':
+        if email and senha:
+            # Aqui você pode adicionar lógica de autenticação com o banco de dados
+            client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
+            db = client['Project']
+            users_collection = db['Usuários']
+            user = users_collection.find_one({"email": email})
+
+            if user and sha256_crypt.verify(senha, user['senha']):
+                session['user_email'] = email
+                return f'Login realizado com email: {email}'
+            else:
+                return 'Credenciais inválidas. Por favor, tente novamente.'
+        else:
+            return 'Por favor, preencha os campos de email e senha'
+    elif button_id == 'ms-button':
+        return 'Redirecionado para login com Microsoft'
+    return 'Erro desconhecido. Por favor, tente novamente.'
+##    return '', dash.no_update
+
+
+#========================================= INTEGRANDO O MSAL LOGIN ====================================================
+
 
 
 
