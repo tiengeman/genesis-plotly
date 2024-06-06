@@ -10,7 +10,7 @@ def tabela(mes): #função que gera a tabela principal da aba gerencial
     lista_contrato.append('TOTAL OPERAÇÃO')
     lista_contrato_final, lista_soma_comp, lista_cc = remove_capex(lista_contrato, lista_soma_comp, lista_cc)
     lista_cc.append('')
-    lista_soma_comp.append(sum(lista_soma_comp))
+    lista_soma_comp.append(sum_medicao(lista_contrato_final, lista_soma_comp))
     lista_cont_total, lista_valor_total, lista_cc_total = back.medicao_total()
     tupla_medicao_total = merge_lists_into_tuples(lista_cont_total, lista_valor_total)
     tupla_despesa_total = back.total_despesa()
@@ -22,20 +22,20 @@ def tabela(mes): #função que gera a tabela principal da aba gerencial
     list_filial = [None]*len(lista_contrato_final)
     list_despesas = ordena_lista(lista_contrato_final, tupla_despesas) #aqui ele ordena os valores de acordo com a lista de contrato
     del list_despesas[-1]
-    list_despesas.append(sum(list_despesas))
+    list_despesas.append(sum_despesa(lista_contrato_final, list_despesas))
     list_lucro = subtrair_listas(lista_soma_comp, list_despesas)
     del list_lucro[-1]
-    list_lucro.append(sum(list_lucro))
+    list_lucro.append(lista_soma_comp[-1]-list_despesas[-1])
     list_perc = perc(lista_soma_comp, list_lucro)
     list_medicao_total = ordena_lista(lista_contrato_final, tupla_medicao_total)
     del list_medicao_total[-1]
-    list_medicao_total.append(sum(list_medicao_total))
+    list_medicao_total.append(sum_medicao(lista_contrato_final, list_medicao_total))
     list_desp_totais = ordena_lista(lista_contrato_final, tupla_despesa_total)
     del list_desp_totais[-1]
-    list_desp_totais.append(sum(list_desp_totais))
+    list_desp_totais.append(sum_despesa(lista_contrato_final, list_desp_totais))
     list_lucro_total = subtrair_listas(list_medicao_total, list_desp_totais)
     del list_lucro_total[-1]
-    list_lucro_total.append(sum(list_lucro_total))
+    list_lucro_total.append(list_medicao_total[-1]-list_desp_totais[-1])
     list_perc_total = perc(list_medicao_total, list_lucro_total)
     df = pd.DataFrame.from_dict(data={'LOCAL':lista_locais, 
                                       'CONTRATO':lista_contrato_final, 
@@ -95,6 +95,20 @@ def tabela_2(mes):
                                       '% TOTAL': list_perc_total})
     
     return df
+
+def sum_medicao(lista_contrato_final, lista_soma_comp): #cria o somatório da medicao
+    soma = 0
+    for i in range(len(lista_soma_comp)):
+        if lista_contrato_final[i] != "ADM CENTRAL (RECIFE)":
+            soma += lista_soma_comp[i]
+    return soma
+
+def sum_despesa(lista_contrato_final, lista_despesas): # cria o somatorio da despesa
+    soma = 0
+    for i in range(len(lista_despesas)):
+        if lista_contrato_final[i] != "ADM LOCAL (MACAÉ)" and lista_contrato_final[i] != "FILIAL - PERNAMBUCO (RECIFE)":
+            soma += lista_despesas[i]
+    return soma
 
 def ordenar_listas_locais(lista_contrato, lista_soma_comp, lista_cc, lista_locais): #ordena essas 4 listas de acordo com os locais e depois de acordo com os contratos
     # Garantir que todas as listas têm o mesmo comprimento
@@ -263,7 +277,6 @@ def cad_encargos():
         lista.append(df_encargos)
     return lista
     
-
 def enviar_contratos(lista):
     try:
         inserir_contrato(lista)
