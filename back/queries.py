@@ -36,7 +36,7 @@ def pega_centro_custos(db=back.db):
     lista_local = []
 
     collection = db.get_collection('Contratos')
-    collection_filial = db.get_collection('Filais')
+    collection_filial = db.get_collection('Filiais')
 
 
     desc = collection.distinct('descricao-contratos')
@@ -44,9 +44,14 @@ def pega_centro_custos(db=back.db):
     for i in desc:
         linha = collection.find_one({'descricao-contratos':i})
         # print(i)
-        filial = collection_filial.find_one({'codigo-filial':int(linha['filial-contratos'])})
-        # print(linha)
+        print(linha)
+        if linha['filial-contratos'] == '':
+            pass
+        else:
+            filial = collection_filial.find_one({'codigo-filial':int(linha['filial-contratos'])})
+        print(filial)
         lista_centro_custos.append(int(linha['projetosapiens-contratos']))
+        print(filial['municipio-filial'])
         lista_local.append(filial['municipio-filial'])
 
     # print(desc)
@@ -272,7 +277,7 @@ def medicao(competencia, db=back.db):
         # print(f'filial{filial}')
         local = filial['municipio-filial']
         # print(f'local:{local}')
-        lista_locais.append(local)
+        lista_locais.append(str(filial['codigo-filial'])+' - '+local)
         
 
     return lista_descricao_projeto,lista_total_medicao,lista_centro_de_custo,lista_locais
