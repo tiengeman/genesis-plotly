@@ -239,7 +239,7 @@ def medicao(competencia, db=back.db):
     # consulta que agrupa as receitas por descrição do projeto e soma o campo de valor de medição
     pipeline = [
         {"$match": {"competencia-medicao": competencia}},  # Filtrar por data
-        {"$group": {"_id": {"descricao-projeto": "$descricao-projeto",'codigo-projeto-unificado':'$codigo-projeto-unificado','codigo-projeto-original':'$codigo-projeto-original'}, "total-medicao": {"$sum": "$valor-medicao"}}}  # Calcular a soma da receita
+        {"$group": {"_id": {"descricao-projeto": "$descricao-projeto",'codigo-projeto-unificado':'$codigo-projeto-unificado'}, "total-medicao": {"$sum": "$valor-medicao"}}}  # Calcular a soma da receita
     ]
 
     medicao = colecao_medicao.aggregate(pipeline)
@@ -255,9 +255,14 @@ def medicao(competencia, db=back.db):
         lista_centro_de_custo.append(i['_id']['codigo-projeto-unificado'])
         lista_total_medicao.append(i["total-medicao"])
 
-        retorno = colecao_contratos.find_one({'projetosapiens-contratos':i['_id']['codigo-projeto-original']})
-        if retorno == None:
-            retorno = colecao_contratos.find_one({'projetosapiens-contratos':i['_id']['codigo-projeto-unificado']})
+        # a variavel contrato serve para buscar no banco uma linha que tenha a descrio de projeto atual do loop.
+        contrato = colecao_medicao.find_one({'descricao-projeto':i['_id']['descricao-projeto']})
+
+        # a variavel retorno usa a variavel contrato como fonte para buscar um codigo de projeto original
+        retorno = colecao_contratos.find_one({'projetosapiens-contratos':contrato['codigo-projeto-unificado']})
+
+        # if retorno == None:
+        #     retorno = colecao_contratos.find_one({'projetosapiens-contratos':contrato['codigo-projeto-unificado']})
         # print(f'retorno:{retorno}')
         filial = colecao_filial.find_one({'codigo-filial':retorno['filial-contratos']})
         # print(f'filial{filial}')
