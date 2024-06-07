@@ -33,21 +33,25 @@ def pega_contratos(db=back.db):
 
 def pega_centro_custos(db=back.db):
     lista_centro_custos = []
+    lista_local = []
 
     collection = db.get_collection('Contratos')
+    collection_filial = db.get_collection('Filais')
 
 
     desc = collection.distinct('descricao-contratos')
 
     for i in desc:
-        # print(i)
         linha = collection.find_one({'descricao-contratos':i})
+        # print(i)
+        filial = collection_filial.find_one({'codigo-filial':int(linha['filial-contratos'])})
         # print(linha)
         lista_centro_custos.append(int(linha['projetosapiens-contratos']))
+        lista_local.append(filial['municipio-filial'])
 
     # print(desc)
 
-    return desc, lista_centro_custos
+    return desc, lista_centro_custos, lista_local
 
 
 def total_despesa(db=back.db):
