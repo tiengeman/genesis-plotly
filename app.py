@@ -1,6 +1,6 @@
 import dash
 import dash_bootstrap_components as dbc
-from dash import html, dcc, callback_context
+from dash import html, dcc
 from dash.dependencies import Input, Output, State
 from pages.encargos import lista_encargos
 import pages.gerencial as gerencial
