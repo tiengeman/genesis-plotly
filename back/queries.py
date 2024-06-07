@@ -31,6 +31,25 @@ def pega_contratos(db=back.db):
     return desc
 
 
+def pega_centro_custos(db=back.db):
+    lista_centro_custos = []
+
+    collection = db.get_collection('Contratos')
+
+
+    desc = collection.distinct('descricao-contratos')
+
+    for i in desc:
+        # print(i)
+        linha = collection.find_one({'descricao-contratos':i})
+        # print(linha)
+        lista_centro_custos.append(int(linha['projetosapiens-contratos']))
+
+    # print(desc)
+
+    return desc, lista_centro_custos
+
+
 def total_despesa(db=back.db):
 
     soma_total = 0
@@ -230,6 +249,7 @@ def medicao(competencia, db=back.db):
     lista_total_medicao = []
     lista_locais = []
 
+    # logica para pegar os locais
     for i in medicao:
         lista_descricao_projeto.append(i["_id"]["descricao-projeto"])
         lista_centro_de_custo.append(i['_id']['codigo-projeto-unificado'])
