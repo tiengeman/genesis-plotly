@@ -110,10 +110,6 @@ def sum_despesa(lista_contrato_final, lista_despesas): # cria o somatorio da des
     return soma
 
 def ordenar_listas_locais(lista_contrato, lista_soma_comp, lista_cc, lista_locais):
-    # Garantir que todas as listas têm o mesmo comprimento
-    if not (len(lista_contrato) == len(lista_soma_comp) == len(lista_cc) == len(lista_locais)):
-        raise ValueError("Todas as listas devem ter o mesmo comprimento")
-    
     lista_todos_contrato, lista_todos_cc, lista_todos_locais = back.pega_centro_custos()
     for i in range(len(lista_todos_contrato)):
         if lista_todos_contrato[i] not in lista_contrato:
@@ -122,21 +118,19 @@ def ordenar_listas_locais(lista_contrato, lista_soma_comp, lista_cc, lista_locai
             lista_cc.append(lista_todos_cc[i])
             lista_locais.append(lista_todos_locais[i])
 
-    # Convertendo todos os elementos de lista_locais para strings e lista_cc para inteiros
-    lista_locais_str = list(map(str, lista_locais))
-    lista_cc_int = list(map(int, lista_cc))
-    
-    # Cria uma lista de tuplas que combina todas as listas
-    combined_list = list(zip(lista_locais_str, lista_cc_int, lista_soma_comp, lista_contrato))
-    
-    # Ordena primeiro pelos locais (decrescente) e depois pelos cc (crescente)
-    combined_list_sorted = sorted(combined_list, key=lambda x: (-ord(x[0][0]), x[1]))
-    
-    # Separa as listas ordenadas
+    # Combine as listas em uma lista de tuplas
+    combinados = list(zip(lista_contrato, lista_soma_comp, lista_cc, lista_locais))
 
-    lista_locais_ordenada, lista_cc_ordenada, lista_soma_comp_ordenada, lista_contrato_ordenada = zip(*combined_list_sorted)
-    
-    return list(lista_contrato_ordenada), list(lista_soma_comp_ordenada), list(lista_cc_ordenada), list(lista_locais_ordenada)
+    # Ordene a lista primeiro por lista_locais em ordem crescente
+    # e dentro de cada grupo de lista_locais por lista_contrato em ordem decrescente (ordem lexicográfica)
+    combinados.sort(key=lambda x: (x[3], x[0]), reverse=True)
+    combinados.sort(key=lambda x: x[3])
+
+    # Descompacte as listas ordenadas de volta em suas listas originais
+    lista_contrato, lista_soma_comp, lista_cc, lista_locais = zip(*combinados)
+
+    # Retorne as listas como tuplas
+    return list(lista_contrato), list(lista_soma_comp), list(lista_cc), list(lista_locais)
 
 def inativo(lista_valores): #função para criar a lista se o contrato está inativo ou não
     lista_inativo = []
@@ -149,8 +143,7 @@ def inativo(lista_valores): #função para criar a lista se o contrato está ina
     return lista_inativo
 
 def ordena_lista(lista_contrato, lista_desp): #função para ordenar a lista de despesas de acordo com a lista de contratos
-    lista_apoio = []
-    print(lista_desp)                           # a lista de valores devem ser tuplas
+    lista_apoio = []                          # a lista de valores devem ser tuplas
     for i in lista_contrato:
         flag = False
         for a in lista_desp:
