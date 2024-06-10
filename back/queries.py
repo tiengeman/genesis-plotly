@@ -35,7 +35,7 @@ def pega_centro_custos(db=back.db):
     lista_centro_custos = []
     lista_local = []
 
-    collection = db.get_collection('Cadastro Contratos')
+    collection = db.get_collection('Contratos')
     collection_filial = db.get_collection('Filiais')
 
 
@@ -47,8 +47,8 @@ def pega_centro_custos(db=back.db):
         if linha['filial-contratos'] == '':
             pass
         else:
-            filial = collection_filial.find_one({'codigo-filial':linha['filial-contratos']})
-        lista_centro_custos.append(linha['projetosapiens-contratos'])
+            filial = collection_filial.find_one({'codigo-filial':int(linha['filial-contratos'])})
+        lista_centro_custos.append(int(linha['projetosapiens-contratos']))
         lista_local.append(str(filial['codigo-filial'])+' - '+filial['municipio-filial'])
 
     # print(desc)
@@ -178,72 +178,59 @@ def total_despesa_competencia(competencia, db=back.db):
     total_impostos = colecao_despesa_impostos.aggregate(pipeline_impostos)
     total_deducoes = colecao_despesa_deducoes.aggregate(pipeline_deducoes)
 
-    
-    # dicio_financeiro = {}
-    # dicio_folha = {}
-    # dicio_relatorio = {}
-    # dicio_impostos = {}
-    # dicio_deducoes = {}
-
-    dicio_geral = {}
+    dicio_financeiro = {}
+    dicio_folha = {}
+    dicio_relatorio = {}
+    dicio_impostos = {}
+    dicio_deducoes = {}
 
     lista_final = []
-    # print(list(total_financeiro))
+
     # Loops para adicionar nos respectivos dicionários os valores totais dos contratos(são as chaves dos dicios) e a despesa total(que são os valores dos dicios)
     for i in total_financeiro:
-        
-        if i['_id']['descricao-projeto'] not in dicio_geral:
-            dicio_geral[i['_id']['descricao-projeto']] = i['despesa_financeiro']
-            
-        else:
-            dicio_geral[i['_id']['descricao-projeto']] += i['despesa_financeiro']
-        # if i['_id']['descricao-projeto'] == 'OS 001/24 - EPASA SERVIÇO DE INSPEÇÃO EM CALDEIRAS':
-        #     print(i)
+        dicio_financeiro[i['_id']['descricao-projeto']] = i['despesa_financeiro']
 
     for j in total_folha:
-        
-        if j['_id']['descricao-projeto'] not in dicio_geral:
-            dicio_geral[j['_id']['descricao-projeto']] = j['despesa_folha']
-            
-        else:
-            dicio_geral[j['_id']['descricao-projeto']] += j['despesa_folha']
-        # if j['_id']['descricao-projeto'] == 'OS 001/24 - EPASA SERVIÇO DE INSPEÇÃO EM CALDEIRAS':
-        #     print(j)
+        dicio_folha[j['_id']['descricao-projeto']] = j['despesa_folha']
     
     for k in total_relatorio:
-        
-        if k['_id']['descricao-projeto'] not in dicio_geral:
-            dicio_geral[k['_id']['descricao-projeto']] = k['despesa_relatorio']
-            
-        else:
-            dicio_geral[k['_id']['descricao-projeto']] += k['despesa_relatorio']
-        # if k['_id']['descricao-projeto'] == 'OS 001/24 - EPASA SERVIÇO DE INSPEÇÃO EM CALDEIRAS':
-        #     print(k)
+        dicio_relatorio[k['_id']['descricao-projeto']] = k['despesa_relatorio']
     
     for x in total_impostos:
-        
-        if x['_id']['descricao-projeto'] not in dicio_geral:
-            dicio_geral[x['_id']['descricao-projeto']] = x['despesa_impostos']
-            
-        else:
-            dicio_geral[x['_id']['descricao-projeto']] += x['despesa_impostos']
-        # if x['_id']['descricao-projeto'] == 'OS 001/24 - EPASA SERVIÇO DE INSPEÇÃO EM CALDEIRAS':
-        #     print(x)
+        dicio_impostos[x['_id']['descricao-projeto']] = x['despesa_impostos']
     
     for y in total_deducoes:
-        print(y)
-        if y['_id']['descricao-projeto'] not in dicio_geral:
-            dicio_geral[y['_id']['descricao-projeto']] = y['despesa_deducoes']
-            
-        else:
-            dicio_geral[y['_id']['descricao-projeto']] += y['despesa_deducoes']
-        # if y['_id']['descricao-projeto'] == 'OS 001/24 - EPASA SERVIÇO DE INSPEÇÃO EM CALDEIRAS':
-        #     print(y)
+        dicio_deducoes[y['_id']['descricao-projeto']] = y['despesa_deducoes']
 
-    for contrato in dicio_geral:
-        if dicio_geral[contrato] == 0:
-            lista_final.append([contrato,dicio_geral[contrato]])
-        # soma_total = 0
+    for contrato in dicio_relatorio:
+        try:
+            soma_total += dicio_financeiro[contrato]
+        except:
+            pass
+
+        try:
+            soma_total += dicio_folha[contrato]
+        except:
+            pass
+
+        try:            
+            soma_total += dicio_relatorio[contrato]
+        except:
+            pass
+
+        try:            
+            soma_total += dicio_impostos[contrato]
+        except:
+            pass
+
+        try:            
+            soma_total += dicio_deducoes[contrato]
+        except:
+            pass
+
+        
+        lista_final.append((contrato,soma_total))
+        soma_total = 0
     
     return lista_final
 
