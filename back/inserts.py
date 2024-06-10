@@ -38,7 +38,7 @@ def inserir_contrato(lista,db=back.db):
         'inicio-contratos'          :lista[7],
         'fim-contratos'             :lista[8],
         'aditivos-contratos'        :lista[9],
-        'valor-contratos'           :lista[1],
+        'valor-contratos'           :lista[10],
         'prazomes-contratos'        :lista[11],
         'prazodias-contratos'       :lista[12],
         'status-contratos'          :lista[13],
