@@ -8,7 +8,7 @@ def tabela(mes): #função que gera a tabela principal da aba gerencial
     lista_contrato, lista_soma_comp, lista_cc, lista_locais = ordenar_listas_locais(lista_contrato, lista_soma_comp, lista_cc, lista_locais)
     lista_locais.append("")
     lista_contrato.append('TOTAL OPERAÇÃO')
-    lista_contrato_final, lista_soma_comp, lista_cc = remove_capex(lista_contrato, lista_soma_comp, lista_cc)
+    lista_contrato_final, lista_soma_comp, lista_cc, lista_locais = remove_capex(lista_contrato, lista_soma_comp, lista_cc, lista_locais)
     lista_cc.append('')
     lista_soma_comp.append(sum_medicao(lista_contrato_final, lista_soma_comp))
     lista_cont_total, lista_valor_total, lista_cc_total = back.medicao_total()
@@ -52,7 +52,6 @@ def tabela(mes): #função que gera a tabela principal da aba gerencial
                                       '% TOTAL': list_perc_total})
     
     return df
-
 # tabela do capex
 def tabela_2(mes):
     lista_contrato = ['INVESTIMENTOS (CONTRATO)', 'EXPANSÃO - FILIAL MACAÉ', 'EXPANSÃO - MATRIZ RECIFE', 'DEPÓSITOS JUDICIAIS', 'ENGEMAN TECNOLOGIAS']
@@ -115,6 +114,14 @@ def ordenar_listas_locais(lista_contrato, lista_soma_comp, lista_cc, lista_locai
     if not (len(lista_contrato) == len(lista_soma_comp) == len(lista_cc) == len(lista_locais)):
         raise ValueError("Todas as listas devem ter o mesmo comprimento")
     
+    lista_todos_contrato, lista_todos_cc, lista_todos_locais = back.pega_centro_custos()
+    for i in range(len(lista_todos_contrato)):
+        if lista_todos_contrato[i] not in lista_contrato:
+            lista_contrato.append(lista_todos_contrato[i])
+            lista_soma_comp.append(0)
+            lista_cc.append(lista_todos_cc[i])
+            lista_locais.append(lista_todos_locais[i])
+
     # Convertendo todos os elementos de lista_locais para strings e lista_cc para inteiros
     lista_locais_str = list(map(str, lista_locais))
     lista_cc_int = list(map(int, lista_cc))
@@ -126,10 +133,10 @@ def ordenar_listas_locais(lista_contrato, lista_soma_comp, lista_cc, lista_locai
     combined_list_sorted = sorted(combined_list, key=lambda x: (-ord(x[0][0]), x[1]))
     
     # Separa as listas ordenadas
+
     lista_locais_ordenada, lista_cc_ordenada, lista_soma_comp_ordenada, lista_contrato_ordenada = zip(*combined_list_sorted)
     
     return list(lista_contrato_ordenada), list(lista_soma_comp_ordenada), list(lista_cc_ordenada), list(lista_locais_ordenada)
-
 
 def inativo(lista_valores): #função para criar a lista se o contrato está inativo ou não
     lista_inativo = []
@@ -142,7 +149,8 @@ def inativo(lista_valores): #função para criar a lista se o contrato está ina
     return lista_inativo
 
 def ordena_lista(lista_contrato, lista_desp): #função para ordenar a lista de despesas de acordo com a lista de contratos
-    lista_apoio = []                           # a lista de valores devem ser tuplas
+    lista_apoio = []
+    print(lista_desp)                           # a lista de valores devem ser tuplas
     for i in lista_contrato:
         flag = False
         for a in lista_desp:
@@ -213,7 +221,7 @@ def medicao_capex_total(): # gera a coluna de medição total para o capex
 
     return medicao_total
 
-def remove_capex(lista_contratos, lista_valor, lista_cc): #função para gerar uma lista sem o capex
+def remove_capex(lista_contratos, lista_valor, lista_cc, list_locais): #função para gerar uma lista sem o capex
     lista_capex = ['INVESTIMENTOS (CONTRATO)', 'EXPANSÃO - FILIAL MACAÉ', 'EXPANSÃO - MATRIZ RECIFE', 'DEPÓSITOS JUDICIAIS', 'ENGEMAN TECNOLOGIAS']
     list_index = []
     for i in lista_capex:
@@ -224,8 +232,9 @@ def remove_capex(lista_contratos, lista_valor, lista_cc): #função para gerar u
         del lista_contratos[i]
         del lista_valor[i]
         del lista_cc[i]
+        del list_locais[i]
     
-    return lista_contratos, lista_valor, lista_cc
+    return lista_contratos, lista_valor, lista_cc, list_locais
 
 def df_impostos(): # forma o df com os impostos
     lista_contrato, lista_impostos = back.impostos()
@@ -305,6 +314,7 @@ def detalha_despesas(competencia, contrato):
     return df_impostos
 
 def detalha_receita(competencia, contrato):
+
     lista_receita = back.detalha_receita(competencia, contrato)
     nome_colunas = ['ID', 'PROJETO-UNI', 'DESCRIÇÃO', 'PROJETO-ORI', 'DOCUMENTO', 'CLIENTE', 'DATA', 'VALOR', 'VALOR-RETENCAO', 'VALOR-ADM', 'COMPETENCIA', 'FILIAL']
     dicionario_de_listas = {coluna: [] for coluna in nome_colunas}
