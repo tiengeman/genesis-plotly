@@ -49,7 +49,7 @@ def pega_centro_custos(db=back.db):
         else:
             filial = collection_filial.find_one({'codigo-filial':int(linha['filial-contratos'])})
         lista_centro_custos.append(int(linha['projetosapiens-contratos']))
-        lista_local.append(filial['municipio-filial'])
+        lista_local.append(str(filial['codigo-filial'])+' - '+filial['municipio-filial'])
 
     # print(desc)
     return desc, lista_centro_custos, lista_local
