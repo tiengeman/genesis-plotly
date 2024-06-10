@@ -34,24 +34,36 @@ def pega_contratos(db=back.db):
 def pega_centro_custos(db=back.db):
     lista_centro_custos = []
     lista_local = []
+    filial = 0
 
-    collection = db.get_collection('Contratos')
+    collection = db.get_collection('Cadastro Contratos')
     collection_filial = db.get_collection('Filiais')
 
 
     desc = collection.distinct('descricao-contratos')
 
     for i in desc:
-        linha = collection.find_one({'descricao-contratos':i})
-        # print(i)
-        if linha['filial-contratos'] == '':
-            pass
-        else:
-            filial = collection_filial.find_one({'codigo-filial':int(linha['filial-contratos'])})
-        lista_centro_custos.append(int(linha['projetosapiens-contratos']))
-        lista_local.append(str(filial['codigo-filial'])+' - '+filial['municipio-filial'])
+        # print(f'Contrato: {i}')
+        if i != None:
+            linha = collection.find_one({'descricao-contratos':i})
+            # print(linha['descricao-contratos'])
+            # print(i)
+            # print(linha)
+            if linha['filial-contratos'] == None:
+                # print(linha)
+                pass
+            else:
+                # print('entrou para pegar a filial')
+                filial = collection_filial.find_one({'codigo-filial':int(linha['filial-contratos'])})
+                # print(filial)
+            # print(filial)
+            lista_centro_custos.append(linha['projetosapiens-contratos'])
+            # print(filial['municipio-filial'])
+            # print(filial['municipio-filial'])
+            lista_local.append(str(filial['codigo-filial'])+' - '+filial['municipio-filial'])
 
     # print(desc)
+
     return desc, lista_centro_custos, lista_local
 
 
