@@ -164,23 +164,23 @@ def total_despesa_competencia(competencia, db=back.db):
     # filtros que agrupam os campos especificados e somam os valores de despesas de cada contrato
     pipeline_financeiro =  [ 
         {"$match": {"competencia-despesa": competencia}},
-        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa_financeiro':{'$sum':'$valor-despesa'}}}
+        {'$group':{'_id':{'codigo-projeto-unificado':'$codigo-projeto-unificado'},'despesa_financeiro':{'$sum':'$valor-despesa'}}}
     ]
     pipeline_folha  = [
         {"$match": {"competencia-despesa": competencia}},
-        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa_folha':{'$sum':'$valor-despesa'}}}
+        {'$group':{'_id':{'codigo-projeto-unificado':'$codigo-projeto-unificado'},'despesa_folha':{'$sum':'$valor-despesa'}}}
     ]
     pipeline_relatorio = [
         {"$match": {"competencia-despesa": competencia}},
-        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa_relatorio':{'$sum':'$valor-despesa'}}}
+        {'$group':{'_id':{'codigo-projeto-unificado':'$codigo-projeto-unificado'},'despesa_relatorio':{'$sum':'$valor-despesa'}}}
     ]
     pipeline_impostos = [
         {"$match": {"competencia-despesa": competencia}},
-        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa_impostos':{'$sum':'$valor-despesa'}}}
+        {'$group':{'_id':{'codigo-projeto-unificado':'$codigo-projeto-unificado'},'despesa_impostos':{'$sum':'$valor-despesa'}}}
     ]
     pipeline_deducoes = [
         {"$match": {"competencia-despesa": competencia}},
-        {'$group':{'_id':{'descricao-projeto':'$descricao-projeto'},'despesa_deducoes':{'$sum':'$valor-despesa'}}}
+        {'$group':{'_id':{'codigo-projeto-unificado':'$codigo-projeto-unificado'},'despesa_deducoes':{'$sum':'$valor-despesa'}}}
     ]
 
     # Consultas que utilizam os filtros a cima. O retorno dessas consultas são dicionarios. Ex:. {'_id': {'descricao-projeto': 'ADM LOCAL (MACAÉ)'}, 'despesa_financeiro': 450681.34}
@@ -200,48 +200,48 @@ def total_despesa_competencia(competencia, db=back.db):
 
     # Loops para adicionar nos respectivos dicionários os valores totais dos contratos(são as chaves dos dicios) e a despesa total(que são os valores dos dicios)
     for i in total_financeiro:
-        dicio_financeiro[i['_id']['descricao-projeto']] = i['despesa_financeiro']
+        dicio_financeiro[i['_id']['codigo-projeto-unificado']] = i['despesa_financeiro']
 
     for j in total_folha:
-        dicio_folha[j['_id']['descricao-projeto']] = j['despesa_folha']
+        dicio_folha[j['_id']['codigo-projeto-unificado']] = j['despesa_folha']
     
     for k in total_relatorio:
-        dicio_relatorio[k['_id']['descricao-projeto']] = k['despesa_relatorio']
+        dicio_relatorio[k['_id']['codigo-projeto-unificado']] = k['despesa_relatorio']
     
     for x in total_impostos:
-        dicio_impostos[x['_id']['descricao-projeto']] = x['despesa_impostos']
+        dicio_impostos[x['_id']['codigo-projeto-unificado']] = x['despesa_impostos']
     
     for y in total_deducoes:
-        dicio_deducoes[y['_id']['descricao-projeto']] = y['despesa_deducoes']
+        dicio_deducoes[y['_id']['codigo-projeto-unificado']] = y['despesa_deducoes']
 
-    for contrato in dicio_relatorio:
+    for cc in dicio_relatorio:
         try:
-            soma_total += dicio_financeiro[contrato]
+            soma_total += dicio_financeiro[cc]
         except:
             pass
 
         try:
-            soma_total += dicio_folha[contrato]
+            soma_total += dicio_folha[cc]
         except:
             pass
 
         try:            
-            soma_total += dicio_relatorio[contrato]
+            soma_total += dicio_relatorio[cc]
         except:
             pass
 
         try:            
-            soma_total += dicio_impostos[contrato]
+            soma_total += dicio_impostos[cc]
         except:
             pass
 
         try:            
-            soma_total += dicio_deducoes[contrato]
+            soma_total += dicio_deducoes[cc]
         except:
             pass
 
         
-        lista_final.append((contrato,soma_total))
+        lista_final.append((cc,soma_total))
         soma_total = 0
     
     return lista_final
@@ -256,7 +256,7 @@ def medicao(competencia, db=back.db):
     # consulta que agrupa as receitas por descrição do projeto e soma o campo de valor de medição
     pipeline = [
         {"$match": {"competencia-medicao": competencia}},  # Filtrar por data
-        {"$group": {"_id": {"descricao-projeto": "$descricao-projeto",'codigo-projeto-unificado':'$codigo-projeto-unificado'}, "total-medicao": {"$sum": "$valor-medicao"}}}  # Calcular a soma da receita
+        {"$group": {"_id": {'codigo-projeto-unificado':'$codigo-projeto-unificado'}, "total-medicao": {"$sum": "$valor-medicao"}}}  # Calcular a soma da receita
     ]
 
     medicao = colecao_medicao.aggregate(pipeline)
@@ -268,15 +268,16 @@ def medicao(competencia, db=back.db):
 
     # logica para pegar os locais
     for i in medicao:
-        lista_descricao_projeto.append(i["_id"]["descricao-projeto"])
         lista_centro_de_custo.append(i['_id']['codigo-projeto-unificado'])
         lista_total_medicao.append(i["total-medicao"])
 
         # a variavel contrato serve para buscar no banco uma linha que tenha a descrio de projeto atual do loop.
-        contrato = colecao_medicao.find_one({'descricao-projeto':i['_id']['descricao-projeto']})
+        # contrato = colecao_medicao.find_one({'descricao-projeto':i['_id']['descricao-projeto']})
 
         # a variavel retorno usa a variavel contrato como fonte para buscar um codigo de projeto original
-        retorno = colecao_contratos.find_one({'projetosapiens-contratos':contrato['codigo-projeto-unificado']})
+        retorno = colecao_contratos.find_one({'projetosapiens-contratos':i['_id']['codigo-projeto-unificado']})
+        
+        lista_descricao_projeto.append(retorno["descricao-contratos"])
 
         # if retorno == None:
         #     retorno = colecao_contratos.find_one({'projetosapiens-contratos':contrato['codigo-projeto-unificado']})
