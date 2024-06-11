@@ -17,7 +17,7 @@ def tabela(mes): #função que gera a tabela principal da aba gerencial
     tupla_despesas = back.total_despesa_competencia(mes) #gera uma lista de tuplas com as info
 
     list_filial = [None]*len(lista_contrato_final)
-    list_despesas = ordena_lista(lista_contrato_final, tupla_despesas) #aqui ele ordena os valores de acordo com a lista de contrato
+    list_despesas = ordena_lista(lista_cc, tupla_despesas) #aqui ele ordena os valores de acordo com a lista de contrato
     del list_despesas[-1]
     list_despesas.append(sum_despesa(lista_contrato_final, list_despesas))
     list_lucro = subtrair_listas(lista_soma_comp, list_despesas)
@@ -112,7 +112,7 @@ def sum_despesa(lista_contrato_final, lista_despesas): # cria o somatorio da des
 def ordenar_listas_locais(lista_contrato, lista_soma_comp, lista_cc, lista_locais):
     lista_todos_contrato, lista_todos_cc, lista_todos_locais = back.pega_centro_custos()
     for i in range(len(lista_todos_contrato)):
-        if lista_todos_contrato[i] not in lista_contrato:
+        if lista_todos_cc[i] not in lista_cc:
             lista_contrato.append(lista_todos_contrato[i])
             lista_soma_comp.append(0)
             lista_cc.append(lista_todos_cc[i])
@@ -142,9 +142,9 @@ def inativo(lista_valores): #função para criar a lista se o contrato está ina
         
     return lista_inativo
 
-def ordena_lista(lista_contrato, lista_desp): #função para ordenar a lista de despesas de acordo com a lista de contratos
+def ordena_lista(lista_cc, lista_desp): #função para ordenar a lista de despesas de acordo com a lista de contratos
     lista_apoio = []                          # a lista de valores devem ser tuplas
-    for i in lista_contrato:
+    for i in lista_cc:
         flag = False
         for a in lista_desp:
             if a[0]==i:
