@@ -6,23 +6,47 @@ from banco import *
 from constants import *
 
 # Define a layout with a centered container
+# Define a layout with a centered container
 layout = html.Div(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center'}, children=[
-    html.H1(children='Performance Mensal por Competência', style={'marginTop': '10px', 'color': colors['gray'], 'fontWeight': 'bold'}),
-    html.Hr(style={'backgroundColor': colors['orange']}),  # Linha horizontal laranja
-    html.Div(style={'marginTop': '20px'}),
-    # Lista suspensa
-    dcc.Dropdown(
-        id='minha-lista-suspensa',
-        options=back.competencias(),
-        value=back.competencias()[-1],
-        style={'fontFamily': 'Arial, sans-serif'}  # Definindo a fonte da lista suspensa
-    ),
-    html.Div(style={'marginTop': '20px'}),  # Espaçamento entre dropdown e tabela
-    html.Div(id='tabela-container', style={'margin': '20px'}),  # Div para mostrar a tabela selecionada com margem
-    html.Div(id='tabela2-container', style={'margin': '20px'}),  # Div para mostrar a tabela selecionada com margem
-    html.Div(id='row-info-container', style={'margin': '20px'}),  # Add this Div to display row information
-    html.Div(style={'textAlign': 'center', 'marginTop': '20px'}),
-    dbc.Button('Detalhamento', id='detalhamento-button', href='/detalhamento', style={'backgroundColor': colors['orange']}),
+    dcc.Tabs(id='tabs', value='tab-1', children=[
+        dcc.Tab(label='Resumo', value='tab-1', children=[
+            html.H1(children='Performance Mensal por Competência', style={'marginTop': '10px', 'color': colors['gray'], 'fontWeight': 'bold'}),
+            html.Hr(style={'backgroundColor': colors['orange']}),  # Linha horizontal laranja
+            html.Div(style={'marginTop': '20px'}),
+            # Lista suspensa
+            dcc.Dropdown(
+                id='minha-lista-suspensa',
+                options=back.competencias(),
+                value=back.competencias()[-1],
+                style={'fontFamily': 'Arial, sans-serif'}  # Definindo a fonte da lista suspensa
+            ),
+            html.Div(style={'marginTop': '20px'}),  # Espaçamento entre dropdown e tabela
+            html.Div(id='tabela-container', style={'margin': '20px'}),  # Div para mostrar a tabela selecionada com margem
+            html.Div(id='tabela2-container', style={'margin': '20px'}),  # Div para mostrar a tabela selecionada com margem
+            html.Div(id='row-info-container', style={'margin': '20px'}),  # Add this Div to display row information
+            html.Div(style={'textAlign': 'center', 'arginTop': '20px'}),
+            dbc.Button('Detalhamento', id='detalhamento-button', href='/detalhamento', style={'backgroundColor': colors['orange']}),
+        ]),
+        dcc.Tab(label='Dashboards', value='tab-2', children=[
+            html.H1(children='Dashboards', style={'marginTop': '10px', 'color': colors['gray'], 'fontWeight': 'bold'}),
+            html.Div(style={'marginTop': '20px'}),
+            html.Div(style={'display': 'flex', 'justifyContent': 'pace-between'}, children=[
+                dcc.Dropdown(
+                    id='multi-select-dropdown',
+                    options=[{'label': i, 'value': i} for i in ['Option 1', 'Option 2', 'Option 3', 'Option 4', 'Option 5']],
+                    value=['Option 1', 'Option 3'],  # default selected options
+                    multi=True,  # allow multiple selections
+                    style={'fontFamily': 'Arial, sans-serif', 'width': '100%'}  # Definindo a fonte e largura da lista suspensa
+                ),
+                dcc.Dropdown(
+                    id='single-select-dropdown',
+                    options=[{'label': i, 'value': i} for i in ['Option A', 'Option B', 'Option C', 'Option D', 'Option E']],
+                    value='Option A',  # default selected option
+                    style={'fontFamily': 'Arial, sans-serif', 'width': '100%'}  # Definindo a fonte e largura da lista suspensa
+                ),
+            ]),
+        ]),
+    ])
 ])
 
 #função para atualizar a tabela, é chamada no callback quando uma competencia é selecionada

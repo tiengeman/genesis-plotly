@@ -12,7 +12,7 @@ def tabela(mes): #função que gera a tabela principal da aba gerencial
     lista_cc.append('')
     lista_soma_comp.append(sum_medicao(lista_contrato_final, lista_soma_comp))
     lista_cont_total, lista_valor_total, lista_cc_total = back.medicao_total()
-    tupla_medicao_total = merge_lists_into_tuples(lista_cont_total, lista_valor_total)
+    tupla_medicao_total = merge_lists_into_tuples(lista_cc_total, lista_valor_total)
     tupla_despesa_total = back.total_despesa()
     tupla_despesas = back.total_despesa_competencia(mes) #gera uma lista de tuplas com as info
 
@@ -24,10 +24,10 @@ def tabela(mes): #função que gera a tabela principal da aba gerencial
     del list_lucro[-1]
     list_lucro.append(lista_soma_comp[-1]-list_despesas[-1])
     list_perc = perc(lista_soma_comp, list_lucro)
-    list_medicao_total = ordena_lista(lista_contrato_final, tupla_medicao_total)
+    list_medicao_total = ordena_lista(lista_cc, tupla_medicao_total)
     del list_medicao_total[-1]
     list_medicao_total.append(sum_medicao(lista_contrato_final, list_medicao_total))
-    list_desp_totais = ordena_lista(lista_contrato_final, tupla_despesa_total)
+    list_desp_totais = ordena_lista(lista_cc, tupla_despesa_total)
     del list_desp_totais[-1]
     list_desp_totais.append(sum_despesa(lista_contrato_final, list_desp_totais))
     list_lucro_total = subtrair_listas(list_medicao_total, list_desp_totais)
@@ -58,7 +58,7 @@ def tabela_2(mes):
     lista_contrato.append('TOTAL CAPEX')
     list_local = ['CAPEX']*(len(lista_contrato)-1)
     list_local.append("")
-    lista_cc = ['888', '2180', '2250', '1111', '1930', ""]
+    lista_cc = [888, 2180, 2250, 1111, 1930, ""]
     list_inativo = [None]*len(lista_contrato)
     del list_inativo[-1]
     list_inativo.append("NÂO")
@@ -66,7 +66,7 @@ def tabela_2(mes):
     lista_soma_comp = medicao_capex(mes)
     lista_soma_comp.append(sum(lista_soma_comp))
     tupla_despesas = back.total_despesa_competencia(mes) #gera uma lista de tuplas com as info
-    list_despesas = ordena_lista(lista_contrato, tupla_despesas) #aqui ele ordena os valores de acordo com a lista de contrato
+    list_despesas = ordena_lista(lista_cc, tupla_despesas) #aqui ele ordena os valores de acordo com a lista de contrato
     del list_despesas[-1]
     list_despesas.append(sum(list_despesas))
     list_lucro = subtrair_listas(lista_soma_comp, list_despesas)
@@ -74,7 +74,7 @@ def tabela_2(mes):
     list_medicao_total = medicao_capex_total()
     list_medicao_total.append(sum(list_medicao_total))
     tupla_despesa_total = back.total_despesa()
-    list_desp_totais = ordena_lista(lista_contrato, tupla_despesa_total)
+    list_desp_totais = ordena_lista(lista_cc, tupla_despesa_total)
     del list_desp_totais[-1]
     list_desp_totais.append(sum(list_desp_totais))
     list_lucro_total = subtrair_listas(list_medicao_total, list_desp_totais)
@@ -111,6 +111,7 @@ def sum_despesa(lista_contrato_final, lista_despesas): # cria o somatorio da des
 
 def ordenar_listas_locais(lista_contrato, lista_soma_comp, lista_cc, lista_locais):
     lista_todos_contrato, lista_todos_cc, lista_todos_locais = back.pega_centro_custos()
+    
     for i in range(len(lista_todos_contrato)):
         if lista_todos_cc[i] not in lista_cc:
             lista_contrato.append(lista_todos_contrato[i])
@@ -143,7 +144,7 @@ def inativo(lista_valores): #função para criar a lista se o contrato está ina
     return lista_inativo
 
 def ordena_lista(lista_cc, lista_desp): #função para ordenar a lista de despesas de acordo com a lista de contratos
-    lista_apoio = []                          # a lista de valores devem ser tuplas
+    lista_apoio = []                        # a lista de valores devem ser tuplas
     for i in lista_cc:
         flag = False
         for a in lista_desp:
@@ -152,7 +153,6 @@ def ordena_lista(lista_cc, lista_desp): #função para ordenar a lista de despes
                 flag = True
         if flag == False:
             lista_apoio.append(0)
-
     return lista_apoio
 
 def subtrair_listas(lista1, lista2): #calcula o lucro
@@ -215,17 +215,15 @@ def medicao_capex_total(): # gera a coluna de medição total para o capex
     return medicao_total
 
 def remove_capex(lista_contratos, lista_valor, lista_cc, list_locais): #função para gerar uma lista sem o capex
-    lista_capex = ['INVESTIMENTOS (CONTRATO)', 'EXPANSÃO - FILIAL MACAÉ', 'EXPANSÃO - MATRIZ RECIFE', 'DEPÓSITOS JUDICIAIS', 'ENGEMAN TECNOLOGIAS']
+    lista_capex = ['INVESTIMENTOS (CONTRATO)', 'EXPANSÃO - FILIAL MACAÉ', 'EXPANSÃO - MATRIZ RECIFE', 'DEPÓSITOS JUDICIAIS', 'ENGEMAN TECNOLOGIAS', 'CUSTOS DIRETORIA']
     list_index = []
     for i in lista_capex:
-        for a in range(len(lista_contratos)):
-            if i == lista_contratos[a]:
-                list_index.append(a)
-    for i in list_index:
-        del lista_contratos[i]
-        del lista_valor[i]
-        del lista_cc[i]
-        del list_locais[i]
+        if i in lista_contratos:
+            index = lista_contratos.index(i)
+            del lista_contratos[index]
+            del lista_valor[index]
+            del lista_cc[index]
+            del list_locais[index]
     
     return lista_contratos, lista_valor, lista_cc, list_locais
 
