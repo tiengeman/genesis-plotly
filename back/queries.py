@@ -66,7 +66,7 @@ def pega_centro_custos(db=back.db):
 
     return desc, lista_centro_custos, lista_local
 
-
+# -------------------------FUNÇÕES DESPESAS-----------------------------
 def total_despesa(db=back.db):
 
     soma_total = 0
@@ -106,49 +106,71 @@ def total_despesa(db=back.db):
     dicio_impostos = {}
     dicio_deducoes = {}
 
+    dicio_geral = {}
+
     lista_final = []
     
     # Loops para adicionar nos respectivos dicionários os valores totais dos contratos(são as chaves dos dicios) e a despesa total(que são os valores dos dicios)
     for i in total_financeiro:
-        dicio_financeiro[i['_id']['codigo-projeto-unificado']] = i['despesa_financeiro']
+        if i['_id']['codigo-projeto-unificado'] not in dicio_geral:
+            dicio_geral[i['_id']['codigo-projeto-unificado']] = i['despesa_financeiro']
+        else:
+            dicio_geral[i['_id']['codigo-projeto-unificado']] += i['despesa_financeiro']
 
     for j in total_folha:
-        dicio_folha[j['_id']['codigo-projeto-unificado']] = j['despesa_folha']
+
+        if j['_id']['codigo-projeto-unificado'] not in dicio_geral:
+            # print(f'entrou no if com o valor de cc :{i['_id']['codigo-projeto-unificado']}')
+            dicio_geral[j['_id']['codigo-projeto-unificado']] = j['despesa_folha']
+        else:
+            dicio_geral[j['_id']['codigo-projeto-unificado']] += j['despesa_folha']
     
+        # sleep(1.5)
+
     for k in total_relatorio:
-        dicio_relatorio[k['_id']['codigo-projeto-unificado']] = k['despesa_relatorio']
-    
+        if k['_id']['codigo-projeto-unificado'] not in dicio_geral:
+            dicio_geral[k['_id']['codigo-projeto-unificado']] = k['despesa_relatorio']
+        else:    
+            dicio_geral[k['_id']['codigo-projeto-unificado']] += k['despesa_relatorio']
+
     for x in total_impostos:
-        dicio_impostos[x['_id']['codigo-projeto-unificado']] = x['despesa_impostos']
-    
+        if x['_id']['codigo-projeto-unificado'] not in dicio_geral:
+            dicio_geral[x['_id']['codigo-projeto-unificado']] = x['despesa_impostos']
+        else:    
+            dicio_geral[x['_id']['codigo-projeto-unificado']] += x['despesa_impostos']
+
     for y in total_deducoes:
-        dicio_deducoes[y['_id']['codigo-projeto-unificado']] = y['despesa_deducoes']
+        if y['_id']['codigo-projeto-unificado'] not in dicio_geral:
+            dicio_geral[y['_id']['codigo-projeto-unificado']] = y['despesa_deducoes']
+        else:    
+            dicio_geral[y['_id']['codigo-projeto-unificado']] += y['despesa_deducoes']
 
-    for cc in dicio_relatorio:
+    for cc in dicio_geral:
+
         # aqui o código ira tentar somar o valor da despesa caso a chave contrato exista no dicionario
-        try:
-            soma_total += dicio_financeiro[cc]
-        except:
-            pass
-        try:
-            soma_total += dicio_folha[cc]
-        except:
-            pass
-        try:            
-            soma_total += dicio_relatorio[cc]
-        except:
-            pass
-        try:            
-            soma_total += dicio_impostos[cc]
-        except:
-            pass
-        try:            
-            soma_total += dicio_deducoes[cc]
-        except:
-            pass
+        # try:
+        #     soma_total += dicio_financeiro[cc]
+        # except:
+        #     pass
+        # try:
+        #     soma_total += dicio_folha[cc]
+        # except:
+        #     pass
+        # try:            
+        #     soma_total += dicio_relatorio[cc]
+        # except:
+        #     pass
+        # try:            
+        #     soma_total += dicio_impostos[cc]
+        # except:
+        #     pass
+        # try:            
+        #     soma_total += dicio_deducoes[cc]
+        # except:
+        #     pass
 
-        lista_final.append((cc,soma_total))
-        soma_total = 0
+        lista_final.append((cc,dicio_geral[cc]))
+        # soma_total = 0
     
     return lista_final
 
@@ -247,6 +269,9 @@ def total_despesa_competencia(competencia, db=back.db):
     return lista_final
 
 
+# --------------------------------------FIM FUNÇÕES DESPESAS------------------------------------
+
+# ------------------------------------FUNÇÕES MEDIÇÃO------------------------------------
 def medicao(competencia, db=back.db):
 
     colecao_medicao = db.get_collection('Receitas')
@@ -321,6 +346,8 @@ def competencias(db=back.db):
     comp = ordenar_datas(list(filtro))
 
     return comp
+
+# ---------------------------------------FIM FUNÇÕES MEDIÇÃO--------------------------------------------
 
 # Função que irá retornar uma lista de listas de alguns dos elementos da tabela de Cadastro Impostos
 def cad_impostos(db=back.db):
