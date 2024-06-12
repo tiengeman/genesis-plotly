@@ -268,6 +268,40 @@ def total_despesa_competencia(competencia, db=back.db):
     
     return lista_final
 
+def despesas_diretoria_competencia(competencia,db=back.db):
+    collection_despesa_diretoria = db.get_collection('Despesas Diretoria')
+
+    pipeline_diretoria = [
+        {"$match": {"competencia-despesa": competencia}},
+        {'$group':{'_id':{'codigo-projeto-unificado':'$codigo-projeto-unificado'},'despesa_diretoria':{'$sum':'$valor-despesa'}}}
+    ]
+
+    retorno = collection_despesa_diretoria.aggregate(pipeline_diretoria)
+
+    lista_despesas = []
+
+    for i in retorno:
+        lista_despesas.append((i['_id']['codigo-projeto-unificado'],i['despesa_diretoria']))
+
+    return lista_despesas
+    # print(lista_despesas)
+
+def despesas_diretoria_total(db=back.db):
+    collection_despesa_diretoria = db.get_collection('Despesas Diretoria')
+
+    pipeline = [
+        {'$group':{'_id':{'codigo-projeto-unificado':'$codigo-projeto-unificado'},'despesa_diretoria':{'$sum':'$valor-despesa'}}}
+    ]
+
+    retorno = collection_despesa_diretoria.aggregate(pipeline)
+
+    lista_despesas = []
+
+    for i in retorno:
+        lista_despesas.append((i['_id']['codigo-projeto-unificado'],i['despesa_diretoria']))
+
+    return lista_despesas
+
 
 # --------------------------------------FIM FUNÇÕES DESPESAS------------------------------------
 
