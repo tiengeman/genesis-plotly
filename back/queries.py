@@ -347,6 +347,91 @@ def competencias(db=back.db):
 
     return comp
 
+def medicao_diretoria_competencia(competencia,db=back.db):
+    collection_receitas_diretoria = db.get_collection('Receitas Diretoria')
+    colecao_contratos = db.get_collection('Cadastro Contratos')
+    colecao_filial = db.get_collection('Filiais')
+
+    pipeline = [
+        {"$match": {"competencia-medicao": competencia}},
+        {'$group':{'_id':{'codigo-projeto-unificado':'$codigo-projeto-unificado'},'receita_diretoria':{'$sum':'$valor-medicao'}}}
+    ]
+
+    retorno = collection_receitas_diretoria.aggregate(pipeline)
+
+    lista_descricao_projeto = []
+    lista_centro_de_custo = []
+    lsita_receitas = []
+    lista_locais = []
+
+
+    for i in retorno:
+
+        lsita_receitas.append(i['receita_diretoria'])
+        lista_centro_de_custo.append(i['_id']['codigo-projeto-unificado'])
+
+        # a variavel contrato serve para buscar no banco uma linha que tenha a descrio de projeto atual do loop.
+        # contrato = colecao_medicao.find_one({'descricao-projeto':i['_id']['descricao-projeto']})
+
+        # a variavel retorno usa a variavel contrato como fonte para buscar um codigo de projeto original
+        retorno = colecao_contratos.find_one({'projetosapiens-contratos':i['_id']['codigo-projeto-unificado']})
+
+        lista_descricao_projeto.append(retorno["descricao-contratos"])
+
+        # if retorno == None:
+        #     retorno = colecao_contratos.find_one({'projetosapiens-contratos':contrato['codigo-projeto-unificado']})
+        # print(f'retorno:{retorno}')
+        filial = colecao_filial.find_one({'codigo-filial':retorno['filial-contratos']})
+        # print(f'filial{filial}')
+        local = filial['municipio-filial']
+        # print(f'local:{local}')
+        lista_locais.append(str(filial['codigo-filial'])+' - '+local)
+        # lista_geral.append((str(filial['codigo-filial'])+' - '+local,retorno["descricao-contratos"],i['_id']['codigo-projeto-unificado'],i['receita_diretoria']))
+
+    return lista_descricao_projeto,lsita_receitas,lista_centro_de_custo,lista_locais
+
+def medicao_total_diretoria(db=back.db):
+
+    collection_receitas_diretoria = db.get_collection('Receitas Diretoria')
+    colecao_contratos = db.get_collection('Cadastro Contratos')
+    colecao_filial = db.get_collection('Filiais')
+
+    pipeline = [
+        {'$group':{'_id':{'codigo-projeto-unificado':'$codigo-projeto-unificado'},'receita_diretoria':{'$sum':'$valor-medicao'}}}
+    ]
+
+    retorno = collection_receitas_diretoria.aggregate(pipeline)
+
+    lsita_receitas = []
+    lista_descricao_projeto = []
+    lista_centro_de_custo = []
+
+    lista_geral = []
+
+
+    for i in retorno:
+
+        lsita_receitas.append(i['receita_diretoria'])
+        lista_centro_de_custo.append(i['_id']['codigo-projeto-unificado'])
+
+        # a variavel contrato serve para buscar no banco uma linha que tenha a descrio de projeto atual do loop.
+        # contrato = colecao_medicao.find_one({'descricao-projeto':i['_id']['descricao-projeto']})
+
+        # a variavel retorno usa a variavel contrato como fonte para buscar um codigo de projeto original
+        retorno = colecao_contratos.find_one({'projetosapiens-contratos':i['_id']['codigo-projeto-unificado']})
+        
+        # print(i['_id']['codigo-projeto-unificado'])
+        if retorno != None:
+            lista_descricao_projeto.append(retorno["descricao-contratos"])
+            lista_geral.append((retorno["descricao-contratos"],i['_id']['codigo-projeto-unificado'],i['receita_diretoria']))
+        else:
+            lista_descricao_projeto.append(None)
+            lista_geral.append((None,i['_id']['codigo-projeto-unificado'],i['receita_diretoria']))
+
+
+    # print(lista_geral)
+    return lista_descricao_projeto,lsita_receitas,lista_centro_de_custo
+
 # ---------------------------------------FIM FUNÇÕES MEDIÇÃO--------------------------------------------
 
 # Função que irá retornar uma lista de listas de alguns dos elementos da tabela de Cadastro Impostos
