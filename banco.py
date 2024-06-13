@@ -290,8 +290,8 @@ def lista_contratos():
     
     return lista_contrato
 
-def detalha_despesas(competencia, contrato):
-    lista_desp = back.detalha_despesas(competencia, contrato)
+def detalha_despesas():
+    lista_desp = back.detalha_despesas()
     nome_colunas = ['ID', 'PROJETO-UNI', 'DESCRIÇÃO', 'PROJETO-ORI', 'DOCUMENTO', 'AGENTE', 'DESC. AGENTE', 'VALOR ORI', 'VALOR INVEST.', 'VALOR DESP', 'COD. CLASSE', 'DESC. CLASSE', 'DATA', 'COMPETENCIA', 'CATEGORIA',
                     'OBSERVAÇÕES', 'TIPO']
     dicionario_de_listas = {coluna: [] for coluna in nome_colunas}
@@ -304,9 +304,9 @@ def detalha_despesas(competencia, contrato):
 
     return df_impostos
 
-def detalha_receita(competencia, contrato):
+def detalha_receita():
 
-    lista_receita = back.detalha_receita(competencia, contrato)
+    lista_receita = back.detalha_receita()
     nome_colunas = ['ID', 'PROJETO-UNI', 'DESCRIÇÃO', 'PROJETO-ORI', 'DOCUMENTO', 'CLIENTE', 'DATA', 'VALOR', 'VALOR-RETENCAO', 'VALOR-ADM', 'COMPETENCIA', 'FILIAL']
     dicionario_de_listas = {coluna: [] for coluna in nome_colunas}
     for linha in lista_receita:

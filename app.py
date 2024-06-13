@@ -10,7 +10,6 @@ import pages.relacao as relacao
 import pages.cadastro_projetos as cadastro_projetos
 import pages.impostos as impostos
 import pages.encargos as encargos
-import pages.detalhamento as detalhamento
 import pages.cadastro as cadastro
 from constants import *
 from dash.exceptions import PreventUpdate
@@ -34,8 +33,6 @@ sidebar = dbc.Nav(
                             [
                                 dbc.NavLink('Gerencial', href='/gerencial', className='nav-link'),
                                 dbc.NavLink('Diretoria', href='/diretoria', className='nav-link'),
-                                dbc.NavLink('Relação', href='/relacao', className='nav-link'),
-                                dbc.NavLink('Detalhamento', href='/detalhamento', className='nav-link')
                             ],
                             title='Relatórios',
                             item_id='accordion-item',
@@ -58,7 +55,8 @@ sidebar = dbc.Nav(
                                 dbc.NavLink('Cadastro Projetos', href='/cadastro_projetos', className='nav-link'),
                                 dbc.NavLink('Cadastro de Impostos', href='/impostos', className='nav-link'),
                                 dbc.NavLink('Cadastro de Encargos', href='/encargos', className='nav-link'),
-                                dbc.NavLink('Cadastro de Usuários', href='/cadastro', className='nav-link')
+                                dbc.NavLink('Cadastro de Usuários', href='/cadastro', className='nav-link'),
+                                dbc.NavLink('Cadastro de Relacionamento', href='/relacao', className='nav-link'),
                             ],
                             title='Cadastros',
                             item_id='accordion-item',
@@ -150,8 +148,8 @@ def update_content(pathname):
         return impostos.layout
     elif pathname == '/encargos':
         return encargos.layout
-    elif pathname == '/detalhamento':
-        return detalhamento.layout
+    # elif pathname == '/detalhamento':
+    #     return detalhamento.layout
     elif pathname == '/cadastro':
         return cadastro.layout
     else:
@@ -178,9 +176,9 @@ def update_tables(value):
 
 def update_table_detalhamento(output_id, value, contrato):
     if output_id == 'tabela-detalhamento-container-medicao':
-        return detalhamento.atualizar_tabela_medicao(value, contrato)
+        return gerencial.atualizar_tabela_medicao(value, contrato)
     elif output_id == 'tabela-detalhamento-container-despesa':
-        return detalhamento.atualizar_tabela_despesa(value, contrato)
+        return gerencial.atualizar_tabela_despesa(value, contrato)
 
 #callback para atualizar as tabelas gerenciais de acordo com a competencia
 @app.callback(
