@@ -553,21 +553,11 @@ def detalha_despesas(db=back.db):
 
     return lista_geral
 
-def detalha_receita(competencia,contrato,db=back.db):
+def detalha_receita(db=back.db):
     
     colecao_receitas = db.get_collection('Receitas')
 
-    if competencia == None and contrato == None:
-        retorno_receita = colecao_receitas.find()
-    
-    elif competencia == None:
-        retorno_receita = colecao_receitas.find({'descricao-projeto':contrato})
-
-    elif contrato == None:
-        retorno_receita = colecao_receitas.find({'competencia-medicao':competencia})
-    
-    else:
-        retorno_receita = colecao_receitas.find({'descricao-projeto':contrato,'competencia-medicao':competencia})
+    retorno_receita = colecao_receitas.find()
 
 
     lista_geral = []
