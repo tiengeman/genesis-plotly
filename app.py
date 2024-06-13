@@ -1,4 +1,5 @@
 import base64
+import os
 from flask import Flask, render_template, redirect, url_for, session, request,send_from_directory
 from msal import ConfidentialClientApplication, SerializableTokenCache
 import uuid
@@ -26,6 +27,7 @@ from back.models import *
 from pymongo import MongoClient
 from passlib.hash import sha256_crypt
 from flask import send_from_directory
+import datetime
 
 # Constants
 # logo = 'https://i0.wp.com/engeman.net/wp-content/uploads/2024/04/LOGO_ENGEMAN_HORIZONTAL-e1714498268589.png?w=851&ssl=1'
@@ -33,7 +35,8 @@ from flask import send_from_directory
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP])
 server = app.server
 
-UPLOAD_DIRECTORY = os.environ.get('UPLOAD_DIRECTORY', 'uploaded_images')
+#  UPLOAD_DIRECTORY = os.environ.get('UPLOAD_DIRECTORY', 'uploaded_images')
+
 
 CLIENT_ID = '67e2167c-bb04-48d3-a10f-e9d9d618ad9d'
 CLIENT_SECRET = 's2a8Q~dCSTsX-oPuaZuQSUOcnGjtAIlwv9oyLbWb'
@@ -200,7 +203,7 @@ def _save_cache(cache):
     if cache.has_state_changed:
         session['token_cache'] = cache.serialize()
 
-# Função para obter URL de autenticação na página de login
+## Função para obter URL de autenticação na página de login
 def initiate_microsoft_login():
     with server.test_request_context():
         session["state"] = str(uuid.uuid4())
@@ -370,44 +373,54 @@ def update_table(n_clicks):
         return df_impostos.to_dict('records')
 
 
-# CALBACKS DA TELA REGISTRO ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° finalmenrte deu certo aaaaaahhhhhh
-# @app.callback(
-#     Output('output-message', 'children'),
-#     [Input('register-button', 'n_clicks')],
-#     [State('nome', 'value'), State('email', 'value'), State('senha', 'value'), State('confirmar-senha', 'value'), State('setor', 'value')]
+# ============================================== CALLBACKS DA TELA CADASTRO =========================================================== 
+@app.callback(
+    Output('output-message-cadastro', 'children'),
+#    Output('url', 'pathname'),
+    [Input('register-button', 'n_clicks')], # [Input('fzlogin-button', 'n_clicks_fz')],
+    [State('nome', 'value'), State('email', 'value'), State('senha', 'value'), State('confirmar-senha', 'value'), State('setor', 'value')]
 
-# )
-# def register_user(n_clicks, nome, email, senha, confirmar_senha, setor):
-#     if n_clicks > 0:
-#         if not nome or not email or not senha or not confirmar_senha or not setor:
-#             return 'Por favor, preencha todos os campos.'
+)
+def register_user(n_clicks, nome, email, senha, confirmar_senha, setor):
+    if n_clicks > 0:
+        if not nome or not email or not senha or not confirmar_senha or not setor:
+            return 'Por favor, preencha todos os campos.'
 
-#         if senha != confirmar_senha:
-#             return 'As senhas não coincidem. Por favor, tente novamente.'
+        if senha != confirmar_senha:
+            return 'As senhas não coincidem. Por favor, tente novamente.'
 
-#         try:
-#             client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
-#             db = client['Project']
-#             users_collection = db['Usuários']
+        try:
+            client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
+            db = client['Project']
+            users_collection = db['Usuários']
             
-#             # Verificar se o email já está registrado
-#             if users_collection.find_one({"email": email}):
-#                 return 'Email já registrado. Por favor, faça o login.'
+            # Verificar se o email já está registrado
+            if users_collection.find_one({"email": email}):
+                return 'Email já registrado. Por favor, faça o login.'
 
-#             # Gerar hash da senha
-#             hashed_senha = sha256_crypt.hash(senha) #Dê certo, pfv eu preciso largar
+            # Gerar hash da senha
+            hashed_senha = sha256_crypt.hash(senha) #Dê certo, pfv eu preciso largar
 
-#             user_document = {
-#                 'nome': nome,
-#                 'email': email, 
-#                 'senha': hashed_senha, #hash.senha
-#                 'setor': setor
-#             }
-#             result = users_collection.insert_one(user_document)
-#             print("Documento inserido:", result)
-#             return 'Cadastro realizado com sucesso!'
-#         except Exception as e:
-#             return f'Erro ao realizar o cadastro: {e}'
+            user_document = {
+                'nome': nome,
+                'email': email, 
+                'senha': hashed_senha, #hash.senha
+                'setor': setor
+            }
+            result = users_collection.insert_one(user_document)
+            print("Documento inserido:", result)
+            return '/home' #, 'Cadastro realizado com sucesso!' #redireciona para a página inicial com sessão ativa
+        except Exception as e:
+            return f'Erro ao realizar o cadastro: {e}'
+        
+    raise PreventUpdate
+    # return '', None
+
+# def fzlogin_button(n_clicks_fz):
+#     if n_clicks_fz:
+#         return '/login'
+#     return None
+
 
 # CALLBACK DA TELA DE PERFIL DO USUÁRIO ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° 
 @app.callback(
@@ -415,6 +428,7 @@ def update_table(n_clicks):
     [Input('url', 'pathname')]
 )
 def load_user_data(pathname):
+ 
     if pathname == '/user' and 'user_email' in session:
         client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
         db = client['Project']
@@ -435,34 +449,65 @@ def load_user_data(pathname):
             ])
         return None
 # CALLBACK PARA UPLOAD DA IMAGEM 
+
+external_stylessheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
 @app.callback(
     Output('output-image-upload','children'),
     [Input('upload-image', 'contents')],
     [State('upload-image', 'filename')]
 )
-def upload_output(content, filename):
-    if content is not None:
-        data = content.encode("utf8").split(b";base64,")[1]
-        file_path = os.path.join(UPLOAD_DIRECTORY, filename)
 
-        with open(file_path, "wb") as fh:
-            fh.write(base64.decodebytes(data))
+def parse_contents(contents, filename, date):
+    return html.Div([
+        html.H5(filename),
+        html.H6(datetime.datetime.fromtimestamp(date)),
 
-        client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
-        db = client['Project']
-        collection = db['Usuários']
-        profile_pic = f'/uploaded_images/{filename}'
-        collection.update_one({'email': session['user_email']}, {'$set': {'profile_pic': profile_pic}})
+        # HTML images accept base64 encoded strings in the same format
+        # that is supplied by the upload
+        html.Img(src=contents),
+        html.Hr(),
+        html.Div('Raw Content'),
+        html.Pre(contents[0:200] + '...', style={
+            'whiteSpace': 'pre-wrap',
+            'wordBreak': 'break-all'
+        })
+    ])
 
-        return html.Div([
-            html.Img(src=profile_pic, style={'border-radius': '50%', 'width': '150px', 'height': '150px'})
-        ])
-    return None
+@app.callback(Output('output-image-upload', 'children'),
+              Input('upload-image', 'contents'),
+              State('upload-image', 'filename'),
+              State('upload-image', 'last_modified'))
+def update_output(list_of_contents, list_of_names, list_of_dates):
+    if list_of_contents is not None:
+        children = [
+            parse_contents(c, n, d) for c, n, d in
+            zip(list_of_contents, list_of_names, list_of_dates)]
+        return children
+# def upload_output(content, filename):
+#     if content is not None:
+#         data = content.encode("utf8").split(b";base64,")[1]
+#         file_path = os.path.join(UPLOAD_DIRECTORY, filename)
 
-@server.route('/uploaded_images/<filename>')
-def uploaded_images(filename):
-    return send_from_directory(UPLOAD_DIRECTORY, filename)
+#         with open(file_path, "wb") as fh:
+#             fh.write(base64.decodebytes(data))
 
+#         client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
+#         db = client['Project']
+#         collection = db['Usuários']
+#         profile_pic = f'/uploaded_images/{filename}'
+#         collection.update_one({'email': session['user_email']}, {'$set': {'profile_pic': profile_pic}})
+
+#         return html.Div([
+#             html.Img(src=profile_pic, style={'border-radius': '50%', 'width': '150px', 'height': '150px'})
+#         ])
+#     return None
+
+# @server.route('/uploaded_images/<filename>')
+# def uploaded_images(filename):
+#     return send_from_directory(UPLOAD_DIRECTORY, filename)
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # @app.callback(
 #     Output('output-image-upload','children'),
@@ -500,21 +545,23 @@ def uploaded_images(filename):
 
 # CALLBACKS DA TELA LOGIN ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° °
 @app.callback(
-    Output('output-message', 'children'),
+#    Output('url', 'href'),
+    Output('output-message-login', 'children'),
     [Input('login-button', 'n_clicks'), Input('ms-button', 'n_clicks')],
-    [State('email', 'value'), State('senha', 'value')]
+    [State('email', 'value'), State('senha', 'value')],
+    prevent_initial_call=True, ##########
 )
 def handle_login(n_clicks_login, n_clicks_ms, email, senha):
     ctx = dash.callback_context
 
     if not ctx.triggered:
-        return '', None #dash.no_update
+        raise PreventUpdate#return '', None #dash.no_update
     
     button_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
     if button_id == 'login-button':
         if email and senha:
-            # Aqui você pode adicionar lógica de autenticação com o banco de dados
+
             client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
             db = client['Project']
             users_collection = db['Usuários']
@@ -522,19 +569,126 @@ def handle_login(n_clicks_login, n_clicks_ms, email, senha):
 
             if user and sha256_crypt.verify(senha, user['senha']):
                 session['user_email'] = email
-                return f'Login realizado com email: {email}'
+                return 'Login realizado com sucesso!' ,'/home' #f'Login realizado com email: {email}'
             else:
                 return 'Credenciais inválidas. Por favor, tente novamente.'
         else:
             return 'Por favor, preencha os campos de email e senha'
     elif button_id == 'ms-button':
-        return 'Redirecionado para login com Microsoft'
+        return '/loginms'    #Redirecionar para o MS login endpoint
+        #webbrowser.open('https://login.microsoftonline.com/{TENANT_ID}')
+        # return url_for('/loginms'), ''
     return 'Erro desconhecido. Por favor, tente novamente.'
-##    return '', dash.no_update
+        # return redirect(url_for('loginms'))
+
+    
+#        print ('Redirecionado para login com Microsoft')
+#    return 'Erro desconhecido. Por favor, tente novamente.'
+
+# @app.callback(
+#     Output('url', 'href'),
+#     [Input('redirect-store', 'data')],    
+#     prevent_initial_call=True
+    
+# )
+
+# def redirect_to(data):
+#     if data:
+#         return data.get('url')
+#     return '', None #dash.no_update
 
 
-#========================================= INTEGRANDO O MSAL LOGIN ====================================================
 
+
+
+# #============================================== LOGIN COM MICROSOFT ===========================================================
+
+# # Configuração do aplicativo no azure
+CLIENT_ID = '67e2167c-bb04-48d3-a10f-e9d9d618ad9d'
+CLIENT_SECRET = 's2a8Q~dCSTsX-oPuaZuQSUOcnGjtAIlwv9oyLbWb'
+TENANT_ID = '751b9ffa-fe40-4f7f-90a6-e3276de42583'
+AUTHORITY = f'https://login.microsoftonline.com/{TENANT_ID}'
+REDIRECT_PATH = '/getAToken'
+SCOPE = ['User.Read']
+
+# Função para obter URL de autenticação na página de login
+# def initiate_microsoft_login():
+#     with server.test_request_context():
+#         session["state"] = str(uuid.uuid4())
+#         auth_url = _build_auth_url(scopes=SCOPE, state=session["state"])
+#         return auth_url
+
+# def _build_msal_app(cache=None, authority=None):
+#     return ConfidentialClientApplication(
+#         CLIENT_ID, authority=authority or AUTHORITY,
+#         client_credential=CLIENT_SECRET, token_cache=cache)
+
+# def _build_auth_url(authority=None, scopes=None, state=None):
+#     return _build_msal_app(authority=authority).get_authorization_request_url(
+#         scopes or [],
+#         state=state or str(uuid.uuid4()),
+#         redirect_uri=url_for('authorized', _external=True))
+
+# def _load_cache():
+#     cache = SerializableTokenCache()
+#     if session.get('token_cache'):
+#         cache.deserialize(session['token_cache'])
+#     return cache
+
+# def _save_cache(cache):
+#     if cache.has_state_changed:
+#         session['token_cache'] = cache.serialize()
+
+
+# # - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# # Precisa de uma rota principal mas não faz nada
+# @app.routes('/')
+# def index():
+#     return 'Flask MSAL'
+
+msal_client = ConfidentialClientApplication(
+    CLIENT_ID, 
+    authority=AUTHORITY, 
+    client_credential=CLIENT_SECRET,
+    token_cache=SerializableTokenCache()
+)
+
+@server.route('/loginms')
+def loginms():
+    session["state"] = str(uuid.uuid4())
+    auth_url = msal_client.get_authorization_request_url(
+        SCOPE, 
+        state=session["state"], 
+        redirect_uri=url_for("authorized", _external=True)
+    )
+    return redirect(auth_url)
+
+
+@server.route(REDIRECT_PATH)
+def authorized():
+    if request.args.get('state') != session.get("state"):
+        return redirect(url_for("home"))
+
+    if "error" in request.args:
+        return f"Login failed: {request.args['error']} - {request.args.get('error_description')}", 403  #erro 403
+
+    if request.args.get('code'):
+#        cache = msal_client.token_cache
+        result = msal_client.acquire_token_by_authorization_code(
+            request.args['code'], 
+            scopes=SCOPE, 
+            redirect_uri=url_for("authorized", _external=True)
+        )
+        if "error" in result:
+            return f"Error in token acquisition: {result['error']} - {result.get('error_description')}"
+        session["user"] = result.get("id_token_claims")
+        return redirect(url_for("home"))
+    return "Authorization failed."
+
+@server.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('home'))
 
 
 
