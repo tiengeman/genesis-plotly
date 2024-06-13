@@ -26,14 +26,52 @@ server = app.server
 sidebar = dbc.Nav(
     [
         dbc.NavItem(dbc.NavLink('Home', href='/home', className='nav-link')),
-        dbc.NavItem(dbc.NavLink('Gerencial', href='/gerencial', className='nav-link')),
-        dbc.NavItem(dbc.NavLink('Diretoria', href='/diretoria', className='nav-link')),
-        dbc.NavItem(dbc.NavLink('Relação', href='/relacao', className='nav-link')),
-        dbc.NavItem(dbc.NavLink('Cadastro Projetos', href='/cadastro_projetos', className='nav-link')),
-        dbc.NavItem(dbc.NavLink('Impostos', href='/impostos', className='nav-link')),
-        dbc.NavItem(dbc.NavLink('Encargos', href='/encargos', className='nav-link')),
-        dbc.NavItem(dbc.NavLink('Detalhamento', href='/detalhamento', className='nav-link')),
-        dbc.NavItem(dbc.NavLink('Cadastro', href='/cadastro', className='nav-link')),
+        html.Div(
+            [
+                dbc.Accordion(
+                    [
+                        dbc.AccordionItem(
+                            [
+                                dbc.NavLink('Gerencial', href='/gerencial', className='nav-link'),
+                                dbc.NavLink('Diretoria', href='/diretoria', className='nav-link'),
+                                dbc.NavLink('Relação', href='/relacao', className='nav-link'),
+                                dbc.NavLink('Detalhamento', href='/detalhamento', className='nav-link')
+                            ],
+                            title='Relatórios',
+                            item_id='accordion-item',
+                            className='nav-link',
+                        ),
+                    ],
+                    id='accordion-relatorios',
+                    flush=True,
+                    start_collapsed=True,
+                ),
+            ],
+            className='nav-item',
+        ),
+        html.Div(
+            [
+                dbc.Accordion(
+                    [
+                        dbc.AccordionItem(
+                            [
+                                dbc.NavLink('Cadastro Projetos', href='/cadastro_projetos', className='nav-link'),
+                                dbc.NavLink('Cadastro de Impostos', href='/impostos', className='nav-link'),
+                                dbc.NavLink('Cadastro de Encargos', href='/encargos', className='nav-link'),
+                                dbc.NavLink('Cadastro de Usuários', href='/cadastro', className='nav-link')
+                            ],
+                            title='Cadastros',
+                            item_id='accordion-item',
+                            className='nav-link',
+                        ),
+                    ],
+                    id='accordion-cadastros',
+                    flush=True,
+                    start_collapsed=True,
+                ),
+            ],
+            className='nav-item',
+        ),
     ],
     vertical=True,  # Make the nav items stack vertically
     pills=True,  # Make the nav items take up the full width of the sidebar
