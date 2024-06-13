@@ -78,19 +78,19 @@ def total_despesa(db=back.db):
 
     # filtros que agrupam os campos descricao-projeto e somam os valores de valor-original-despesa de cada contrato
     pipeline_financeiro =  [ 
-        {'$group':{'_id':{'codigo-projeto-unificado':'$codigo-projeto-unificado'},'despesa_financeiro':{'$sum':'$valor-despesa','depesa_ivestimento':{'$sum':'$valor-investimento-despesa'}}}}
+        {'$group':{'_id':{'codigo-projeto-unificado':'$codigo-projeto-unificado'},'despesa_financeiro':{'$sum':'$valor-despesa'}}}
     ]
     pipeline_folha  = [
-        {'$group':{'_id':{'codigo-projeto-unificado':'$codigo-projeto-unificado'},'despesa_folha':{'$sum':'$valor-despesa','depesa_ivestimento':{'$sum':'$valor-investimento-despesa'}}}}
+        {'$group':{'_id':{'codigo-projeto-unificado':'$codigo-projeto-unificado'},'despesa_folha':{'$sum':'$valor-despesa'}}}
     ]
     pipeline_relatorio = [
-        {'$group':{'_id':{'codigo-projeto-unificado':'$codigo-projeto-unificado'},'despesa_relatorio':{'$sum':'$valor-despesa','depesa_ivestimento':{'$sum':'$valor-investimento-despesa'}}}}
+        {'$group':{'_id':{'codigo-projeto-unificado':'$codigo-projeto-unificado'},'despesa_relatorio':{'$sum':'$valor-despesa'}}}
     ]
     pipeline_impostos = [
-        {'$group':{'_id':{'codigo-projeto-unificado':'$codigo-projeto-unificado'},'despesa_impostos':{'$sum':'$valor-despesa'},'depesa_ivestimento':{'$sum':'$valor-investimento-despesa'}}}
+        {'$group':{'_id':{'codigo-projeto-unificado':'$codigo-projeto-unificado'},'despesa_impostos':{'$sum':'$valor-despesa'}}}
     ]
     pipeline_deducoes = [
-        {'$group':{'_id':{'codigo-projeto-unificado':'$codigo-projeto-unificado'},'despesa_deducoes':{'$sum':'$valor-despesa','depesa_ivestimento':{'$sum':'$valor-investimento-despesa'}}}}
+        {'$group':{'_id':{'codigo-projeto-unificado':'$codigo-projeto-unificado'},'despesa_deducoes':{'$sum':'$valor-despesa'}}}
     ]
 
     # Consultas que utilizam os filtros a cima. O retorno dessas consultas são dicionarios. Ex:. {'_id': {'descricao-projeto': 'ADM LOCAL (MACAÉ)'}, 'despesa_financeiro': 450681.34}
@@ -114,8 +114,6 @@ def total_despesa(db=back.db):
     for i in total_financeiro:
         if i['_id']['codigo-projeto-unificado'] not in dicio_geral:
             dicio_geral[i['_id']['codigo-projeto-unificado']] = i['despesa_financeiro']
-        elif i['_id']['codigo-projeto-unificado'] == 888:
-            dicio_geral[k['_id']['codigo-projeto-unificado']] += k['depesa_ivestimento']
         else:
             dicio_geral[i['_id']['codigo-projeto-unificado']] += i['despesa_financeiro']
 
@@ -124,8 +122,6 @@ def total_despesa(db=back.db):
         if j['_id']['codigo-projeto-unificado'] not in dicio_geral:
             # print(f'entrou no if com o valor de cc :{i['_id']['codigo-projeto-unificado']}')
             dicio_geral[j['_id']['codigo-projeto-unificado']] = j['despesa_folha']
-        elif j['_id']['codigo-projeto-unificado'] == 888:
-            dicio_geral[k['_id']['codigo-projeto-unificado']] += k['depesa_ivestimento']
         else:
             dicio_geral[j['_id']['codigo-projeto-unificado']] += j['despesa_folha']
     
@@ -134,8 +130,6 @@ def total_despesa(db=back.db):
     for k in total_relatorio:
         if k['_id']['codigo-projeto-unificado'] not in dicio_geral:
             dicio_geral[k['_id']['codigo-projeto-unificado']] = k['despesa_relatorio']
-        elif k['_id']['codigo-projeto-unificado'] == 888:
-            dicio_geral[k['_id']['codigo-projeto-unificado']] += k['depesa_ivestimento']
         else:    
             dicio_geral[k['_id']['codigo-projeto-unificado']] += k['despesa_relatorio']
 
@@ -144,16 +138,12 @@ def total_despesa(db=back.db):
     for x in total_impostos:
         if x['_id']['codigo-projeto-unificado'] not in dicio_geral:
             dicio_geral[x['_id']['codigo-projeto-unificado']] = x['despesa_impostos']
-        elif x['_id']['codigo-projeto-unificado'] == 888:
-            dicio_geral[k['_id']['codigo-projeto-unificado']] += k['depesa_ivestimento']
         else:    
             dicio_geral[x['_id']['codigo-projeto-unificado']] += x['despesa_impostos']
 
     for y in total_deducoes:
         if y['_id']['codigo-projeto-unificado'] not in dicio_geral:
             dicio_geral[y['_id']['codigo-projeto-unificado']] = y['despesa_deducoes']
-        elif y['_id']['codigo-projeto-unificado'] == 888:
-            dicio_geral[k['_id']['codigo-projeto-unificado']] += k['depesa_ivestimento']
         else:    
             dicio_geral[y['_id']['codigo-projeto-unificado']] += y['despesa_deducoes']
 
