@@ -38,15 +38,20 @@ layout = dbc.Container(
         dbc.Row(
             dbc.Col(
                 dbc.Button('Cadastrar', id='register-button', n_clicks=0),
-                width='auto',
+                width='50px',
                 className='d-flex justify-content-center'
             )
         ),
         dbc.Row(
             dbc.Col(
-                html.Div(id='output-message', className='text-center mt-3')
+                html.Div(id='output-message-cadastro', className='text-center mt-3')
             )
         ),
+        dbc.Row(
+            dbc.Col(
+                html.Button( 'Ou Faça Login', id='fzlogin-button', n_clicks=0)
+            )
+        )
     ],
     fluid=True
 )

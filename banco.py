@@ -41,9 +41,9 @@ def tabela(mes): #função que gera a tabela principal da aba gerencial
                                       'C.CUSTOS':lista_cc, 
                                       'INATIVO':list_inativo,
                                       'FILIAL':list_filial, 
-                                      '(R) MEDIÇÃO':lista_soma_comp, 
-                                      '(D) DESPESAS':list_despesas, 
-                                      '(R-D) LUCRO':list_lucro, 
+                                      'MEDIÇÃO':lista_soma_comp, 
+                                      'DESPESAS':list_despesas, 
+                                      'LUCRO':list_lucro, 
                                       '%':list_perc,
                                       'MEDIÇÃO TOTAL': list_medicao_total,
                                       'DESPESAS TOTAIS': list_desp_totais,
@@ -85,9 +85,9 @@ def tabela_2(mes):
                                       'C.CUSTOS':lista_cc, 
                                       'INATIVO':list_inativo,
                                       'FILIAL':list_filial, 
-                                      '(R) MEDIÇÃO':lista_soma_comp, 
-                                      '(D) DESPESAS':list_despesas, 
-                                      '(R-D) LUCRO':list_lucro, 
+                                      'MEDIÇÃO':lista_soma_comp, 
+                                      'DESPESAS':list_despesas, 
+                                      'LUCRO':list_lucro, 
                                       '%':list_perc,
                                       'MEDIÇÃO TOTAL': list_medicao_total,
                                       'DESPESAS TOTAIS': list_desp_totais,
@@ -226,7 +226,23 @@ def cad_impostos():
     del dicionario_de_listas['ID']
     df_impostos = pd.DataFrame.from_dict(data=dicionario_de_listas)
     format_numeric_columns(df_impostos, ["RECEITATOTAL", 'PISRETIDO', 'PISPAGO', 'COFINSRETIDO', 'COFINSPAGO'])
+
     return df_impostos
+
+def cad_encargos():
+    lista_encargos = back.cad_encargos()
+    lista = []
+    nome_colunas = ['id', 'CODIGO', 'NOME', 'CNPJ', 'PERCENTUAL', 'CPRB', 'INICIO', 'FIM']
+    for a in lista_encargos:
+        dicionario_de_listas = {coluna: [] for coluna in nome_colunas}
+        for linha in a:
+            for i, valor in enumerate(linha):
+                dicionario_de_listas[nome_colunas[i]].append(valor)
+        del dicionario_de_listas['id']
+        df_encargos = pd.DataFrame.from_dict(data=dicionario_de_listas)
+        lista.append(df_encargos)
+    return lista
+    
 
 def enviar_contratos(lista):
     try:
@@ -234,3 +250,35 @@ def enviar_contratos(lista):
         return "Cadastro realizado com sucesso"
     except Exception as e:
         return str(e)
+    
+def lista_contratos():
+    lista_contrato, lista_soma_comp, lista_cc = back.medicao_total()
+    
+    return lista_contrato
+
+def detalha_despesas(competencia, contrato):
+    lista_desp = back.detalha_despesas(competencia, contrato)
+    nome_colunas = ['ID', 'PROJETO-UNI', 'DESCRIÇÃO', 'PROJETO-ORI', 'DOCUMENTO', 'AGENTE', 'DESC. AGENTE', 'VALOR ORI', 'VALOR INVEST.', 'VALOR DESP', 'COD. CLASSE', 'DESC. CLASSE', 'DATA', 'COMPETENCIA', 'CATEGORIA',
+                    'OBSERVAÇÕES', 'TIPO']
+    dicionario_de_listas = {coluna: [] for coluna in nome_colunas}
+    for linha in lista_desp:
+        for i, valor in enumerate(linha):
+            dicionario_de_listas[nome_colunas[i]].append(valor)
+    del dicionario_de_listas['ID']
+    df_impostos = pd.DataFrame.from_dict(data=dicionario_de_listas)
+    format_numeric_columns(df_impostos, ["VALOR ORI", 'VALOR INVEST.', 'VALOR DESP'])
+
+    return df_impostos
+
+def detalha_receita(competencia, contrato):
+    lista_receita = back.detalha_receita(competencia, contrato)
+    nome_colunas = ['ID', 'PROJETO-UNI', 'DESCRIÇÃO', 'PROJETO-ORI', 'DOCUMENTO', 'CLIENTE', 'DATA', 'VALOR', 'VALOR-RETENCAO', 'VALOR-ADM', 'COMPETENCIA', 'FILIAL']
+    dicionario_de_listas = {coluna: [] for coluna in nome_colunas}
+    for linha in lista_receita:
+        for i, valor in enumerate(linha):
+            dicionario_de_listas[nome_colunas[i]].append(valor)
+    del dicionario_de_listas['ID']
+    df_receita = pd.DataFrame.from_dict(data=dicionario_de_listas)
+    format_numeric_columns(df_receita, ["VALOR"])
+    
+    return df_receita

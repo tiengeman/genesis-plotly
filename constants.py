@@ -5,3 +5,5 @@ colors = {
     'white': '#FFFFFF',       # Branco
     'gray': '#616468'         # Cinza claro para elementos secundários
 }
+
+logo = 'assets\logo_genesis.png'

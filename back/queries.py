@@ -426,3 +426,5 @@ def ordenar_datas(lista):
     lista_ordenada = [data.replace(datetime.strptime(data.split('/')[0], '%B').strftime('%B').lower(), meses_pt[datetime.strptime(data.split('/')[0], '%B').strftime('%B').lower()]) for data in lista_ordenada]
 
     return lista_ordenada
+
+
