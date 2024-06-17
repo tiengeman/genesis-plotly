@@ -1,6 +1,6 @@
 import dash
 from flask import Flask, render_template, redirect, url_for, session, request, send_from_directory, sessions
-from flask_session import Session
+from flask_session import Session as FlaskSession
 import uuid
 import os
 import dash_bootstrap_components as dbc
@@ -31,20 +31,20 @@ from passlib.hash import sha256_crypt
 from msal import ConfidentialClientApplication, SerializableTokenCache
 import webbrowser
 
-
+# SERVIDOR FLASK
 server = Flask(__name__)
-server.config['SECRET_KEY'] = '68f170cb6f230e030cd3353b48666511a7bdc74600576a03'
-# server = app.server
-# server.secret_key = os.getenv('SECRET_KEY', '68f170cb6f230e030cd3353b48666511a7bdc74600576a03')
+server.secret_key = os.getenv('SECRET_KEY', '68f170cb6f230e030cd3353b48666511a7bdc74600576a03')
+server.config['SESSION_TYPE'] = 'filesystem'  
 
-# if not session.get('user_email'):
-#     session['user_email'] = None
+FlaskSession(server)
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP])
-server = app.server
+# mudei por causa do flask
+app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP])
+app.title = 'Genesis'
+app.config.suppress_callback_exceptions = True
 
-# @server.route('/login')
-# def login_route():
+# @server.routes('/login')
+# def login_routes():
 #     return redirect('/login-page')
 
 
@@ -535,6 +535,8 @@ def register_user(n_clicks, nome, email, senha, confirmar_senha, setor, cargo):
     [State('email', 'value'), State('senha', 'value')],
     prevent_initial_call=True, ##########
 )
+
+
 def handle_login(n_clicks_login, n_clicks_ms, email, senha):
     ctx = dash.callback_context
 
@@ -553,15 +555,15 @@ def handle_login(n_clicks_login, n_clicks_ms, email, senha):
 
             if user and sha256_crypt.verify(senha, user['senha']):
                 session['user_email'] = email
-                return 'Login realizado com sucesso!' ,'/home' #f'Login realizado com email: {email}'
+                return '/perfil_user','Login realizado com sucesso!'  #f'Login realizado com email: {email}'
             else:
                 return 'Credenciais inválidas. Por favor, tente novamente.'
         else:
             return 'Por favor, preencha os campos de email e senha'
     elif button_id == 'ms-button':
-        return '/loginms'    #Redirecionar para o MS login endpoint
+        #return 'vs está logado'    #Redirecionar para o MS login endpoint
         #webbrowser.open('https://login.microsoftonline.com/{TENANT_ID}')
-        # return url_for('/loginms'), ''
+        return url_for('/loginms'), ''
     return 'Erro desconhecido. Por favor, tente novamente.'
         # return redirect(url_for('loginms'))
 
@@ -624,7 +626,7 @@ SCOPE = ['User.Read']
 
 # # - - - - - - - - - - - - - - - - - - - - - - - - - - 
 # # Precisa de uma rota principal mas não faz nada
-# @app.routes('/')
+# @app.routess('/')
 # def index():
 #     return 'Flask MSAL'
 
@@ -680,11 +682,12 @@ def logout():
     Output('data_nascimento', 'value'),
     Output('telefone', 'value'),
     Output('setor', 'value'),
-    Input('register-button', 'n_clicks')
+    Output('cargo', 'value'),
+    Input('url','pathname')
 )
 
-def get_user_data(n_clicks):
-    if n_clicks is not None and n_clicks > 0:
+def get_user_data(pathname):
+    if 'user_email' in session:
         email = session.get('user_email')
         client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
         db = client['Project']
@@ -701,7 +704,13 @@ def get_user_data(n_clicks):
             )
         else:
             return ('', '', '', '', '', '')
-    raise PreventUpdate
+    else:
+        return ('', '', '', '', '', '')
+    
+# @server.routes('/logout')
+# def logout():
+#     session.clear()
+#     return redirect(url_for('home'))
 
 # def update_user_data(pathname):
 #     email = pathname.split('/')[-1]
