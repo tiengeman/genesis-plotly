@@ -39,13 +39,14 @@ def pega_centro_custos(db=back.db):
     collection = db.get_collection('Cadastro Contratos')
     collection_filial = db.get_collection('Filiais')
 
+    planilha_aux = collection.find({'tipo-contratos':{'$ne':'ADITIVO'}})
 
-    desc = collection.distinct('descricao-contratos')
+    desc = planilha_aux.distinct('descricao-contratos')
 
     for i in desc:
         # print(f'Contrato: {i}')
         if i != None:
-            linha = collection.find_one({'descricao-contratos':i})
+            linha = collection.find_one({'descricao-contratos':i,'tipo-contratos':{'$ne':'ADITIVO'}})
             # print(linha['descricao-contratos'])
             # print(i)
             # print(linha)
