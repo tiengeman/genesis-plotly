@@ -510,11 +510,15 @@ def detalha_despesas(db=back.db):
     colecao_notas = db.get_collection('Despesas Relatório')
     colecao_fin = db.get_collection('Despesas Folha')
     colecao_folha = db.get_collection('Despesas Financeiro')
+    colecao_impostos = db.get_collection('Despesas Impostos')
+    colecao_deducoes = db.get_collection('Despesas Deduções')
 
     # if competencia == None and contrato == None:
     retorno_notas = colecao_notas.find()
     retorno_fin = colecao_fin.find()
     retorno_folha = colecao_folha.find()
+    retorno_impostos = colecao_impostos.find()
+    retorno_deducoes = colecao_deducoes.find()
     
     # elif competencia == None:
     #     retorno_notas = colecao_notas.find({'descricao-projeto':contrato})
@@ -546,6 +550,14 @@ def detalha_despesas(db=back.db):
     
     for k in retorno_folha:
         valores = k.values()
+        lista_geral.append(list(valores))
+    
+    for x in retorno_impostos:
+        valores = x.values()
+        lista_geral.append(list(valores))
+    
+    for y in retorno_deducoes:
+        valores = y.values()
         lista_geral.append(list(valores))
 
     # lista_geral.append(lista_notas)
