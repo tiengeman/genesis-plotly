@@ -83,16 +83,51 @@ layout = dbc.Card(style={'fontFamily': 'Arial, sans-serif', 'textAlign': 'center
                     ),
                 ]),
             ]),
+            dcc.Tab(label='Backlog', value='tab-4', children=[
+                html.H1(children='Backlog', style={'marginTop': '10px', 'color': colors['gray'], 'fontWeight': 'bold'}),
+                html.Div(style={'marginTop': '20px'}),
+            ]),
+            dcc.Tab(label='Ger. Geral', value='tab-5', children=[
+                html.H1(children='Gerência Geral', style={'marginTop': '10px', 'color': colors['gray'], 'fontWeight': 'bold'}),
+                html.Div(style={'marginTop': '20px'}),
+            ]),
+            dcc.Tab(label='Ger. Contratos', value='tab-6', children=[
+                html.H1(children='Gerência Contratos', style={'marginTop': '10px', 'color': colors['gray'], 'fontWeight': 'bold'}),
+                html.Div(style={'marginTop': '20px'}),
+            ]),
+            dcc.Tab(label='Ger. Administrativa', value='tab-7', children=[
+                html.H1(children='Gerência Contratos', style={'marginTop': '10px', 'color': colors['gray'], 'fontWeight': 'bold'}),
+                html.Div(style={'marginTop': '20px'}),
+            ]),
+            dcc.Tab(label='Fluxo de Contratos', value='tab-8', children=[
+                html.H1(children='Fluxo de Contratos', style={'marginTop': '10px', 'color': colors['gray'], 'fontWeight': 'bold'}),
+                html.Div(style={'marginTop': '20px'}),
+            ]),
         ])
     )
 ])
 
 # ================================================== FUNÇÕES GERENCIAL ==================================================================
 
+global df_medicao_gerencial
+global df_despesa_gerencial
+global lista_todos_contrato
+global lista_todos_cc
+global lista_todos_locais
+lista_todos_contrato, lista_todos_cc, lista_todos_locais = back.pega_centro_custos()
+lista_todos_contrato, lista_todos_cc, lista_todos_locais = ordenar_listas_locais(lista_todos_contrato, lista_todos_cc, lista_todos_locais)
+df_medicao_gerencial = detalha_receita_sem_format()
+df_medicao_gerencial = df_medicao_gerencial.fillna(0)
+df_despesa_gerencial = detalha_despesas_sem_format()
+df_despesa_gerencial = df_despesa_gerencial.fillna(0)
+
 #função para atualizar a tabela, é chamada no callback quando uma competencia é selecionada
 def atualizar_tabela(selecao):
     if selecao:
-        df_tabela = tabela(selecao)
+        lista_todos_contrato1 = lista_todos_contrato.copy()
+        lista_todos_cc1 = lista_todos_cc.copy()
+        lista_todos_locais1 = lista_todos_locais.copy()
+        df_tabela = tabela(selecao, df_medicao_gerencial, df_despesa_gerencial, lista_todos_contrato1, lista_todos_cc1, lista_todos_locais1)
         format_numeric_columns(df_tabela, ['MEDIÇÃO', 'DESPESAS', 'LUCRO', 'MEDIÇÃO TOTAL', 'DESPESAS TOTAIS', 'LUCRO TOTAL'])
         return create_datatable(df_tabela, colors, "tabela")
     else:

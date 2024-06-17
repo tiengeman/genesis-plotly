@@ -3,53 +3,61 @@ import back.queries
 import back.banco_teste
 from back.inserts import inserir_contrato
 
-def tabela(mes): #função que gera a tabela principal da aba gerencial
-    lista_contrato, lista_soma_comp, lista_cc, lista_locais = back.medicao(mes)
-    lista_contrato, lista_soma_comp, lista_cc, lista_locais = ordenar_listas_locais(lista_contrato, lista_soma_comp, lista_cc, lista_locais)
-    lista_locais.append("")
-    lista_contrato.append('TOTAL OPERAÇÃO')
-    lista_contrato_final, lista_soma_comp, lista_cc, lista_locais = remove_capex(lista_contrato, lista_soma_comp, lista_cc, lista_locais)
-    lista_cc.append('')
-    lista_soma_comp.append(sum_medicao(lista_contrato_final, lista_soma_comp))
-    lista_cont_total, lista_valor_total, lista_cc_total = back.medicao_total()
-    tupla_medicao_total = merge_lists_into_tuples(lista_cc_total, lista_valor_total)
-    tupla_despesa_total = back.total_despesa()
-    tupla_despesas = back.total_despesa_competencia(mes) #gera uma lista de tuplas com as info
+def tabela(mes, df_receita, df_despesa, lista_todos_contrato, lista_todos_cc, lista_todos_locais): 
+    lista_medicao_comp = []
+    lista_medicao_total = []
+    lista_despesa_comp = []
+    lista_despesa_total = []
+    
+    for i in lista_todos_cc:
+        df_receita_filtrado = df_receita[df_receita['PROJETOUNI'] == i]
+        lista_medicao_total.append(df_receita_filtrado['VALOR'].sum())
+        
+        df_receita_filtrado_comp = df_receita_filtrado[df_receita_filtrado['COMPETENCIA'] == mes]
+        lista_medicao_comp.append(df_receita_filtrado_comp['VALOR'].sum())
 
-    list_filial = [None]*len(lista_contrato_final)
-    list_despesas = ordena_lista(lista_cc, tupla_despesas) #aqui ele ordena os valores de acordo com a lista de contrato
-    del list_despesas[-1]
-    list_despesas.append(sum_despesa(lista_contrato_final, list_despesas))
-    list_lucro = subtrair_listas(lista_soma_comp, list_despesas)
-    del list_lucro[-1]
-    list_lucro.append(lista_soma_comp[-1]-list_despesas[-1])
-    list_perc = perc(lista_soma_comp, list_lucro)
-    list_medicao_total = ordena_lista(lista_cc, tupla_medicao_total)
-    del list_medicao_total[-1]
-    list_medicao_total.append(sum_medicao(lista_contrato_final, list_medicao_total))
-    list_desp_totais = ordena_lista(lista_cc, tupla_despesa_total)
-    del list_desp_totais[-1]
-    list_desp_totais.append(sum_despesa(lista_contrato_final, list_desp_totais))
-    list_lucro_total = subtrair_listas(list_medicao_total, list_desp_totais)
-    del list_lucro_total[-1]
-    list_lucro_total.append(list_medicao_total[-1]-list_desp_totais[-1])
-    list_perc_total = perc(list_medicao_total, list_lucro_total)
-    list_inativo = inativo(list_lucro) #gera a lista se é inativo ou não
-    del list_inativo[-1]
-    list_inativo.append('NÃO')
-    df = pd.DataFrame.from_dict(data={'LOCAL':lista_locais, 
-                                      'CONTRATO':lista_contrato_final, 
-                                      'C.CUSTOS':lista_cc, 
-                                      'INATIVO':list_inativo,
-                                      'FILIAL':list_filial, 
-                                      'MEDIÇÃO':lista_soma_comp, 
-                                      'DESPESAS':list_despesas, 
-                                      'LUCRO':list_lucro, 
-                                      '%':list_perc,
-                                      'MEDIÇÃO TOTAL': list_medicao_total,
-                                      'DESPESAS TOTAIS': list_desp_totais,
-                                      'LUCRO TOTAL': list_lucro_total,
-                                      '% TOTAL': list_perc_total})
+        df_despesa_filtrado = df_despesa[df_despesa['PROJETOUNI'] == i]
+        lista_despesa_total.append(df_despesa_filtrado['VALOR DESP'].sum())
+        
+        df_despesa_filtrado_comp = df_despesa_filtrado[df_despesa_filtrado['COMPETENCIA'] == mes]
+        lista_despesa_comp.append(df_despesa_filtrado_comp['VALOR DESP'].sum())
+    
+    lista_todos_contrato.append("TOTAL OPERAÇÃO")
+    lista_todos_locais.append("")
+    lista_todos_cc.append("")
+    
+    lista_medicao_comp.append(sum_medicao(lista_todos_contrato, lista_medicao_comp))
+    lista_medicao_total.append(sum_medicao(lista_todos_contrato, lista_medicao_total))
+    lista_despesa_comp.append(sum_despesa(lista_todos_contrato, lista_despesa_comp))
+    lista_despesa_total.append(sum_despesa(lista_todos_contrato, lista_despesa_total))
+
+    lista_lucro = subtrair_listas(lista_medicao_comp, lista_despesa_comp)
+    lista_lucro_total = subtrair_listas(lista_medicao_total, lista_despesa_total)
+    lista_inativo = inativo(lista_lucro)
+
+    del lista_inativo[-1]
+    lista_inativo.append('NÃO')
+    del lista_lucro[-1]
+    lista_lucro.append(lista_medicao_comp[-1] - lista_despesa_comp[-1])
+    del lista_lucro_total[-1]
+    lista_lucro_total.append(lista_medicao_total[-1] - lista_despesa_total[-1])
+
+    lista_perc = perc(lista_medicao_comp, lista_lucro)
+    lista_perc_total = perc(lista_medicao_total, lista_lucro_total)
+
+    df = pd.DataFrame.from_dict(data={'LOCAL': lista_todos_locais, 
+                                      'CONTRATO': lista_todos_contrato, 
+                                      'C.CUSTOS': lista_todos_cc, 
+                                      'INATIVO': lista_inativo,
+                                      'FILIAL': [None] * len(lista_todos_cc), 
+                                      'MEDIÇÃO': lista_medicao_comp, 
+                                      'DESPESAS': lista_despesa_comp, 
+                                      'LUCRO': lista_lucro, 
+                                      '%': lista_perc,
+                                      'MEDIÇÃO TOTAL': lista_medicao_total,
+                                      'DESPESAS TOTAIS': lista_despesa_total,
+                                      'LUCRO TOTAL': lista_lucro_total,
+                                      '% TOTAL': lista_perc_total})
     
     return df
 # tabela do capex
@@ -99,7 +107,7 @@ def sum_medicao(lista_contrato_final, lista_soma_comp): #cria o somatório da me
     soma = 0
     for i in range(len(lista_soma_comp)):
         if lista_contrato_final[i] != "ADM CENTRAL (RECIFE)":
-            soma += lista_soma_comp[i]
+            soma += float(lista_soma_comp[i])
     return soma
 
 def sum_despesa(lista_contrato_final, lista_despesas): # cria o somatorio da despesa
@@ -109,29 +117,29 @@ def sum_despesa(lista_contrato_final, lista_despesas): # cria o somatorio da des
             soma += lista_despesas[i]
     return soma
 
-def ordenar_listas_locais(lista_contrato, lista_soma_comp, lista_cc, lista_locais):
-    lista_todos_contrato, lista_todos_cc, lista_todos_locais = back.pega_centro_custos()
+def ordenar_listas_locais(lista_contrato, lista_cc, lista_locais):
+    # lista_todos_contrato, lista_todos_cc, lista_todos_locais = back.pega_centro_custos()
     
-    for i in range(len(lista_todos_contrato)):
-        if lista_todos_cc[i] not in lista_cc:
-            lista_contrato.append(lista_todos_contrato[i])
-            lista_soma_comp.append(0)
-            lista_cc.append(lista_todos_cc[i])
-            lista_locais.append(lista_todos_locais[i])
+    # for i in range(len(lista_todos_contrato)):
+    #     if lista_todos_cc[i] not in lista_cc:
+    #         lista_contrato.append(lista_todos_contrato[i])
+    #         lista_soma_comp.append(0)
+    #         lista_cc.append(lista_todos_cc[i])
+    #         lista_locais.append(lista_todos_locais[i])
 
     # Combine as listas em uma lista de tuplas
-    combinados = list(zip(lista_contrato, lista_soma_comp, lista_cc, lista_locais))
+    combinados = list(zip(lista_contrato, lista_cc, lista_locais))
 
     # Ordene a lista primeiro por lista_locais em ordem crescente
     # e dentro de cada grupo de lista_locais por lista_contrato em ordem decrescente (ordem lexicográfica)
-    combinados.sort(key=lambda x: (x[3], x[0]), reverse=True)
-    combinados.sort(key=lambda x: x[3])
+    combinados.sort(key=lambda x: (x[2], x[0]), reverse=True)
+    combinados.sort(key=lambda x: x[2])
 
     # Descompacte as listas ordenadas de volta em suas listas originais
-    lista_contrato, lista_soma_comp, lista_cc, lista_locais = zip(*combinados)
+    lista_contrato, lista_cc, lista_locais = zip(*combinados)
 
     # Retorne as listas como tuplas
-    return list(lista_contrato), list(lista_soma_comp), list(lista_cc), list(lista_locais)
+    return list(lista_contrato), list(lista_cc), list(lista_locais)
 
 def inativo(lista_valores): #função para criar a lista se o contrato está inativo ou não
     lista_inativo = []
@@ -317,3 +325,29 @@ def detalha_receita():
     format_numeric_columns(df_receita, ["VALOR"])
     
     return df_receita
+
+def detalha_receita_sem_format():
+
+    lista_receita = back.detalha_receita()
+    nome_colunas = ['ID', 'PROJETOUNI', 'DESCRIÇÃO', 'PROJETO-ORI', 'DOCUMENTO', 'CLIENTE', 'DATA', 'VALOR', 'VALOR-RETENCAO', 'VALOR-ADM', 'COMPETENCIA', 'FILIAL']
+    dicionario_de_listas = {coluna: [] for coluna in nome_colunas}
+    for linha in lista_receita:
+        for i, valor in enumerate(linha):
+            dicionario_de_listas[nome_colunas[i]].append(valor)
+    del dicionario_de_listas['ID']
+    df_receita = pd.DataFrame.from_dict(data=dicionario_de_listas)
+    
+    return df_receita
+
+def detalha_despesas_sem_format():
+    lista_desp = back.detalha_despesas()
+    nome_colunas = ['ID', 'PROJETOUNI', 'DESCRIÇÃO', 'PROJETO-ORI', 'DOCUMENTO', 'AGENTE', 'DESC. AGENTE', 'VALOR ORI', 'VALOR INVEST.', 'VALOR DESP', 'COD. CLASSE', 'DESC. CLASSE', 'DATA', 'COMPETENCIA', 'CATEGORIA',
+                    'OBSERVAÇÕES', 'TIPO']
+    dicionario_de_listas = {coluna: [] for coluna in nome_colunas}
+    for linha in lista_desp:
+        for i, valor in enumerate(linha):
+            dicionario_de_listas[nome_colunas[i]].append(valor)
+    del dicionario_de_listas['ID']
+    df_impostos = pd.DataFrame.from_dict(data=dicionario_de_listas)
+
+    return df_impostos
