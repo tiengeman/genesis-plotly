@@ -17,20 +17,21 @@ layout = html.Div([
         dbc.Row(
             dbc.Col(
                 html.Img(src="https://th.bing.com/th/id/R.5db279e2c2b45c912f7b1ad811275985?rik=QaUgIIHBl1LHxQ&riu=http%3a%2f%2fwww.rwg.bz%2fprivate%2fhamster%2fHamsterusesmini-computer.jpg&ehk=RkZlS26KLyIW5TAPLOw4Nm03wK3LyLAoKkcqdBRiWsA%3d&risl=&pid=ImgRaw&r=0", 
-                         height=100, width=100, style={"border-radius": "50%"}),
+                         height=200, width=200, style={"border-radius": "50%"}),
                 width="auto", 
                 className="d-flex justify-content-center" 
             ),
         ),
         dbc.Row(
             dbc.Col(
-                dbc.Input(id='nome', placeholder='Nome', type='text', className='mb-3', disabled=True),
+                dbc.Input(id='nome', placeholder='Nome', type='text', className='mb-3', disabled=True,),
             )
         ),
         dbc.Row(
             dbc.Col(
                 dbc.Input(id='email', placeholder='Email', type='email', className='mb-3', disabled=True),
-            )
+            ),
+            justify="center"
         ),
         dbc.Row(
             dbc.Col(
@@ -78,6 +79,21 @@ layout = html.Div([
                 html.Div(id='output-message-perfil', className='text-center mt-3'),
             )
         ),
+        #consciderar depois
+        # dbc.Row(
+        #     dbc.Col(
+        #         # html.H3('Permissões'),
+        #         # dcc.Markdown('''
+        #         #     **Editar tabelas**
+        #         # '''),
+        #         dbc.Checklist(
+        #             {'label': 'Gerencial', 'value':'Gerencial'},
+        #             {'label': 'Detalhamento', 'value': 'Detalhamento'},
+        #             {'label': 'Encargos', 'value': 'Encargos'},
+        #             {'label': 'Impostos', 'value':'Impostos'}
+        #         )
+        #     )
+        # )
     ]),
     html.Div(id='output-data'),
 ])

@@ -22,7 +22,23 @@ layout = dbc.Container(
         ),
         dbc.Row(
             dbc.Col(
-                dbc.Input(id='setor', placeholder='Setor', type='text', className='mb-3')
+                dcc.Dropdown(
+                    id='setor',
+                    placeholder= 'Setor',
+                    options=[
+                        {'label': 'Financeiro', 'value': 'financeiro'},
+                        {'label': 'Tecnologia e Informações', 'value': 'TI'},
+                        {'label': 'Operações', 'value': 'operacoes'},
+                    ],
+                    # value='NaoPrestador', 
+                    # clearable=False,
+                    className='mb-3'
+                ),
+            )
+        ),
+        dbc.Row(
+            dbc.Col(
+                dbc.Input(id='cargo', placeholder='Cargo/Função', type='text', className='mb-3')
             )
         ),
         dbc.Row(

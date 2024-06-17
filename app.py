@@ -479,10 +479,10 @@ def update_detalhamento_container(n_clicks):
     Output('output-message-cadastro', 'children'),
 #    Output('url', 'pathname'),
     [Input('register-button', 'n_clicks')], # [Input('fzlogin-button', 'n_clicks_fz')],
-    [State('nome', 'value'), State('email', 'value'), State('senha', 'value'), State('confirmar-senha', 'value'), State('setor', 'value')]
+    [State('nome', 'value'), State('email', 'value'), State('senha', 'value'), State('confirmar-senha', 'value'), State('setor', 'value'), State('cargo', 'value')]
 
 )
-def register_user(n_clicks, nome, email, senha, confirmar_senha, setor):
+def register_user(n_clicks, nome, email, senha, confirmar_senha, setor, cargo):
     if n_clicks > 0:
         if not nome or not email or not senha or not confirmar_senha or not setor:
             return 'Por favor, preencha todos os campos.'
@@ -506,7 +506,9 @@ def register_user(n_clicks, nome, email, senha, confirmar_senha, setor):
                 'nome': nome,
                 'email': email, 
                 'senha': hashed_senha, #hash.senha
-                'setor': setor
+                'setor': setor,
+                'cargo': cargo,
+
             }
             result = users_collection.insert_one(user_document)
             print("Documento inserido:", result)
@@ -678,29 +680,43 @@ def logout():
     Output('data_nascimento', 'value'),
     Output('telefone', 'value'),
     Output('setor', 'value'),
-    Input('url_login', 'pathname')
+    Input('register-button', 'n_clicks')
 )
 
-def get_user_data(email):
-    client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
-    db = client['Project']
-    users_collection = db['Usuários']
-    user_data = users_collection.find_one({'email': email})
-    return user_data
+def get_user_data(n_clicks):
+    if n_clicks is not None and n_clicks > 0:
+        email = session.get('user_email')
+        client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
+        db = client['Project']
+        users_collection = db['Usuários']
+        user_data = users_collection.find_one({'email': email})
+        if user_data:
+            return(
+                user_data['nome'],
+                user_data['email'],
+                user_data['data_nascimento'],
+                user_data['telefone'],
+                user_data['setor'],
+                user_data['cargo']
+            )
+        else:
+            return ('', '', '', '', '', '')
+    raise PreventUpdate
 
-def update_user_data(pathname):
-    email = pathname.split('/')[-1]
-    user_data = get_user_data(email)
-    if user_data:
-        return (
-            user_data['nome'],
-            user_data['email'],
-            user_data['data_nascimento'],
-            user_data['telefone'],
-            user_data['setor']
-        )
-    else:
-        return ('', '', '', '', '')
+# def update_user_data(pathname):
+#     email = pathname.split('/')[-1]
+#     user_data = get_user_data(email)
+#     if user_data:
+#         return (
+#             user_data['nome'],
+#             user_data['email'],
+#             user_data['data_nascimento'],
+#             user_data['telefone'],
+#             user_data['setor'],
+#             user_data['cargo']
+#         )
+#     else:
+#         return ('', '', '', '', '')
 
 if __name__ == '__main__':
     app.run_server(debug=True)
