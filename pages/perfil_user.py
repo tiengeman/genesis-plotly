@@ -24,7 +24,7 @@ layout = html.Div([
         ),
         dbc.Row(
             dbc.Col(
-                dbc.Input(id='nome', placeholder='Nome', type='text', className='mb-3', disabled=True,),
+                dbc.Input(id='nome', placeholder='Nome', type='text', className='mb-3', disabled=True),
             )
         ),
         dbc.Row(
@@ -40,7 +40,12 @@ layout = html.Div([
         ),
         dbc.Row(
             dbc.Col(
-                dbc.Input(id='telefone', placeholder='Telefone', type='tel', className='mb-3'),
+                dbc.Input(id='telefone', placeholder='Telefone', type='number', className='mb-3'),
+            )
+        ),
+        dbc.Row(
+            dbc.Col(
+                dbc.Input(id='cargo', placeholder='Cargo/Função', type='text', className='mb-3', disabled = True),
             )
         ),
         dbc.Row(
@@ -58,6 +63,11 @@ layout = html.Div([
                     className='mb-3'
                     , disabled=True
                 ),
+            )
+        ),
+        dbc.Row(
+            dbc.Col(
+                dbc.Input(id='senha', placeholder='Senha', type='password', className='mb-3', disabled=True),
             )
         ),
         dbc.Row(

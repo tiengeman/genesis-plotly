@@ -533,7 +533,7 @@ def register_user(n_clicks, nome, email, senha, confirmar_senha, setor, cargo):
     Output('output-message-login', 'children'),
     [Input('login-button', 'n_clicks'), Input('ms-button', 'n_clicks')],
     [State('email', 'value'), State('senha', 'value')],
-    prevent_initial_call=True, ##########
+#    prevent_initial_call=True, ##########
 )
 
 
@@ -637,7 +637,7 @@ msal_client = ConfidentialClientApplication(
     token_cache=SerializableTokenCache()
 )
 
-@server.route('/loginms')
+@server.route('/loginms', methods=['GET'])
 def loginms():
     session["state"] = str(uuid.uuid4())
     auth_url = msal_client.get_authorization_request_url(
@@ -648,7 +648,7 @@ def loginms():
     return redirect(auth_url)
 
 
-@server.route(REDIRECT_PATH)
+@server.route(REDIRECT_PATH, methods=['GET', 'POST'])
 def authorized():
     if request.args.get('state') != session.get("state"):
         return redirect(url_for("home"))
@@ -669,7 +669,7 @@ def authorized():
         return redirect(url_for("home"))
     return "Authorization failed."
 
-@server.route('/logout')
+@server.route('/logout', methods=['GET'])
 def logout():
     session.clear()
     return redirect(url_for('home'))
