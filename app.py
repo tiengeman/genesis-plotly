@@ -529,6 +529,109 @@ def register_user(n_clicks, nome, email, senha, confirmar_senha, setor):
             return f'Erro ao realizar o cadastro: {e}'
 #    return '', dash.no_update
 
+# Callbacks to update the content of each tab dynamically
+@app.callback(Output('tabs-content', 'children'),
+              Input('tabs', 'value'))
+def render_tab_content(tab):
+    if tab == 'tab-1':
+        return [
+            html.H1(children='Performance Mensal por Competência', style={'marginTop': '10px', 'color': colors['gray'], 'fontWeight': 'bold'}),
+            html.Hr(style={'backgroundColor': colors['orange']}),  # Linha horizontal laranja
+            html.Div(style={'marginTop': '20px'}),
+            dcc.Dropdown(
+                id='minha-lista-suspensa',
+                options=back.competencias(),
+                value=back.competencias()[-1],
+                style={'fontFamily': 'Arial, sans-serif'}  # Definindo a fonte da lista suspensa
+            ),
+            html.Div(style={'marginTop': '20px'}),  # Espaçamento entre dropdown e tabela
+            html.Div(id='tabela-container', style={'margin': '20px'}),  # Div para mostrar a tabela selecionada com margem
+            html.Div(id='tabela2-container', style={'margin': '20px'}),  # Div para mostrar a tabela selecionada com margem
+            html.Div(id='row-info-container', style={'margin': '20px'})  # Add this Div to display row information
+        ]
+    elif tab == 'tab-2':
+        return [
+            html.H1(children='Detalhamento', style={'marginTop': '10px', 'color': colors['gray'], 'fontWeight': 'bold'}),
+            html.Hr(style={'backgroundColor': colors['orange']}),  # Linha horizontal laranja
+            html.Div(style={'marginTop': '20px'}),
+            
+            # dbc.Row contendo dois dropdowns
+            dbc.Row([
+                dbc.Col(
+                    dcc.Dropdown(
+                        id='minha-lista-suspensa-1-detalhamento',
+                        options=back.competencias(),
+                        style={'fontFamily': 'Arial, sans-serif'},  # Definindo a fonte da lista suspensa
+                        multi=True,
+                    ),
+                    width=6
+                ),
+                dbc.Col(
+                    dcc.Dropdown(
+                        id='minha-lista-suspensa-2',
+                        options=lista_contratos(),
+                        style={'fontFamily': 'Arial, sans-serif'},  # Definindo a fonte da lista suspensa
+                        multi=True,
+                    ),
+                    width=6
+                )
+            ], justify='center'),
+            
+            html.Div(style={'marginTop': '20px'}),  # Espaçamento entre dropdown e tabela
+
+            html.H3('Medição', style={'marginTop': '10px', 'color': colors['gray']}),
+            html.Div(id='tabela-detalhamento-container-medicao', style={'margin': '20px'}),
+            html.H3('Despesas', style={'marginTop': '10px', 'color': colors['gray']}),
+            html.Div(id='tabela-detalhamento-container-despesa', style={'margin': '20px'}),
+            
+            html.Div(id='tabela-detalhamento-container', style={'margin': '20px'})  # Div para mostrar a tabela selecionada com margem
+        ]
+    elif tab == 'tab-3':
+        return [
+            html.H1(children='Dashboards', style={'marginTop': '10px', 'color': colors['gray'], 'fontWeight': 'bold'}),
+            html.Div(style={'marginTop': '20px'}),
+            html.Div(style={'display': 'flex', 'justifyContent': 'space-between'}, children=[
+                dcc.Dropdown(
+                    id='dropdown-contratos-dashboards',
+                    options=[{'label': i, 'value': i} for i in ['Option 1', 'Option 2', 'Option 3', 'Option 4', 'Option 5']],
+                    value=['Option 1', 'Option 3'],  # default selected options
+                    multi=True,  # allow multiple selections
+                    style={'fontFamily': 'Arial, sans-serif', 'width': '100%'}  # Definindo a fonte e largura da lista suspensa
+                ),
+                dcc.Dropdown(
+                    id='dropdown-competencia-dashboards',
+                    options=[{'label': i, 'value': i} for i in ['Option A', 'Option B', 'Option C', 'Option D', 'Option E']],
+                    value='Option A',  # default selected option
+                    style={'fontFamily': 'Arial, sans-serif', 'width': '100%'}  # Definindo a fonte e largura da lista suspensa
+                ),
+            ]),
+        ]
+    elif tab == 'tab-4':
+        return [
+            html.H1(children='Backlog', style={'marginTop': '10px', 'color': colors['gray'], 'fontWeight': 'bold'}),
+            html.Div(style={'marginTop': '20px'}),
+        ]
+    elif tab == 'tab-5':
+        return [
+            html.H1(children='Gerência Geral', style={'marginTop': '10px', 'color': colors['gray'], 'fontWeight': 'bold'}),
+            html.Div(style={'marginTop': '20px'}),
+        ]
+    elif tab == 'tab-6':
+        return [
+            html.H1(children='Gerência Contratos', style={'marginTop': '10px', 'color': colors['gray'], 'fontWeight': 'bold'}),
+            html.Div(style={'marginTop': '20px'}),
+        ]
+    elif tab == 'tab-7':
+        return [
+            html.H1(children='Gerência Administrativa', style={'marginTop': '10px', 'color': colors['gray'], 'fontWeight': 'bold'}),
+            html.Div(style={'marginTop': '20px'}),
+        ]
+    elif tab == 'tab-8':
+        return [
+            html.H1(children='Fluxo de Contratos', style={'marginTop': '10px', 'color': colors['gray'], 'fontWeight': 'bold'}),
+            html.Div(style={'marginTop': '20px'}),
+        ]
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
