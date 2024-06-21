@@ -30,6 +30,7 @@ global lista_todos_contrato
 global lista_todos_cc
 global lista_todos_locais
 lista_todos_contrato, lista_todos_cc, lista_todos_locais = back.pega_centro_custos()
+lista_todos_contrato, lista_todos_cc, lista_todos_locais = remove_capex(lista_todos_contrato, lista_todos_cc, lista_todos_locais)
 lista_todos_contrato, lista_todos_cc, lista_todos_locais = ordenar_listas_locais(lista_todos_contrato, lista_todos_cc, lista_todos_locais)
 df_medicao_gerencial = detalha_receita_sem_format()
 df_medicao_gerencial = df_medicao_gerencial.fillna(0)
@@ -123,7 +124,7 @@ def create_datatable(df, colors, id):
             },
                         {
                 'if': {
-                    'filter_query': "{CONTRATO} = 'TOTAL CAPEX'",
+                    'filter_query': "{CONTRATO} = 'TOTAL CUSTOS ADMINISTRATIVOS'",
                 },
                 'backgroundColor': colors['gray'],
                 'color': 'white',
@@ -131,7 +132,7 @@ def create_datatable(df, colors, id):
             },
             {
                 'if': {
-                    'filter_query': "{CONTRATO} = 'TOTAL CAPEX'",
+                    'filter_query': "{CONTRATO} = 'TOTAL CUSTOS ADMINISTRATIVOS'",
                     'column_id': 'INATIVO',
                 },
                 'color': colors['gray'],

@@ -62,17 +62,17 @@ def tabela(mes, df_receita, df_despesa, lista_todos_contrato, lista_todos_cc, li
     return df
 # tabela do capex
 def tabela_2(mes):
-    lista_contrato = ['INVESTIMENTOS (CONTRATO)', 'EXPANSÃO - FILIAL MACAÉ', 'EXPANSÃO - MATRIZ RECIFE', 'DEPÓSITOS JUDICIAIS', 'ENGEMAN TECNOLOGIAS']
-    lista_contrato.append('TOTAL CAPEX')
-    list_local = ['CAPEX']*(len(lista_contrato)-1)
+    lista_contrato = ['ADM CENTRAL (RECIFE)','ADM LOCAL (MACAÉ)','INVESTIMENTOS (CONTRATO)', 'EXPANSÃO - FILIAL MACAÉ', 'EXPANSÃO - MATRIZ RECIFE', 'DEPÓSITOS JUDICIAIS', 'ENGEMAN TECNOLOGIAS']
+    lista_contrato.append('TOTAL CUSTOS ADMINISTRATIVOS')
+    list_local = ['CUSTOS ADMINISTRATIVOS']*(len(lista_contrato)-1)
     list_local.append("")
-    lista_cc = [888, 2180, 2250, 1111, 1930, ""]
+    lista_cc = [40,50,888,2180, 2250,1111,1930, ""]
     list_inativo = [None]*len(lista_contrato)
     del list_inativo[-1]
     list_inativo.append("NÂO")
     list_filial = [None]*len(lista_contrato)
     lista_soma_comp = medicao_capex(mes)
-    lista_soma_comp.append(sum(lista_soma_comp))
+    lista_soma_comp.append(sum_medicao(lista_contrato, lista_soma_comp))
     tupla_despesas = back.total_despesa_competencia(mes) #gera uma lista de tuplas com as info
     list_despesas = ordena_lista(lista_cc, tupla_despesas) #aqui ele ordena os valores de acordo com a lista de contrato
     del list_despesas[-1]
@@ -80,7 +80,7 @@ def tabela_2(mes):
     list_lucro = subtrair_listas(lista_soma_comp, list_despesas)
     list_perc = list_perc = perc(lista_soma_comp, list_lucro)
     list_medicao_total = medicao_capex_total()
-    list_medicao_total.append(sum(list_medicao_total))
+    list_medicao_total.append(sum_medicao(lista_contrato, list_medicao_total))
     tupla_despesa_total = back.total_despesa()
     list_desp_totais = ordena_lista(lista_cc, tupla_despesa_total)
     del list_desp_totais[-1]
@@ -193,7 +193,7 @@ def merge_lists_into_tuples(list1, list2): #função para juntar duas listas e f
     return merged_list
 
 def medicao_capex(mes): # gera a coluna de medição para o capex
-    lista_capex = ['INVESTIMENTOS (CONTRATO)', 'EXPANSÃO - FILIAL MACAÉ', 'EXPANSÃO - MATRIZ RECIFE', 'DEPÓSITOS JUDICIAIS', 'ENGEMAN TECNOLOGIAS']
+    lista_capex = ['ADM CENTRAL (RECIFE)','ADM LOCAL (MACAÉ)','INVESTIMENTOS (CONTRATO)', 'EXPANSÃO - FILIAL MACAÉ', 'EXPANSÃO - MATRIZ RECIFE', 'DEPÓSITOS JUDICIAIS', 'ENGEMAN TECNOLOGIAS']
     medicao = []
     lista_contrato, lista_soma_comp, lista_cc, lista_locais = back.medicao(mes)
     for i in lista_capex:
@@ -208,7 +208,7 @@ def medicao_capex(mes): # gera a coluna de medição para o capex
     return medicao
         
 def medicao_capex_total(): # gera a coluna de medição total para o capex
-    lista_capex = ['INVESTIMENTOS (CONTRATO)', 'EXPANSÃO - FILIAL MACAÉ', 'EXPANSÃO - MATRIZ RECIFE', 'DEPÓSITOS JUDICIAIS', 'ENGEMAN TECNOLOGIAS']
+    lista_capex = ['ADM CENTRAL (RECIFE)','ADM LOCAL (MACAÉ)','INVESTIMENTOS (CONTRATO)', 'EXPANSÃO - FILIAL MACAÉ', 'EXPANSÃO - MATRIZ RECIFE', 'DEPÓSITOS JUDICIAIS', 'ENGEMAN TECNOLOGIAS']
     medicao_total = []
     lista_cont_total, lista_valor_total, lista_cc_total = back.medicao_total()
     for i in lista_capex:
@@ -222,18 +222,17 @@ def medicao_capex_total(): # gera a coluna de medição total para o capex
 
     return medicao_total
 
-def remove_capex(lista_contratos, lista_valor, lista_cc, list_locais): #função para gerar uma lista sem o capex
-    lista_capex = ['INVESTIMENTOS (CONTRATO)', 'EXPANSÃO - FILIAL MACAÉ', 'EXPANSÃO - MATRIZ RECIFE', 'DEPÓSITOS JUDICIAIS', 'ENGEMAN TECNOLOGIAS', 'CUSTOS DIRETORIA']
+def remove_capex(lista_contratos, lista_cc, list_locais): #função para gerar uma lista sem o capex
+    lista_capex = [40,50,888,2180, 2250,1111,1930]
     list_index = []
     for i in lista_capex:
-        if i in lista_contratos:
-            index = lista_contratos.index(i)
+        if i in lista_cc:
+            index = lista_cc.index(i)
             del lista_contratos[index]
-            del lista_valor[index]
             del lista_cc[index]
             del list_locais[index]
     
-    return lista_contratos, lista_valor, lista_cc, list_locais
+    return lista_contratos, lista_cc, list_locais
 
 def df_impostos(): # forma o df com os impostos
     lista_contrato, lista_impostos = back.impostos()
