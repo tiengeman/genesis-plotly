@@ -1,6 +1,7 @@
 import dash
 from flask import Flask, render_template, redirect, url_for, session, request, send_from_directory, sessions
 from flask_session import Session as FlaskSession
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 import uuid
 import os
 import dash_bootstrap_components as dbc
@@ -29,10 +30,15 @@ from back.models import *
 from pymongo import MongoClient
 from passlib.hash import sha256_crypt
 from msal import ConfidentialClientApplication, SerializableTokenCache
-import webbrowser
+from werkzeug.middleware.proxy_fix import ProxyFix
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
+from werkzeug.security import generate_password_hash, check_password_hash
+# from werkzeug.contrib.fixers import ProxyFix
+# import app.config
 
 # SERVIDOR FLASK
 server = Flask(__name__)
+# app.wsgi_app = ProxyFix(app.wsgi_app)
 server.secret_key = os.getenv('SECRET_KEY', '68f170cb6f230e030cd3353b48666511a7bdc74600576a03')
 server.config['SESSION_TYPE'] = 'filesystem'  
 
@@ -42,6 +48,9 @@ FlaskSession(server)
 app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP])
 app.title = 'Genesis'
 app.config.suppress_callback_exceptions = True
+
+# Adicionando ProxyFix middleware
+app.server.wsgi_app = ProxyFix(app.server.wsgi_app, x_for=1, x_host=1)
 
 # @server.routes('/login')
 # def login_routes():
@@ -527,6 +536,25 @@ def register_user(n_clicks, nome, email, senha, confirmar_senha, setor, cargo):
 
 
 # # ============================================== CALLBACKS DA TELA LOGIN ===========================================================
+# Configurando o flask login
+login_manager = LoginManager()
+login_manager.init_app(server)
+login_manager.login_view = 'login'
+
+
+# Create a user loader function
+@login_manager.user_loader
+def load_user(user_id):
+    # Replace with your user database query
+    users = [
+        {'id': 1, 'username': 'admin', 'password': 'password'},
+        {'id': 2, 'username': 'user', 'password': 'password'}
+    ]
+    for user in users:
+        if user['id'] == int(user_id):
+            return User(user['id'], user['username'], user['password'])
+    return None
+
 
 @app.callback(
 #    Output('url', 'href'),
@@ -630,7 +658,9 @@ SCOPE = ['User.Read']
 # def index():
 #     return 'Flask MSAL'
 
-msal_client = ConfidentialClientApplication(
+token_cache = SerializableTokenCache()
+
+client_app = ConfidentialClientApplication(
     CLIENT_ID, 
     authority=AUTHORITY, 
     client_credential=CLIENT_SECRET,
@@ -640,7 +670,7 @@ msal_client = ConfidentialClientApplication(
 @server.route('/loginms', methods=['GET'])
 def loginms():
     session["state"] = str(uuid.uuid4())
-    auth_url = msal_client.get_authorization_request_url(
+    auth_url = client_app.get_authorization_request_url(
         SCOPE, 
         state=session["state"], 
         redirect_uri=url_for("authorized", _external=True)
@@ -648,7 +678,8 @@ def loginms():
     return redirect(auth_url)
 
 
-@server.route(REDIRECT_PATH, methods=['GET', 'POST'])
+#@server.route(REDIRECT_PATH, methods=['GET', 'POST'])
+@server.route('/authorized', methods=['GET', 'POST'])
 def authorized():
     if request.args.get('state') != session.get("state"):
         return redirect(url_for("home"))
@@ -658,7 +689,7 @@ def authorized():
 
     if request.args.get('code'):
 #        cache = msal_client.token_cache
-        result = msal_client.acquire_token_by_authorization_code(
+        result = client_app.acquire_token_by_authorization_code(
             request.args['code'], 
             scopes=SCOPE, 
             redirect_uri=url_for("authorized", _external=True)

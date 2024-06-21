@@ -79,9 +79,16 @@ layout = html.Div([
         ),
         dbc.Row(
             dbc.Col(
-                dbc.Button('Alterar Senha', id='altsenha-button', style={'backgroundColor': colors['orange'], 'border':'None'}, className='me-2', n_clicks=0),
+                dbc.Button('Alterar Senha', id='altsenha-button', style={'backgroundColor': colors['white'], 'color': colors['orange'], 'border-color': colors['orange']}, className='me-2', n_clicks=0),
                 width= '50px',
                 className='d-flex justify-content-center mb-2'
+            )
+        ),
+        dbc.Row(
+            dbc.Col(
+                dbc.Button('Sair', id='logout-button', style={'background': colors['white'], 'color': 'red', 'border-color': 'red'}, className='me-2', n_clicks=0),
+                width= '20px',
+                className= 'd-flex right mb-2'
             )
         ),
         dbc.Row(
@@ -89,6 +96,7 @@ layout = html.Div([
                 html.Div(id='output-message-perfil', className='text-center mt-3'),
             )
         ),
+
         #consciderar depois
         # dbc.Row(
         #     dbc.Col(

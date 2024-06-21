@@ -1,6 +1,6 @@
 import dash_bootstrap_components as dbc
 from dash import html, dcc
-
+from constants import *
 
 # Definição do layout da página de login
 layout = dbc.Container(     #depois ajustar essa tela, tá bem feinha
@@ -23,7 +23,7 @@ layout = dbc.Container(     #depois ajustar essa tela, tá bem feinha
         ),
         dbc.Row(
             dbc.Col(
-                dbc.Button('Login', id='login-button', color='orange', className='me-2', n_clicks=0),
+                dbc.Button('Login', id='login-button',style={'backgroundColor': colors['orange'], 'border':'None'}, className='me-2', n_clicks=0),
                 width= '50px',
                 className='d-flex justify-content-center mb-2'
             )

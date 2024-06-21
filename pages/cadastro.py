@@ -1,5 +1,6 @@
 import dash_bootstrap_components as dbc
 from dash import html, dcc
+from constants import *
 
 
 # Definição do layout da página de registro
@@ -58,16 +59,20 @@ layout = dbc.Container(
                 className='d-flex justify-content-center'
             )
         ),
+        html.Div(children='''Ou ''', className='d-flex justify-content-center'),
+        dbc.Row(
+            dbc.Col(
+                dbc.Button('Faça Login', id='fzlogin-button', style={'backgroundColor': colors['white'], 'color': colors['orange'], 'border-color': colors['orange']}, className='me-2', n_clicks=0),
+                width= '20px',
+                className='d-flex justify-content-center mb-2'
+            )
+        ),
         dbc.Row(
             dbc.Col(
                 html.Div(id='output-message-cadastro', className='text-center mt-3')
             )
         ),
-        dbc.Row(
-            dbc.Col(
-                html.Button( 'Ou Faça Login', id='fzlogin-button', n_clicks=0)
-            )
-        )
+
     ],
     fluid=True
 )
