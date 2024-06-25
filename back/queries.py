@@ -681,6 +681,28 @@ def cad_contratos(db=back.db):
 
     return lista
 
+def retorna_categorias(db = back.db):
+    colecao_notas = db.get_collection('Despesas Relatório')
+    colecao_fin = db.get_collection('Despesas Folha')
+    colecao_folha = db.get_collection('Despesas Financeiro')
+    colecao_impostos = db.get_collection('Despesas Impostos')
+    colecao_deducoes = db.get_collection('Despesas Deduções')
+
+    cat_notas = colecao_notas.distinct('categoria-despesa')
+    cat_fin = colecao_fin.distinct('categoria-despesa')
+    cat_folha = colecao_folha.distinct('categoria-despesa')
+    cat_impostos = colecao_impostos.distinct('categoria-despesa')
+    cat_deducoes = colecao_deducoes.distinct('categoria-despesa')
+
+    lista_aux = cat_notas + cat_fin + cat_folha + cat_impostos + cat_deducoes
+    lista_geral = []
+
+    for i in lista_aux:
+        if i not in lista_geral:
+            lista_geral.append(i)
+
+    return lista_geral
+
 def ordenar_datas(lista):
     # Define um dicionário para mapear os meses para seus números correspondentes
     meses = {
