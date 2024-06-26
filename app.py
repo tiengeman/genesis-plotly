@@ -1,5 +1,6 @@
 import dash
 import dash_bootstrap_components as dbc
+from dash import callback_context
 from dash import html, dcc
 from dash.dependencies import Input, Output, State
 from pages.encargos import lista_encargos
@@ -24,15 +25,15 @@ server = app.server
 #conteúdo dentro do menu
 sidebar = dbc.Nav(
     [
-        dbc.NavItem(dbc.NavLink('Home', href='/home', className='nav-link')),
+        dbc.NavItem(dbc.NavLink('Home', href='/home', id='home-link', className='nav-link')),
         html.Div(
             [
                 dbc.Accordion(
                     [
                         dbc.AccordionItem(
                             [
-                                dbc.NavLink('Gerencial', href='/gerencial', className='nav-link'),
-                                dbc.NavLink('Diretoria', href='/diretoria', className='nav-link'),
+                                dbc.NavLink('Gerencial', href='/gerencial', id='gerencial-link', className='nav-link'),
+                                dbc.NavLink('Diretoria', href='/diretoria', id='diretoria-link', className='nav-link'),
                             ],
                             title='Relatórios',
                             item_id='accordion-item',
@@ -52,11 +53,11 @@ sidebar = dbc.Nav(
                     [
                         dbc.AccordionItem(
                             [
-                                dbc.NavLink('Cadastro Projetos', href='/cadastro_projetos', className='nav-link'),
-                                dbc.NavLink('Cadastro de Impostos', href='/impostos', className='nav-link'),
-                                dbc.NavLink('Cadastro de Encargos', href='/encargos', className='nav-link'),
-                                dbc.NavLink('Cadastro de Usuários', href='/cadastro', className='nav-link'),
-                                dbc.NavLink('Cadastro de Relacionamento', href='/relacao', className='nav-link'),
+                                dbc.NavLink('Cadastro Projetos', href='/cadastro_projetos', id='cadastro-projetos-link', className='nav-link'),
+                                dbc.NavLink('Cadastro de Impostos', href='/impostos', id='impostos-link', className='nav-link'),
+                                dbc.NavLink('Cadastro de Encargos', href='/encargos', id='encargos-link', className='nav-link'),
+                                dbc.NavLink('Cadastro de Usuários', href='/cadastro', id='cadastro-link', className='nav-link'),
+                                dbc.NavLink('Cadastro de Relacionamento', href='/relacao', id='relacao-link', className='nav-link'),
                             ],
                             title='Cadastros',
                             item_id='accordion-item',
@@ -92,6 +93,7 @@ offcanvas = html.Div(
             id="offcanvas",
             title="Menu",
             is_open=False,
+            scrollable=True
         ),
     ]
 )
@@ -189,17 +191,26 @@ def update_table_detalhamento(output_id, value, contrato, categoria):
 def update_tables(value, contrato, categoria):
     return update_table_detalhamento('tabela-detalhamento-container-medicao', value, contrato, categoria), update_table_detalhamento('tabela-detalhamento-container-despesa', value, contrato, categoria)
 
-    
+# ============================================================MENU=========================================
 #callback para abrir o menu
 @app.callback(
     Output("offcanvas", "is_open"),
-    Input("open-offcanvas", "n_clicks"),
+    [Input("open-offcanvas", "n_clicks")] +
+    [Input(link_id, "n_clicks") for link_id in ["home-link", "gerencial-link", "diretoria-link", "cadastro-projetos-link", "impostos-link", "encargos-link", "cadastro-link", "relacao-link"]],
     [State("offcanvas", "is_open")],
 )
-def toggle_offcanvas(n1, is_open):
-    if n1:
-        return not is_open
-    return is_open
+def toggle_offcanvas(*args):
+    ctx = callback_context
+
+    if not ctx.triggered:
+        raise PreventUpdate
+    else:
+        trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+    if trigger_id == "open-offcanvas":
+        return not args[-1]
+    else:
+        return False
 
 # ============================================ MODAL CADASTRO ====================================================
 
