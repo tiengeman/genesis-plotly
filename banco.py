@@ -350,3 +350,15 @@ def detalha_despesas_sem_format():
     df_impostos = pd.DataFrame.from_dict(data=dicionario_de_listas)
 
     return df_impostos
+
+def pega_categorias():
+    desp = detalha_despesas_sem_format()
+    categorias = list(desp['CATEGORIA'])
+    categorias = list(set(categorias))
+
+    return categorias
+
+def retorna_categorias():
+    lista = back.retorna_categorias()
+    lista.remove(None)
+    return lista

@@ -199,12 +199,14 @@ global df_medicao
 df_medicao = detalha_receita()
 
 #função para atualizar a tabela, é chamada no callback quando uma competencia é selecionada
-def atualizar_tabela_despesa(selecao, contrato):
+def atualizar_tabela_despesa(selecao, contrato, categoria):
     if selecao == None:
         selecao = []
     if contrato == None:
         contrato = []
-    df_tabela = filtra_detalha(df_despesa, selecao, contrato)
+    if categoria == None:
+        categoria = []
+    df_tabela = filtra_detalha_despesa(df_despesa, selecao, contrato, categoria)
     return create_datatable_despesas(df_tabela, colors, "tabela-detalhamento-despesa")
     
 #função para atualizar a tabela, é chamada no callback quando uma competencia é selecionada
@@ -236,6 +238,7 @@ def create_datatable_despesas(df, colors, id):
             {'name': 'DESC. CLASSE', 'id': 'DESC. CLASSE', 'type': 'text'},
             {'name': 'DATA', 'id': 'DATA', 'type': 'datetime'},
             {'name': 'COMPETENCIA', 'id': 'COMPETENCIA', 'type': 'text'},
+            {'name': 'CATEGORIA', 'id': 'CATEGORIA', 'type': 'text'},
             {'name': 'OBSERVAÇÕES', 'id': 'OBSERVAÇÕES', 'type': 'text'},
             {'name': 'TIPO', 'id': 'TIPO', 'type': 'text'},
         ],

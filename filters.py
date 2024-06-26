@@ -17,6 +17,36 @@ def filtra_detalha(df, selecao, contrato):
         df_final = df[df['DESCRIÇÃO'].isin(contrato)]
         df_final = df_final[df_final['COMPETENCIA'].isin(selecao)]
         return df_final
+        
+def filtra_detalha_despesa(df, selecao, contrato, categoria):
+    if len(selecao) == 0 and len(contrato) == 0 and len(categoria) == 0:
+        return df
+    elif len(selecao) == 0 and len(contrato) == 0 and len(categoria) > 0:
+        df_final = df[df['CATEGORIA'].isin(categoria)]
+        return df_final
+    elif len(selecao) == 0 and len(contrato) > 0 and len(categoria) == 0:
+        df_final = df[df['DESCRIÇÃO'].isin(contrato)]
+        return df_final
+    elif len(selecao) == 0 and len(contrato) > 0 and len(categoria) > 0:
+        df_final = df[df['DESCRIÇÃO'].isin(contrato)]
+        df_final = df_final[df_final['CATEGORIA'].isin(categoria)]
+        return df_final
+    elif len(selecao) > 0 and len(contrato) == 0 and len(categoria) == 0:
+        df_final = df[df['COMPETENCIA'].isin(selecao)]
+        return df_final
+    elif len(selecao) > 0 and len(contrato) == 0 and len(categoria) > 0:
+        df_final = df[df['COMPETENCIA'].isin(selecao)]
+        df_final = df_final[df_final['CATEGORIA'].isin(categoria)]
+        return df_final
+    elif len(selecao) > 0 and len(contrato) > 0 and len(categoria) == 0:
+        df_final = df[df['COMPETENCIA'].isin(selecao)]
+        df_final = df_final[df_final['DESCRIÇÃO'].isin(contrato)]
+        return df_final
+    elif len(selecao) > 0 and len(contrato) > 0 and len(categoria) > 0:
+        df_final = df[df['COMPETENCIA'].isin(selecao)]
+        df_final = df_final[df_final['DESCRIÇÃO'].isin(contrato)]
+        df_final = df_final[df_final['CATEGORIA'].isin(categoria)]
+        return df_final
     
 
 def df_geral_tabela(mes):

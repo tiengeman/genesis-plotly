@@ -174,20 +174,20 @@ def update_tables(value):
 
 # ================================================= UPDATE TABLE DETALHAMENTO ==========================================================
 
-def update_table_detalhamento(output_id, value, contrato):
+def update_table_detalhamento(output_id, value, contrato, categoria):
     if output_id == 'tabela-detalhamento-container-medicao':
         return gerencial.atualizar_tabela_medicao(value, contrato)
     elif output_id == 'tabela-detalhamento-container-despesa':
-        return gerencial.atualizar_tabela_despesa(value, contrato)
+        return gerencial.atualizar_tabela_despesa(value, contrato, categoria)
 
 #callback para atualizar as tabelas gerenciais de acordo com a competencia
 @app.callback(
     Output('tabela-detalhamento-container-medicao', 'children'),
     Output('tabela-detalhamento-container-despesa', 'children'),
-    [Input('minha-lista-suspensa-1-detalhamento', 'value'), Input('minha-lista-suspensa-2', 'value')]
+    [Input('minha-lista-suspensa-1-detalhamento', 'value'), Input('minha-lista-suspensa-2', 'value'), Input('minha-lista-suspensa-3', 'value')]
 )
-def update_tables(value, contrato):
-    return update_table_detalhamento('tabela-detalhamento-container-medicao', value, contrato), update_table_detalhamento('tabela-detalhamento-container-despesa', value, contrato)
+def update_tables(value, contrato, categoria):
+    return update_table_detalhamento('tabela-detalhamento-container-medicao', value, contrato, categoria), update_table_detalhamento('tabela-detalhamento-container-despesa', value, contrato, categoria)
 
     
 #callback para abrir o menu
@@ -560,21 +560,30 @@ def render_tab_content(tab):
                 dbc.Col(
                     dcc.Dropdown(
                         id='minha-lista-suspensa-1-detalhamento',
+                        placeholder = 'Competência',
                         options=back.competencias(),
                         style={'fontFamily': 'Arial, sans-serif'},  # Definindo a fonte da lista suspensa
                         multi=True,
                     ),
-                    width=6
                 ),
                 dbc.Col(
                     dcc.Dropdown(
                         id='minha-lista-suspensa-2',
+                        placeholder = 'Contrato',
                         options=lista_contratos(),
                         style={'fontFamily': 'Arial, sans-serif'},  # Definindo a fonte da lista suspensa
                         multi=True,
                     ),
-                    width=6
-                )
+                ),
+                dbc.Col(
+                    dcc.Dropdown(
+                        id='minha-lista-suspensa-3',
+                        placeholder = 'Categoria',
+                        options=retorna_categorias(),
+                        style={'fontFamily': 'Arial, sans-serif'},  # Definindo a fonte da lista suspensa
+                        multi=True,
+                    ),
+                ),
             ], justify='center'),
             
             html.Div(style={'marginTop': '20px'}),  # Espaçamento entre dropdown e tabela
