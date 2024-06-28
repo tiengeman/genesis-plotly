@@ -51,6 +51,8 @@ layout = dbc.Container(     #depois ajustar essa tela, tá bem feinha
         #     )
         # )
     ],
-    fluid=True
+    fluid=True,
+    style={"maxWidth" :"500px", "margin": "auto", "padding-top": "80px"},
+    className="mx-auto"
 )
 

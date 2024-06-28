@@ -1,5 +1,5 @@
 import dash
-from flask import Flask, render_template, redirect, url_for, session, request, send_from_directory, sessions
+from flask import Flask, render_template, redirect, url_for, session, request, send_from_directory, sessions, make_response
 from flask_session import Session as FlaskSession
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 import uuid
@@ -32,7 +32,7 @@ from passlib.hash import sha256_crypt
 from msal import ConfidentialClientApplication, SerializableTokenCache
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
-from werkzeug.security import generate_password_hash, check_password_hash
+#from werkzeug.security import generate_password_hash, check_password_hash
 # from werkzeug.contrib.fixers import ProxyFix
 # import app.config
 
@@ -97,16 +97,6 @@ offcanvas = html.Div(
     ]
 )
 
-# user_button = dbc.Button(  # ir para página de login ou perfil do usuário caso esteja logado
-#     html.I(className="bi bi-person-circle"),
-#     id="user-button",
-#     n_clicks=0,
-#     size="md",
-#     color='#FFFFFF',
-#     style={"font-size": "1.60em", "color": "#000000"},
-#     className='btn-white',
-# )
-
 # Top navigation bar
 header = dbc.Navbar(
     dbc.Row(
@@ -149,6 +139,12 @@ app.layout = html.Div([
     ]),
 ])
 
+# CONFIGURAÇÃO BANCO MONGO USUÁRIOS
+
+client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
+db = client['Project']
+users_collection = db['Usuários']
+
 #====================================================================== Callbacks ================================================================================================
 
 #callback para mudar de página de acordo com o menu
@@ -156,8 +152,10 @@ app.layout = html.Div([
     Output('content', 'children'),
     [Input('url', 'pathname')]
 )
+
 # #@login_required_dash
 def update_content(pathname):
+    
     if pathname == '/gerencial':
         return gerencial.layout
     elif pathname == '/diretoria':
@@ -183,6 +181,7 @@ def update_content(pathname):
         
     else:
         return home.layout
+    
     
 # ============================================== BOTÃO USUÁRIO ===========================================================
 # Callback para redirecionar para a página de login quando o botão for clicado
@@ -487,7 +486,7 @@ def update_detalhamento_container(n_clicks):
 @app.callback(
     Output('output-message-cadastro', 'children'),
 #    Output('url', 'pathname'),
-    [Input('register-button', 'n_clicks')], # [Input('fzlogin-button', 'n_clicks_fz')],
+    [Input('register-button', 'n_clicks'), ],#Input('fzlogin-button', 'n_clicks_fzlogin')], #CRIAR FUNÇÃO P/ BOTÃO DE LOGIN
     [State('nome', 'value'), State('email', 'value'), State('senha', 'value'), State('confirmar-senha', 'value'), State('setor', 'value'), State('cargo', 'value')]
 
 )
@@ -500,10 +499,6 @@ def register_user(n_clicks, nome, email, senha, confirmar_senha, setor, cargo):
             return 'As senhas não coincidem. Por favor, tente novamente.'
 
         try:
-            client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
-            db = client['Project']
-            users_collection = db['Usuários']
-            
             # Verificar se o email já está registrado
             if users_collection.find_one({"email": email}):
                 return 'Email já registrado. Por favor, faça o login.'
@@ -526,6 +521,13 @@ def register_user(n_clicks, nome, email, senha, confirmar_senha, setor, cargo):
             return f'Erro ao realizar o cadastro: {e}'
         
     raise PreventUpdate
+
+# def botao_login(n_clicks_fzlogin):
+#     if n_clicks_fzlogin is None:
+#         raise PreventUpdate
+#     else:
+#         redirect (login.layout)
+
     # return '', None
 
 # def fzlogin_button(n_clicks_fz):
@@ -564,7 +566,7 @@ def load_user(user_id):
 #    prevent_initial_call=True, ##########
 )
 
-
+@server.route('/login', methods=['POST'])
 def handle_login(n_clicks_login, n_clicks_ms, email, senha):
     ctx = dash.callback_context
 
@@ -576,13 +578,13 @@ def handle_login(n_clicks_login, n_clicks_ms, email, senha):
     if button_id == 'login-button':
         if email and senha:
 
-            client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
-            db = client['Project']
-            users_collection = db['Usuários']
             user = users_collection.find_one({"email": email})
 
             if user and sha256_crypt.verify(senha, user['senha']):
                 session['user_email'] = email
+                resp = make_response(redirect(url_for('perfil_user')))
+                resp.set_cookie('user_email', email)
+                resp.set_cookie('user_nome', user['nome'])
                 return '/perfil_user','Login realizado com sucesso!'  #f'Login realizado com email: {email}'
             else:
                 return 'Credenciais inválidas. Por favor, tente novamente.'
@@ -707,6 +709,44 @@ def logout():
 
 
 # #============================================== PERFIL DE USUÁRIO ===========================================================
+
+#foto de perfil
+# @app.callback(
+#     Output('modal-container', 'children'),
+#     [Input('profile-image-link', 'n_clicks')]  # ou Input('profile-image-button', 'n_clicks')
+# )
+# def show_modal(n_clicks):
+#     if n_clicks is not None:
+#         return html.Div([
+#             html.Div(html.Div([
+#                 html.Img(src='...', height=200, width=200, style={"border-radius": "50%"}),
+#                 html.Div('Modal content')
+#             ], className='modal-content'),
+#             className='modal')
+#         ])
+#     return ''
+
+@app.callback(
+        Output('output-message-perfil', 'children'),
+        Input('profile-image-link', 'n-clicks')
+)
+
+def show_message(n_clicks):
+    if n_clicks is not None and n_clicks > 0:
+        return "Você clicou na imagem de perfil"
+    return ""
+
+# @app.callback(
+#     Output('nome', 'value'),
+#     Output('email', 'value'),
+#     Output('data_nascimento', 'value'),
+#     Output('telefone', 'value'),
+#     Output('setor', 'value'),
+#     Output('cargo', 'value'),
+#     Input('url','pathname'),
+#     [Input('altsenha-button', 'n_clicks'), Input ('logout-button', 'n_clicks'), Input('altdados-button', 'n_clicks')],
+# )
+
 @app.callback(
     Output('nome', 'value'),
     Output('email', 'value'),
@@ -714,31 +754,70 @@ def logout():
     Output('telefone', 'value'),
     Output('setor', 'value'),
     Output('cargo', 'value'),
-    Input('url','pathname')
+    Input('url','pathname'),
+    [Input('altsenha-button', 'n_clicks'), Input ('logout-button', 'n_clicks'), Input('altdados-button', 'n_clicks')],
+    State('nome', 'value'),
+    State('email', 'value'),
+    State('data_nascimento', 'value'),
+    State('telefone', 'value'),
+    State('setor', 'value'),
+    State('cargo', 'value')
 )
 
-def get_user_data(pathname):
+def get_user_data(pathname, email, n_clicks, nome):
     if 'user_email' in session:
         email = session.get('user_email')
-        client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
-        db = client['Project']
-        users_collection = db['Usuários']
         user_data = users_collection.find_one({'email': email})
         if user_data:
+            # resp = make_response()
+            # resp.set_cookie('nome', user_data['nome'])
+            # resp.set_cookie('email', user_data['email'])
+            # resp.set_cookie('data_nascimento', user_data['data_nascimento'])
+            # resp.set_cookie('telefone', user_data['telefone'])
+            # resp.set_cookie('setor', user_data['setor'])
+            # resp.set_cookie('cargo', user_data['cargo'])
             return(
                 user_data['nome'],
                 user_data['email'],
                 user_data['data_nascimento'],
                 user_data['telefone'],
                 user_data['setor'],
-                user_data['cargo']
+                user_data['cargo'],
+                user_data['senha']
             )
         else:
             return ('', '', '', '', '', '')
     else:
         return ('', '', '', '', '', '')
     
+@app.callback(
+Output('profile-image', 'src'),
+Input('nome', 'value'),
+Input('email', 'value'),
+Input('data_nascimento', 'value'),
+Input('telefone', 'value'),
+Input('setor', 'value'),
+Input('cargo', 'value')
+)
+
+def update_profile_image(nome, email, data_nascimento, telefone, setor, cargo):
+    # Atualizar a imagem de perfil com base nos dados do usuário
+    return 'https://example.com/profile-images/{}'.format(nome)
+
+# def enable_edit(n_clicks):
+#     if n_clicks is None or n_clicks % 2 == 0:
+#         return True, True, True, True, True, True, "Alterar dados"
+#     else:
+#         return False, False, False, False, False, "Salvar"
 # @server.routes('/logout')
+
+def logout(n_clicks_logout: int):
+    if n_clicks_logout:
+        session.clear()
+        return '/login'
+    return None
+
+
 # def logout():
 #     session.clear()
 #     return redirect(url_for('home'))
@@ -757,6 +836,7 @@ def get_user_data(pathname):
 #         )
 #     else:
 #         return ('', '', '', '', '')
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)

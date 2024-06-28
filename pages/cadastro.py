@@ -74,7 +74,9 @@ layout = dbc.Container(
         ),
 
     ],
-    fluid=True
+    fluid=True,
+    style={"maxWidth" :"800px", "margin": "auto", "padding-top": "50px"},
+    className="mx-auto"
 )
 
 # Função de callback para registrar o usuário
