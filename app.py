@@ -39,13 +39,13 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 # SERVIDOR FLASK
 server = Flask(__name__)
 # app.wsgi_app = ProxyFix(app.wsgi_app)
-server.secret_key = os.getenv('SECRET_KEY', '68f170cb6f230e030cd3353b48666511a7bdc74600576a03')
+server.secret_key = os.getenv('SECRET_KEY', 'o68f170cb6f230e030cd3353b48666511a7bdc74600576a03')
 server.config['SESSION_TYPE'] = 'filesystem'  
 
 FlaskSession(server)
 
 # mudei por causa do flask
-app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP])
+app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP, dbc.themes.QUARTZ])
 app.title = 'Genesis'
 app.config.suppress_callback_exceptions = True
 
@@ -516,7 +516,7 @@ def register_user(n_clicks, nome, email, senha, confirmar_senha, setor, cargo):
             }
             result = users_collection.insert_one(user_document)
             print("Documento inserido:", result)
-            return '/home' #, 'Cadastro realizado com sucesso!' #redireciona para a página inicial com sessão ativa
+            return perfil_user.render_layout() #, 'Cadastro realizado com sucesso!' #redireciona para a página inicial com sessão ativa
         except Exception as e:
             return f'Erro ao realizar o cadastro: {e}'
         

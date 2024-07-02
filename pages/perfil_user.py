@@ -8,6 +8,7 @@ layout = html.Div([
     #     dcc.Tab(label='Permissões', value='tab-2'),
     # ]),
     dbc.Row([
+        dcc.Location(id="perfil_user", refresh=False),
         dbc.Col([
             # Coluna esquerdaaa
             html.Img(
