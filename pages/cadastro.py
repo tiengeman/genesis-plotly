@@ -4,14 +4,16 @@ from constants import *
 
 
 # Definição do layout da página de registro
-layout = dbc.Container(children=
+layout = dbc.Container(
     [
-        dbc.Row(
-            dbc.Col(
-                dcc.Location(id="login", refresh=False),
-                html.H1('Cadastro', className='text-center mt-5')
-            )
-        ),
+        # dbc.Row(
+        #     dbc.Col( 
+        #         html.Div(
+        #         dcc.Location(id="login", refresh=False),
+        #         html.H1('Cadastro', className='text-center mt-5')
+        #         ),
+        #     )
+        # ),
         dbc.Row(
             dbc.Col(
                 dbc.Input(id='nome', placeholder='Nome Completo', type='text', className='mb-3')

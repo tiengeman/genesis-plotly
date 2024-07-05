@@ -2,7 +2,7 @@ import dash_bootstrap_components as dbc
 from dash import html, dcc
 from constants import *
 
-layout = html.Div([
+layout = dbc.Container([
     #     dcc.Tabs(id='tabs-user', value='tab-1', children=[
     #     dcc.Tab(label='Dados do usuário', value= 'tab-1'),
     #     dcc.Tab(label='Permissões', value='tab-2'),

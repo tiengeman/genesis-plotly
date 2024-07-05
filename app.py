@@ -28,6 +28,7 @@ from back.models import *
 # from back.msal_login import initiate_microsoft_login
 
 from pymongo import MongoClient
+import bson
 from passlib.hash import sha256_crypt
 from msal import ConfidentialClientApplication, SerializableTokenCache
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -45,7 +46,7 @@ server.config['SESSION_TYPE'] = 'filesystem'
 FlaskSession(server)
 
 # mudei por causa do flask
-app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP, dbc.themes.QUARTZ])
+app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP]) #, dbc.themes.QUARTZ
 app.title = 'Genesis'
 app.config.suppress_callback_exceptions = True
 
@@ -538,35 +539,37 @@ def register_user(n_clicks, nome, email, senha, confirmar_senha, setor, cargo):
 
 
 # # ============================================== CALLBACKS DA TELA LOGIN ===========================================================
+
+# dados para guardar em cookies e cache(com base em estudos das aplicações github e microsoft): device_id, logged_in, saved_user_session, user_session, dotcom_user has_recent_active(para documentar edições de outros usuários, ou quando um usuário estiver ativo), 
+# https://github.com/privacy/cookies
+
 # Configurando o flask login
 login_manager = LoginManager()
 login_manager.init_app(server)
 login_manager.login_view = 'login'
 
-
-# Create a user loader function
 @login_manager.user_loader
 def load_user(user_id):
-    # Replace with your user database query
-    users = [
-        {'id': 1, 'username': 'admin', 'password': 'password'},
-        {'id': 2, 'username': 'user', 'password': 'password'}
-    ]
-    for user in users:
-        if user['id'] == int(user_id):
-            return User(user['id'], user['username'], user['password'])
+    user = users_collection.find_one({"_id": bson.ObjectId(user_id)})
+    if user:
+        return User(user)
     return None
+
+class User(UserMixin):
+    def __init__(self, user_document):
+        self.id = str(user_document['_id'])
+        self.email = user_document['email']
+        self.nome = user_document['nome']
 
 
 @app.callback(
-#    Output('url', 'href'),
+#    Output('url', 'href'), 
     Output('output-message-login', 'children'),
     [Input('login-button', 'n_clicks'), Input('ms-button', 'n_clicks')],
     [State('email', 'value'), State('senha', 'value')],
 #    prevent_initial_call=True, ##########
 )
 
-@server.route('/login', methods=['POST'])
 def handle_login(n_clicks_login, n_clicks_ms, email, senha):
     ctx = dash.callback_context
 
@@ -581,10 +584,8 @@ def handle_login(n_clicks_login, n_clicks_ms, email, senha):
             user = users_collection.find_one({"email": email})
 
             if user and sha256_crypt.verify(senha, user['senha']):
-                session['user_email'] = email
-                resp = make_response(redirect(url_for('perfil_user')))
-                resp.set_cookie('user_email', email)
-                resp.set_cookie('user_nome', user['nome'])
+                user_obj = User(user)
+                login_user(user_obj)
                 return '/perfil_user','Login realizado com sucesso!'  #f'Login realizado com email: {email}'
             else:
                 return 'Credenciais inválidas. Por favor, tente novamente.'
