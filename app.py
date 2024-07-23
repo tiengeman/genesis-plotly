@@ -12,16 +12,52 @@ import pages.cadastro_projetos as cadastro_projetos
 import pages.impostos as impostos
 import pages.encargos as encargos
 import pages.cadastro as cadastro
+import pages.login as login
 from constants import *
 from dash.exceptions import PreventUpdate
 from banco import *
 from back.inserts import *
-from pymongo import MongoClient
-from passlib.hash import sha256_crypt
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP])
+# Imports para gerenciamento de logins e usuários
+import os
+from flask import Flask, render_template, redirect, url_for, session, request, send_from_directory, sessions, make_response, flash, jsonify
+from flask_sqlalchemy import SQLAlchemy
+from flask_session import Session as FlaskSession
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from pymongo import MongoClient
+from flask_pymongo import PyMongo
+from passlib.hash import sha256_crypt
+from werkzeug.middleware.proxy_fix import ProxyFix
+import sendgrid 
+
+server = Flask(__name__)
+server.secret_key = os.getenv('SECRET_KEY', 'o68f170cb6f230e030cd3353b48666511a7bdc74600576a04')
+FlaskSession(server)
+
+app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP], suppress_callback_exceptions=True)
 server = app.server
 
+app.server.wsgi_app = ProxyFix(app.server.wsgi_app, x_for=1, x_host=1)
+
+# Configuração do MongoDB para sessões
+# mongo = PyMongo(server, uri="mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/Project")
+# server.config['SESSION_TYPE'] = 'mongodb'
+# server.config['SESSION_MONGODB'] = mongo.cx
+# server.config['SESSION_MONGODB_DB'] = 'Project'
+# server.config['SESSION_MONGODB_COLLECT'] = 'Sessão'
+# server.config['SESSION_PERMANENT'] = True
+# server.config['SESSION_USE_SIGNER'] = True
+
+# Configuração de sessões em arquivos
+server.config['SESSION_TYPE'] = 'filesystem'  
+server.config['SESSION_PERMANENT'] = True
+
+FlaskSession(server)
+
+# Inicialização do MongoDB
+client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
+db_mongo = client['Project']
+users_collection = db_mongo['Usuários']
 #conteúdo dentro do menu
 sidebar = dbc.Nav(
     [
@@ -102,20 +138,43 @@ offcanvas = html.Div(
 header = dbc.Navbar(
     dbc.Row(
         [
-            dbc.Col(offcanvas),
+            dbc.Col(
+                offcanvas,
+                width="auto",
+            ),
             dbc.Col( #adicionar a imagem depois
                 html.A(
                     html.Img(src=logo, height="60px"),
                     href="/home",
                     style={"textDecoration": "none"}  # Add this style to remove the default underline
-                )
+                ),
+                width="auto",
             ),
-        ]
+            dbc.Col(
+                html.Div(
+                    style={"flex": "1"},
+                ),
+            ),
+            dbc.Col( # botão de login/profile
+                dbc.Button(
+                    html.I(className="bi bi-person-circle"),
+                    id="user-button",
+                    n_clicks=0,
+                    size="md",
+                    color='#FFFFFF',
+                    style={"font-size": "1.60em", "color": "#FFFFFF"},
+                    className='btn-white'
+                ),
+                width="auto"
+            ),
+        ],
+        align="center",
+        className="w-100"
     ),
     color=colors['orange'],
     dark=True,
-    className='justify-content-between', 
-    style={'height': '50px'} 
+    className='justify-content-between',
+    style={'height': '50px'}
 )
 
 # Div onde mostra o conteúdo de cada página
@@ -129,6 +188,11 @@ app.layout = html.Div([
         dbc.Col(content_area),
     ]),
 ])
+
+# CONFIGURAÇÃO BANCO MONGO USUÁRIOS
+client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
+db = client['Project']
+users_collection = db['Usuários']
 
 #====================================================================== Callbacks ================================================================================================
 
@@ -154,8 +218,22 @@ def update_content(pathname):
     #     return detalhamento.layout
     elif pathname == '/cadastro':
         return cadastro.layout
+    elif pathname == '/login':
+        return login.layout
     else:
         return home.layout
+    
+
+# ============================================== BOTÃO USUÁRIO ===========================================================
+# Callback para redirecionar para a página de login ou para o perfil de usuário quando já logado
+@app.callback(
+    Output('url', 'pathname'),
+    Input('user-button', 'n_clicks')
+)
+def go_to_login(n_clicks):
+    if n_clicks:
+        return '/login'
+    return None
     
 # ================================================ UPDATE TABLE GERENCIAL ==========================================================
 
@@ -500,20 +578,23 @@ def refresh_table(n_clicks):
 #         return html.P("Nenhum detalhamento disponível.")
 
 
-# CALBACKS DA TELA CADASTRO ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° ° NÃO MEXA
+# ============================================== CALLBACKS DA TELA CADASTRO ===========================================================
 @app.callback(
-    Output('output-message', 'children'),
+    Output('output-message-cadastro', 'children'),
     [Input('register-button', 'n_clicks')],
-    [State('nome', 'value'), State('email', 'value'), State('senha', 'value'), State('confirmar-senha', 'value'), State('setor', 'value')]
+    [State('nome', 'value'), State('email', 'value'), State('senha', 'value'), State('confirmar-senha', 'value'), State('setor', 'value'), State('cargo', 'value')]
 
 )
-def register_user(n_clicks, nome, email, senha, confirmar_senha, setor):
+def register_user(n_clicks, nome, email, senha, confirmar_senha, setor, cargo):
     if n_clicks > 0:
         if not nome or not email or not senha or not confirmar_senha or not setor:
             return 'Por favor, preencha todos os campos.'
 
         if senha != confirmar_senha:
             return 'As senhas não coincidem. Por favor, tente novamente.'
+        
+        if not email.endswith('@engeman.net'):
+            return 'Utilize seu email corporativo Engeman. Por favor, tente novamente!'
 
         try:
             client = MongoClient('mongodb+srv://ianfelipe:MateMatica16@cluster0.hbs6exg.mongodb.net/?retryWrites=true&w=majority')
@@ -531,14 +612,55 @@ def register_user(n_clicks, nome, email, senha, confirmar_senha, setor):
                 'nome': nome,
                 'email': email, 
                 'senha': hashed_senha, #hash.senha
-                'setor': setor
+                'setor': setor,
+                'cargo': cargo,
             }
             result = users_collection.insert_one(user_document)
             print("Documento inserido:", result)
-            return 'Cadastro realizado com sucesso!'
+            flash ('Cadastro realizado com sucesso!', category='sucess')
+            return redirect(url_for('login'))
         except Exception as e:
             return f'Erro ao realizar o cadastro: {e}'
-#    return '', dash.no_update
+    raise PreventUpdate
+
+login_manager = LoginManager()
+login_manager.init_app(server)
+login_manager.login_view = 'login'
+
+class User(UserMixin):
+    def __init__(self, user_data):
+        self.id = str(user_data.get('_id'))
+        self.email = user_data.get('email')
+        self.nome = user_data.get('nome')
+
+@app.callback(
+    Output('output-message-login', 'children'),
+    [Input('login-button', 'n_clicks'), Input('ms-button', 'n_clicks')],
+    [State('email', 'value'), State('senha', 'value')]
+)
+def handle_login(n_clicks_login, n_clicks_ms, email, senha):
+    ctx = dash.callback_context
+
+    if not ctx.triggered:
+        raise PreventUpdate
+    
+    button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+
+    if button_id == 'login-button':
+        user = users_collection.find_one({"email": email})
+        if user:
+            if sha256_crypt.verify(senha, user['senha']):
+                user_obj = User(user)
+                login_user(user_obj, remember=True)
+                return "Logado com sucesso!"
+            else:
+                return "Credenciais inválidas. Por favor, tente novamente."
+        else:
+            return "Usuário não encontrado. Por favor, tente novamente."
+    elif button_id == 'ms-button':
+        return dcc.Location(href='/loginms', id='someid_doesnt_matter')
+    return "Redirecionando para login com a Microsoft..."
+
 
 # Callbacks to update the content of each tab dynamically
 @app.callback(Output('tabs-content', 'children'),

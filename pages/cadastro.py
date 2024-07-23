@@ -1,10 +1,17 @@
 import dash_bootstrap_components as dbc
 from dash import html, dcc
+from constants import *
 
-
-# Definição do layout da página de registro
 layout = dbc.Container(
     [
+        # dbc.Row(
+        #     dbc.Col( 
+        #         html.Div(
+        #         dcc.Location(id="login", refresh=False),
+        #         html.H1('Cadastro', className='text-center mt-5')
+        #         ),
+        #     )
+        # ),
         dbc.Row(
             dbc.Col(
                 html.H1('Cadastro', className='text-center mt-5')
@@ -22,7 +29,23 @@ layout = dbc.Container(
         ),
         dbc.Row(
             dbc.Col(
-                dbc.Input(id='setor', placeholder='Setor', type='text', className='mb-3')
+                dcc.Dropdown(
+                    id='setor',
+                    placeholder= 'Setor',
+                    options=[
+                        {'label': 'Financeiro', 'value': 'financeiro'},
+                        {'label': 'Tecnologia e Informações', 'value': 'TI'},
+                        {'label': 'Operações', 'value': 'operacoes'},
+                    ],
+                    # value='NaoPrestador', 
+                    # clearable=False,
+                    className='mb-3'
+                ),
+            )
+        ),
+        dbc.Row(
+            dbc.Col(
+                dbc.Input(id='cargo', placeholder='Cargo/Função', type='text', className='mb-3')
             )
         ),
         dbc.Row(
@@ -38,17 +61,27 @@ layout = dbc.Container(
         dbc.Row(
             dbc.Col(
                 dbc.Button('Cadastrar', id='register-button', n_clicks=0),
-                width='auto',
+                width='50px',
                 className='d-flex justify-content-center'
+            )
+        ),
+        html.Div(children='''Ou ''', className='d-flex justify-content-center'),
+        dbc.Row(
+            dbc.Col(
+                html.A('Faça Login', href='/login', id='fzlogin-button', style={'backgroundColor': colors['white'], 'color': colors['orange'], 'border-color': colors['orange'], 'padding': '10px', 'border-radius': '5px', 'text-decoration': 'none'}),
+                # dbc.Button('Faça Login', id='fzlogin-button', style={'backgroundColor': colors['white'], 'color': colors['orange'], 'border-color': colors['orange']}, className='me-2', n_clicks=0),
+                width= '20px',
+                className='d-flex justify-content-center mb-2'
             )
         ),
         dbc.Row(
             dbc.Col(
-                html.Div(id='output-message', className='text-center mt-3')
+                html.Div(id='output-message-cadastro', className='text-center mt-3')
             )
         ),
-    ],
-    fluid=True
-)
 
-# Função de callback para registrar o usuário
+    ],
+    fluid=True,
+    style={"maxWidth" :"800px", "margin": "auto", "padding-top": "50px"},
+    className="mx-auto"
+)
